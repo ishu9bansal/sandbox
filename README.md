@@ -182,12 +182,40 @@ npm run build
 npm start
 ```
 
+## 📚 Storybook
+
+This project uses [Storybook](https://storybook.js.org/) for component development and documentation.
+
+### Running Storybook
+
+```bash
+npm run storybook
+```
+
+This will start Storybook on [http://localhost:6006](http://localhost:6006)
+
+### Available Component Stories
+
+- **Button** - Primary, Secondary, and Outline variants in Small, Medium, and Large sizes
+- **Card** - Basic cards, with titles, rich content, actions, and lists
+- **Input** - Text inputs with labels, error states, and various input types
+
+### Building Storybook
+
+```bash
+npm run build-storybook
+```
+
+This creates a static build in the `storybook-static` directory that can be deployed.
+
 ## 📝 Scripts
 
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm start` - Start production server
 - `npm run lint` - Run ESLint
+- `npm run storybook` - Start Storybook for component development
+- `npm run build-storybook` - Build Storybook for deployment
 
 ## 🤝 Contributing
 
