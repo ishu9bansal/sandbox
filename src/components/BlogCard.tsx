@@ -15,9 +15,9 @@ export default function BlogCard({ blog, className = "" }: BlogCardProps) {
       rel="noopener noreferrer"
       className={`block transition-transform hover:scale-105 ${className}`}
     >
-      <Card className="h-full flex flex-col overflow-hidden cursor-pointer hover:shadow-lg">
+      <Card className="h-full flex flex-col cursor-pointer hover:shadow-lg p-0 overflow-hidden">
         {blog.image && (
-          <div className="w-full h-48 mb-4 -mt-6 -mx-6 overflow-hidden">
+          <div className="w-full h-48 overflow-hidden">
             <img
               src={blog.image}
               alt={blog.title || "Blog image"}
@@ -25,7 +25,7 @@ export default function BlogCard({ blog, className = "" }: BlogCardProps) {
             />
           </div>
         )}
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col p-6">
           <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-white line-clamp-2">
             {blog.title || "Untitled Blog Post"}
           </h3>
