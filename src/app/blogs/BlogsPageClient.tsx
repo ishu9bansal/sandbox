@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import BlogCard from "@/components/BlogCard";
 import Button from "@/components/Button";
 import { OGMetadata } from "@/utils/ogMetadata";
 import { BlogMetadata } from "@/lib/blogs";
+import { useHydrationSafety } from "../hooks/hydrationSafety";
 
 interface BlogsPageClientProps {
   blogs: (OGMetadata | BlogMetadata)[];
@@ -13,17 +14,8 @@ interface BlogsPageClientProps {
 const BLOGS_PER_PAGE = 6;
 
 export default function BlogsPageClient({ blogs }: BlogsPageClientProps) {
+  const hydrating = useHydrationSafety();
   const [currentPage, setCurrentPage] = useState(1);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return null;
-  }
-
   const totalPages = Math.ceil(blogs.length / BLOGS_PER_PAGE);
   const startIndex = (currentPage - 1) * BLOGS_PER_PAGE;
   const endIndex = startIndex + BLOGS_PER_PAGE;
@@ -33,6 +25,10 @@ export default function BlogsPageClient({ blogs }: BlogsPageClientProps) {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  if (hydrating) {
+    return null;
+  }
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
