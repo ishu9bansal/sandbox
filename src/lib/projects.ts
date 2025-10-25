@@ -21,5 +21,12 @@ export const projects: Project[] = [
     path: "/counter",
     icon: "🔢",
   },
+  {
+    id: "blogs",
+    name: "My Blogs",
+    description: "A collection of my writings and thoughts on Medium",
+    path: "/blogs",
+    icon: "📚",
+  },
   // Add your new projects here following this pattern
 ];
