@@ -9,9 +9,9 @@ export interface OGMetadata {
 }
 
 // Regex patterns for OG metadata extraction (defined once for performance)
-const OG_TITLE_REGEX = /<meta\s+(?:property=["']og:title["']\s+content=["']([^"']+)["']|content=["']([^"']+)["']\s+property=["']og:title["'])\s*\/?>/i;
-const OG_DESC_REGEX = /<meta\s+(?:property=["']og:description["']\s+content=["']([^"']+)["']|content=["']([^"']+)["']\s+property=["']og:description["'])\s*\/?>/i;
-const OG_IMAGE_REGEX = /<meta\s+(?:property=["']og:image["']\s+content=["']([^"']+)["']|content=["']([^"']+)["']\s+property=["']og:image["'])\s*\/?>/i;
+const OG_TITLE_REGEX = /<meta\b(?=[^>]*\bproperty=(?:["'])og:title(?:["']))[^>]*\bcontent=(?:["'])([\s\S]*?)(?:["'])/i;
+const OG_DESC_REGEX = /<meta\b(?=[^>]*\bproperty=(?:["'])og:description(?:["']))[^>]*\bcontent=(?:["'])([\s\S]*?)(?:["'])/i;
+const OG_IMAGE_REGEX = /<meta\b(?=[^>]*\bproperty=(?:["'])og:image(?:["']))[^>]*\bcontent=(?:["'])([\s\S]*?)(?:["'])/i;
 const TITLE_REGEX = /<title[^>]*>([^<]+)<\/title>/i;
 const META_DESC_REGEX = /<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i;
 const TWITTER_TITLE_REGEX = /<meta\s+name=["']twitter:title["']\s+content=["']([^"']+)["']/i;
