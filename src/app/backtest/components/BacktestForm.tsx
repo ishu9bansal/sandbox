@@ -60,13 +60,24 @@ export default function BacktestForm({ onSubmit, isLoading }: BacktestFormProps)
             let current: any = newData;
             
             for (let i = 0; i < keys.length - 1; i++) {
-                if (!current[keys[i]]) {
-                    current[keys[i]] = {};
+                const key = keys[i];
+                // Guard against prototype pollution
+                if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+                    return prev;
                 }
-                current = current[keys[i]];
+                if (!current[key]) {
+                    current[key] = {};
+                }
+                current = current[key];
             }
             
-            current[keys[keys.length - 1]] = value;
+            const finalKey = keys[keys.length - 1];
+            // Guard against prototype pollution
+            if (finalKey === '__proto__' || finalKey === 'constructor' || finalKey === 'prototype') {
+                return prev;
+            }
+            
+            current[finalKey] = value;
             return newData;
         });
     };
