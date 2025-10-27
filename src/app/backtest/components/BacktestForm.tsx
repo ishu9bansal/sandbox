@@ -13,7 +13,7 @@ interface BacktestFormProps {
 export default function BacktestForm({ onSubmit, isLoading }: BacktestFormProps) {
     const [formData, setFormData] = useState<Partial<BacktestFormData>>({
         start_date: '2022-06-01',
-        end_date: '2022-06-30',
+        end_date: '2022-06-09',
         capital: 100000,
         lot_size: 50,
         position: {
