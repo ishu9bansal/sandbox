@@ -28,5 +28,12 @@ export const projects: Project[] = [
     path: "/blogs",
     icon: "📚",
   },
+  {
+    id: "backtest",
+    name: "Backtest Visualizer",
+    description: "Interactive P&L visualization for options trading backtest results",
+    path: "/backtest",
+    icon: "📊",
+  },
   // Add your new projects here following this pattern
 ];
