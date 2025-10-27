@@ -96,14 +96,14 @@ export default function BacktestPage() {
                 </Button>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-1">
-                    <Card title="Strategy Configuration">
+            <div className="grid grid-cols-1 gap-6">
+                <div className="">
+                    <Card title="Strategy Configuration" collapsible>
                         <BacktestForm onSubmit={handleSubmit} isLoading={isLoading} />
                     </Card>
                 </div>
 
-                <div className="lg:col-span-2 space-y-6">
+                <div className="space-y-6">
                     {error && (
                         <Card>
                             <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
