@@ -18,15 +18,3 @@ export interface Step {
     fields?: Field[];
     customContent?: React.ReactNode;
 }
-
-export interface SurveyProps {
-    steps: Step[];
-    onSubmit: (data: Record<string, any>) => void;
-    prefilledData?: Record<string, any>;
-    nextLabel?: string;
-    previousLabel?: string;
-    submitLabel?: string;
-    buttonClassName?: string;
-    cardClassName?: string;
-    titleClassName?: string;
-}

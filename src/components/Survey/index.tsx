@@ -1,8 +1,20 @@
 
 import { useState } from 'react';
-import { SurveyProps } from './types';
+import { Step } from './types';
 import StepContent from './StepContent';
 import CompletionScreen from './CompletionScreen';
+
+export interface SurveyProps {
+    steps: Step[];
+    onSubmit: (data: Record<string, any>) => void;
+    prefilledData?: Record<string, any>;
+    nextLabel?: string;
+    previousLabel?: string;
+    submitLabel?: string;
+    buttonClassName?: string;
+    cardClassName?: string;
+    titleClassName?: string;
+}
 
 export const Survey: React.FC<SurveyProps> = ({
     steps,

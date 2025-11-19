@@ -1,9 +1,10 @@
 "use client";
 
 import { Survey } from "@/components/Survey";
+import { type Step } from "@/components/Survey/types";
 
 // TODO: create steps for the CNG survey
-const steps = [];
+const steps: Step[] = [];
 
 export default function CNGPage() {
   const handleSubmit = (data: any) => {
