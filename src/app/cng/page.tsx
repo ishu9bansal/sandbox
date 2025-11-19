@@ -18,6 +18,7 @@ export default function CNGPage() {
               { id: "name", label: "Name", type: "text" },
               { id: "email", label: "Email", type: "text" },
               { id: "now", label: "Now", type: "datetime" },
+              { id: "weekday", label: "Favorite Day", type: "select", options: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] },
             ],
           },
           {
