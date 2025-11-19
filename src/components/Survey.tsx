@@ -3,7 +3,7 @@ import React, { useState, ReactNode } from 'react';
 export interface Field {
     id: string;
     label: string;
-    type: 'text' | 'select' | 'radio' | 'checkbox' | 'textarea';
+    type: 'text' | 'select' | 'radio' | 'checkbox' | 'textarea' | 'datetime';
     options?: string[];
     required?: boolean;
     placeholder?: string;
@@ -122,6 +122,47 @@ const FieldRenderer: React.FC<FieldRendererProps> = ({ field, value, onChange })
                             <span>{option}</span>
                         </label>
                     ))}
+                </div>
+            );
+
+        case 'datetime':
+            // Auto-initialize with current datetime if value is empty
+            React.useEffect(() => {
+                if (!value) {
+                    const now = new Date();
+                    const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+                        .toISOString()
+                        .slice(0, 16);
+                    onChange(localDateTime);
+                }
+            }, []);
+
+            const handleReset = () => {
+                const now = new Date();
+                const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+                    .toISOString()
+                    .slice(0, 16);
+                onChange(localDateTime);
+            };
+
+            return (
+                <div className="flex gap-2">
+                    <input
+                        type="datetime-local"
+                        id={field.id}
+                        value={value || ''}
+                        onChange={(e) => onChange(e.target.value)}
+                        required={field.required}
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-600"
+                    />
+                    <button
+                        type="button"
+                        onClick={handleReset}
+                        className="px-3 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-700 transition-colors whitespace-nowrap"
+                        title="Reset to current date and time"
+                    >
+                        Reset to Now
+                    </button>
                 </div>
             );
 

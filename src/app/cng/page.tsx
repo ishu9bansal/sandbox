@@ -17,6 +17,7 @@ export default function CNGPage() {
             fields: [
               { id: "name", label: "Name", type: "text" },
               { id: "email", label: "Email", type: "text" },
+              { id: "now", label: "Now", type: "datetime" },
             ],
           },
           {
