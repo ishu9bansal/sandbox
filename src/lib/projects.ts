@@ -35,5 +35,12 @@ export const projects: Project[] = [
     path: "/backtest",
     icon: "📊",
   },
+  {
+    id: "cng",
+    name: "CNG station buddy",
+    description: "Give your drivers seemless way to update their truck offload status",
+    path: "/cng",
+    icon: "🚛",
+  }
   // Add your new projects here following this pattern
 ];
