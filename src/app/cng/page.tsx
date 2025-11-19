@@ -2,6 +2,9 @@
 
 import { Survey } from "@/components/Survey";
 
+// TODO: create steps for the CNG survey
+const steps = [];
+
 export default function CNGPage() {
   const handleSubmit = (data: any) => {
     console.log("Form submitted with data:", data);
