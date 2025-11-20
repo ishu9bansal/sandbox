@@ -40,20 +40,31 @@ export default function CNGPage() {
 function ProfileSelector({ profile, onProfileChange }: { profile: string, onProfileChange: (profile: string) => void}) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const profiles = VEHICLE_NUMBERS;
+  
+  // Get initials from profile (first 2 characters)
+  const getInitials = (text: string) => {
+    return text.slice(0, 2).toUpperCase();
+  };
+  
   return (
     <div className="relative inline-block text-left">
       <div>
         <button
           type="button"
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-          className="inline-flex items-center justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          className="inline-flex items-center gap-3 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 pr-3"
           id="options-menu"
           aria-expanded={isDropdownOpen}
           aria-haspopup="true"
         >
-          {profile}
+          <div className="w-10 h-10 rounded-full bg-blue-600 dark:bg-blue-500 flex items-center justify-center text-white font-semibold text-sm">
+            {getInitials(profile)}
+          </div>
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+            {profile}
+          </span>
           <svg
-            className={`-mr-1 ml-2 h-5 w-5 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
+            className={`h-4 w-4 text-gray-500 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 20 20"
             fill="currentColor"
@@ -85,8 +96,8 @@ function ProfileSelector({ profile, onProfileChange }: { profile: string, onProf
               {profiles.map((p) => (
                 <button
                   key={p}
-                  className={`text-gray-700 dark:text-gray-200 block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 ${
-                    p === profile ? 'bg-gray-100 dark:bg-gray-600 font-semibold' : ''
+                  className={`text-gray-700 dark:text-gray-200 flex items-center gap-3 w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 ${
+                    p === profile ? 'bg-gray-100 dark:bg-gray-600' : ''
                   }`}
                   role="menuitem"
                   onClick={() => {
@@ -94,7 +105,12 @@ function ProfileSelector({ profile, onProfileChange }: { profile: string, onProf
                     setIsDropdownOpen(false);
                   }}
                 >
-                  {p}
+                  <div className="w-8 h-8 rounded-full bg-blue-600 dark:bg-blue-500 flex items-center justify-center text-white font-semibold text-xs">
+                    {getInitials(p)}
+                  </div>
+                  <span className={p === profile ? 'font-semibold' : ''}>
+                    {p}
+                  </span>
                 </button>
               ))}
             </div>
