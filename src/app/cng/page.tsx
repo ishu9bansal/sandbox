@@ -11,17 +11,19 @@ export default function CNGPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto mt-10">
+    <div className="-m-6">
       <TopBar
         profile={profile}
         onProfileChange={setProfile}
       />
-      <Survey
-        key={profile}
-        steps={steps}
-        onSubmit={handleSubmit}
-        prefilledData={{ vehicleNumber: profile }}
-      />
+      <div className="max-w-3xl mx-auto mt-10 px-6">
+        <Survey
+          key={profile}
+          steps={steps}
+          onSubmit={handleSubmit}
+          prefilledData={{ vehicleNumber: profile }}
+        />
+      </div>
     </div>
   );
 }
@@ -103,8 +105,8 @@ function ProfileSelector({ profile, onProfileChange }: { profile: string, onProf
  */
 function TopBar({ profile, onProfileChange }: { profile: string, onProfileChange: (profile: string) => void}) {
   return (
-    <div className="w-full bg-white dark:bg-gray-800 shadow-md rounded-lg p-4 mb-6 flex items-center justify-between">
-      <h1 className="text-xl font-semibold text-gray-800 dark:text-white">CNG Survey</h1>
+    <div className="w-full bg-white dark:bg-gray-800 shadow-md border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex items-center justify-between">
+      <h1 className="text-xl font-semibold text-gray-800 dark:text-white">CNG Unloading</h1>
       <ProfileSelector profile={profile} onProfileChange={onProfileChange} />
     </div>
   );
