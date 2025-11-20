@@ -1,7 +1,7 @@
 "use client";
 
 import { Survey } from "@/components/Survey";
-import { steps, VEHICLE_NUMBERS } from "./constants";
+import { UnloadingSteps, LoadingSteps, VEHICLE_NUMBERS } from "./constants";
 import { useState } from "react";
 
 type Tab = 'unloading' | 'loading';
@@ -16,6 +16,7 @@ export default function CNGPage() {
   const handleSubmit = (data: any) => {
     console.log("Form submitted with data:", data);
   };
+  const steps = tab === 'unloading' ? UnloadingSteps : LoadingSteps;
 
   return (
     <div className="-m-6">
@@ -27,7 +28,7 @@ export default function CNGPage() {
       />
       <div className="max-w-3xl mx-auto mt-10 px-6">
         <Survey
-          key={profile}
+          key={`${tab}-${profile}`}
           steps={steps}
           onSubmit={handleSubmit}
           prefilledData={{ vehicleNumber: profile }}
