@@ -38,15 +38,15 @@ export default function CNGPage() {
   );
 }
 
+// Get initials from profile (first 2 characters)
+const getInitials = (text: string) => {
+  return text.slice(0, 2).toUpperCase();
+};
+
 function ProfileSelector({ profile, onProfileChange }: { profile: Profile, onProfileChange: (profile: Profile) => void}) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const profiles = SAMPLE_PROFILES;
-  
-  // Get initials from profile (first 2 characters)
-  const getInitials = (text: string) => {
-    return text.slice(0, 2).toUpperCase();
-  };
-  
+
   return (
     <div className="relative inline-block text-left">
       <div>
@@ -98,7 +98,7 @@ function ProfileSelector({ profile, onProfileChange }: { profile: Profile, onPro
                 <button
                   key={p.vehicleNumber}
                   className={`text-gray-700 dark:text-gray-200 flex items-center gap-3 w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 ${
-                    p === profile ? 'bg-gray-100 dark:bg-gray-600' : ''
+                    p.vehicleNumber === profile.vehicleNumber ? 'bg-gray-100 dark:bg-gray-600' : ''
                   }`}
                   role="menuitem"
                   onClick={() => {
@@ -106,12 +106,10 @@ function ProfileSelector({ profile, onProfileChange }: { profile: Profile, onPro
                     setIsDropdownOpen(false);
                   }}
                 >
-                  <div className="w-8 h-8 rounded-full bg-blue-600 dark:bg-blue-500 flex items-center justify-center text-white font-semibold text-xs">
-                    {getInitials(p.driverName)}
-                  </div>
-                  <span className={p.vehicleNumber === profile.vehicleNumber ? 'font-semibold' : ''}>
-                    {p.driverName}
-                  </span>
+                  <ProfileOptionLayout
+                    profile={p}
+                    isSelected={p.vehicleNumber === profile.vehicleNumber}
+                  />
                 </button>
               ))}
             </div>
@@ -119,6 +117,19 @@ function ProfileSelector({ profile, onProfileChange }: { profile: Profile, onPro
         </>
       )}
     </div>
+  );
+}
+
+function ProfileOptionLayout({ profile, isSelected }: { profile: Profile, isSelected?: boolean }) {
+  return (
+    <>
+      <div className="w-8 h-8 rounded-full bg-blue-600 dark:bg-blue-500 flex items-center justify-center text-white font-semibold text-xs">
+        {getInitials(profile.driverName)}
+      </div>
+      <span className={isSelected ? 'font-semibold' : ''}>
+        {profile.driverName}
+      </span>
+    </>
   );
 }
 
