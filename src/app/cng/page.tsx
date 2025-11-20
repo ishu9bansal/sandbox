@@ -1,7 +1,7 @@
 "use client";
 
 import { Survey } from "@/components/Survey";
-import { UnloadingSteps, LoadingSteps, VEHICLE_NUMBERS } from "./constants";
+import { UnloadingSteps, LoadingSteps, VEHICLE_NUMBERS, SAMPLE_PROFILES, Profile } from "./constants";
 import { useState } from "react";
 
 type Tab = 'unloading' | 'loading';
@@ -12,7 +12,7 @@ const TABS: { id: Tab, label: string }[] = [
 
 export default function CNGPage() {
   const [tab, setTab] = useState<Tab>('unloading');
-  const [profile, setProfile] = useState(VEHICLE_NUMBERS[0]);
+  const [profile, setProfile] = useState(SAMPLE_PROFILES[0]);
   const handleSubmit = (data: any) => {
     console.log("Form submitted with data:", data);
   };
@@ -31,16 +31,16 @@ export default function CNGPage() {
           key={`${tab}-${profile}`}
           steps={steps}
           onSubmit={handleSubmit}
-          prefilledData={{ vehicleNumber: profile }}
+          prefilledData={{ vehicleNumber: profile, driverName: profile.driverName, driverContact: profile.driverContact }}
         />
       </div>
     </div>
   );
 }
 
-function ProfileSelector({ profile, onProfileChange }: { profile: string, onProfileChange: (profile: string) => void}) {
+function ProfileSelector({ profile, onProfileChange }: { profile: Profile, onProfileChange: (profile: Profile) => void}) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const profiles = VEHICLE_NUMBERS;
+  const profiles = SAMPLE_PROFILES;
   
   // Get initials from profile (first 2 characters)
   const getInitials = (text: string) => {
@@ -59,10 +59,10 @@ function ProfileSelector({ profile, onProfileChange }: { profile: string, onProf
           aria-haspopup="true"
         >
           <div className="w-10 h-10 rounded-full bg-blue-600 dark:bg-blue-500 flex items-center justify-center text-white font-semibold text-sm">
-            {getInitials(profile)}
+            {getInitials(profile.driverName)}
           </div>
           <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-            {profile}
+            {profile.driverName}
           </span>
           <svg
             className={`h-4 w-4 text-gray-500 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
@@ -96,7 +96,7 @@ function ProfileSelector({ profile, onProfileChange }: { profile: string, onProf
             <div className="py-1" role="none">
               {profiles.map((p) => (
                 <button
-                  key={p}
+                  key={p.vehicleNumber}
                   className={`text-gray-700 dark:text-gray-200 flex items-center gap-3 w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 ${
                     p === profile ? 'bg-gray-100 dark:bg-gray-600' : ''
                   }`}
@@ -107,10 +107,10 @@ function ProfileSelector({ profile, onProfileChange }: { profile: string, onProf
                   }}
                 >
                   <div className="w-8 h-8 rounded-full bg-blue-600 dark:bg-blue-500 flex items-center justify-center text-white font-semibold text-xs">
-                    {getInitials(p)}
+                    {getInitials(p.driverName)}
                   </div>
                   <span className={p === profile ? 'font-semibold' : ''}>
-                    {p}
+                    {p.driverName}
                   </span>
                 </button>
               ))}
@@ -125,8 +125,8 @@ function ProfileSelector({ profile, onProfileChange }: { profile: string, onProf
 interface TopBarProps {
   tab: Tab;
   onTabChange: (tab: Tab) => void;
-  profile: string;
-  onProfileChange: (profile: string) => void;
+  profile: Profile;
+  onProfileChange: (profile: Profile) => void;
 }
 
 function TopBar({ tab, onTabChange, profile, onProfileChange }: TopBarProps) {

@@ -53,7 +53,7 @@ export const LoadingSteps: Step[] = [
     title: "Driver Details",
     fields: [
       { id: "driverName", label: "Driver's name", type: "text" },
-      { id: "driverNumber", label: "Driver's Mobile No.", type: "text" },
+      { id: "driverContact", label: "Driver's Mobile No.", type: "text" },
     ],
   },
   {
@@ -74,4 +74,19 @@ export const LoadingSteps: Step[] = [
       { id: "finalMFMReading", label: "Final MFM Reading (kg)", type: "text" },
     ],
   }
+];
+
+export interface Profile {
+  vehicleNumber: string;
+  driverName: string;
+  driverContact: string;
+}
+
+export const SAMPLE_PROFILES: Profile[] = [
+  { vehicleNumber: "PB 06 BG 4547", driverName: "Rajesh Kumar", driverContact: "9876543210" },
+  { vehicleNumber: "PB 06 BE 5947", driverName: "Amit Singh", driverContact: "9123456780" },
+  { vehicleNumber: "PB 06 BD 9947", driverName: "Vikram Sharma", driverContact: "9988776655" },
+  { vehicleNumber: "PB 06 BF 7647", driverName: "Suresh Gupta", driverContact: "9234567890" },
+  { vehicleNumber: "PB 06 BD 9948", driverName: "Rohit Verma", driverContact: "9345678901" },
+  { vehicleNumber: "WB 39 D 8211", driverName: "Anil Das", driverContact: "9456789012" },
 ];
