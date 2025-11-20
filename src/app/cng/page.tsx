@@ -126,9 +126,14 @@ function ProfileOptionLayout({ profile, isSelected }: { profile: Profile, isSele
       <div className="w-8 h-8 rounded-full bg-blue-600 dark:bg-blue-500 flex items-center justify-center text-white font-semibold text-xs">
         {getInitials(profile.driverName)}
       </div>
-      <span className={isSelected ? 'font-semibold' : ''}>
-        {profile.driverName}
-      </span>
+      <div className="flex flex-col">
+        <span className={isSelected ? 'font-semibold' : ''}>
+          {profile.driverName}
+        </span>
+        <span className="text-xs text-gray-500 dark:text-gray-400">
+          {profile.vehicleNumber}
+        </span>
+      </div>
     </>
   );
 }
