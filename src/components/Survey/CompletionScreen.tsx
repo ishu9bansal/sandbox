@@ -12,6 +12,8 @@ interface CompletionScreenProps {
     onRestart: () => void;
 }
 
+// TODO: make it compatible with StepContent, the title and buttons layout must be handled outside
+// TODO: add ability to customize the completion screen
 const CompletionScreen: React.FC<CompletionScreenProps> = ({
     submittedData,
     steps,
@@ -52,7 +54,7 @@ const CompletionScreen: React.FC<CompletionScreenProps> = ({
                         />
                     </svg>
                     <span className="text-green-600 dark:text-green-400">
-                        Survey Completed!
+                        Information Recorded!
                     </span>
                 </span>
             </h2>
@@ -84,7 +86,7 @@ const CompletionScreen: React.FC<CompletionScreenProps> = ({
                     onClick={onRestart}
                     className={`${buttonClassName} bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700`}
                 >
-                    Start New Survey
+                    Start New Entry
                 </button>
             </div>
         </>

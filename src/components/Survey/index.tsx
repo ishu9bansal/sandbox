@@ -82,7 +82,8 @@ export const Survey: React.FC<SurveyProps> = ({
                 <>
                     <h2 className={titleClassName}>{currentStepData.title}</h2>
 
-                    <div className="mb-6">
+                    {/* make the card height consistent by defining a height here */}
+                    <div className="mb-6 h-[275px]">
                         <StepContent
                             step={currentStepData}
                             formData={formData}

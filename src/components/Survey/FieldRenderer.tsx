@@ -10,6 +10,8 @@ interface FieldRendererProps {
     onChange: (value: any) => void;
 }
 
+// TODO: add number field type
+// TODO: make it extensible for more field types in future
 const FieldRenderer: React.FC<FieldRendererProps> = ({ field, value, onChange }) => {
     switch (field.type) {
         case 'text':
