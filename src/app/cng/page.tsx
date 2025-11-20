@@ -1,19 +1,89 @@
 "use client";
 
 import { Survey } from "@/components/Survey";
-import { steps } from "./constants";
+import { steps, VEHICLE_NUMBERS } from "./constants";
+import { useState } from "react";
 
 export default function CNGPage() {
+  const [profile, setProfile] = useState(VEHICLE_NUMBERS[0]);
   const handleSubmit = (data: any) => {
     console.log("Form submitted with data:", data);
   };
 
   return (
     <div className="max-w-3xl mx-auto mt-10">
+      <TopBar
+        profile={profile}
+        onProfileChange={setProfile}
+      />
       <Survey
         steps={steps}
         onSubmit={handleSubmit}
+        prefilledData={{ vehicleNumber: profile }}
       />
+    </div>
+  );
+}
+
+/**
+ * A top bar component that displays user profile information and allows switching profiles via a dropdown.
+ * On clicking the profile picture, a dropdown menu appears with available profiles to select from. 
+ * 
+ * @param profile - The current user profile.
+ * @param onProfileChange - Callback function to handle profile changes.
+ */
+function TopBar({ profile, onProfileChange }: { profile: string, onProfileChange: (profile: string) => void}) {
+  const profiles = VEHICLE_NUMBERS;
+  
+  return (
+    <div className="w-full bg-white dark:bg-gray-800 shadow p-4 flex justify-end">
+      <div className="relative inline-block text-left">
+        <div>
+          <button
+            type="button"
+            className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            id="options-menu"
+            aria-expanded="true"
+            aria-haspopup="true"
+          >
+            {profile}
+            <svg
+              className="-mr-1 ml-2 h-5 w-5"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                fillRule="evenodd"
+                d="M5.23 7.21a.75.75 0 011.06.02L10 11.584l3.71-4.354a.75.75 0 111.14.976l-4.25 5a.75.75 0 01-1.14 0l-4.25-5a.75.75 0 01.02-1.06z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <div
+          className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-gray-700 ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
+          role="menu"
+          aria-orientation="vertical"
+          aria-labelledby="options-menu"
+        >
+          <div className="py-1" role="none">
+            {profiles.map((p) => (
+              <a
+                key={p}
+                href="#"
+                className="text-gray-700 dark:text-gray-200 block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"
+                role="menuitem"
+                onClick={() => onProfileChange(p)}
+              >
+                {p}
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
