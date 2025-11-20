@@ -4,7 +4,14 @@ import { Survey } from "@/components/Survey";
 import { steps, VEHICLE_NUMBERS } from "./constants";
 import { useState } from "react";
 
+type Tab = 'unloading' | 'loading';
+const TABS: { id: Tab, label: string }[] = [
+  { id: 'unloading', label: 'CNG Unloading' },
+  { id: 'loading', label: 'CNG Loading' },
+];
+
 export default function CNGPage() {
+  const [tab, setTab] = useState<Tab>('unloading');
   const [profile, setProfile] = useState(VEHICLE_NUMBERS[0]);
   const handleSubmit = (data: any) => {
     console.log("Form submitted with data:", data);
@@ -13,6 +20,8 @@ export default function CNGPage() {
   return (
     <div className="-m-6">
       <TopBar
+        tab={tab}
+        onTabChange={setTab}
         profile={profile}
         onProfileChange={setProfile}
       />
@@ -96,17 +105,31 @@ function ProfileSelector({ profile, onProfileChange }: { profile: string, onProf
   );
 }
 
-/**
- * A top bar component that displays user profile information and allows switching profiles via a dropdown.
- * On clicking the profile picture, a dropdown menu appears with available profiles to select from. 
- * 
- * @param profile - The current user profile.
- * @param onProfileChange - Callback function to handle profile changes.
- */
-function TopBar({ profile, onProfileChange }: { profile: string, onProfileChange: (profile: string) => void}) {
+interface TopBarProps {
+  tab: Tab;
+  onTabChange: (tab: Tab) => void;
+  profile: string;
+  onProfileChange: (profile: string) => void;
+}
+
+function TopBar({ tab, onTabChange, profile, onProfileChange }: TopBarProps) {
   return (
     <div className="w-full bg-white dark:bg-gray-800 shadow-md border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex items-center justify-between">
-      <h1 className="text-xl font-semibold text-gray-800 dark:text-white">CNG Unloading</h1>
+      <div className="flex space-x-4">
+        {TABS.map((t) => (
+          <button
+            key={t.id}
+            onClick={() => onTabChange(t.id)}
+            className={`px-4 py-2 rounded-md font-medium ${
+              tab === t.id
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
       <ProfileSelector profile={profile} onProfileChange={onProfileChange} />
     </div>
   );
