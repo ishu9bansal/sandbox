@@ -1,7 +1,7 @@
 "use client";
 
 import { Survey } from "@/components/Survey";
-import { UnloadingSteps, LoadingSteps, VEHICLE_NUMBERS, SAMPLE_PROFILES, Profile } from "./constants";
+import { UnloadingSteps, LoadingSteps, SAMPLE_PROFILES, Profile } from "./constants";
 import { useState } from "react";
 
 type Tab = 'unloading' | 'loading';
@@ -109,7 +109,7 @@ function ProfileSelector({ profile, onProfileChange }: { profile: Profile, onPro
                   <div className="w-8 h-8 rounded-full bg-blue-600 dark:bg-blue-500 flex items-center justify-center text-white font-semibold text-xs">
                     {getInitials(p.driverName)}
                   </div>
-                  <span className={p === profile ? 'font-semibold' : ''}>
+                  <span className={p.vehicleNumber === profile.vehicleNumber ? 'font-semibold' : ''}>
                     {p.driverName}
                   </span>
                 </button>

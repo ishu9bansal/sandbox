@@ -10,15 +10,6 @@ const STATIONS = [
   "Walia Filling Station",
 ];
 
-export const VEHICLE_NUMBERS = [
-  "PB 06 BG 4547",
-  "PB 06 BE 5947",
-  "PB 06 BD 9947",
-  "PB 06 BF 7647",
-  "PB 06 BD 9948",
-  "WB 39 D 8211",
-];
-
 export const UnloadingSteps: Step[] = [
   {
     id: "stationSelection",
