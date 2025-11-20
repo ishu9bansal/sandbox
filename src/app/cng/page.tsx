@@ -28,10 +28,10 @@ export default function CNGPage() {
       />
       <div className="max-w-3xl mx-auto mt-10 px-6">
         <Survey
-          key={`${tab}-${profile}`}
+          key={`${tab}-${profile.vehicleNumber}`}
           steps={steps}
           onSubmit={handleSubmit}
-          prefilledData={{ vehicleNumber: profile, driverName: profile.driverName, driverContact: profile.driverContact }}
+          prefilledData={{ vehicleNumber: profile.vehicleNumber, driverName: profile.driverName, driverContact: profile.driverContact }}
         />
       </div>
     </div>
@@ -61,9 +61,14 @@ function ProfileSelector({ profile, onProfileChange }: { profile: Profile, onPro
           <div className="w-10 h-10 rounded-full bg-blue-600 dark:bg-blue-500 flex items-center justify-center text-white font-semibold text-sm">
             {getInitials(profile.driverName)}
           </div>
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-            {profile.driverName}
-          </span>
+          <div className="flex flex-col">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+              {profile.driverName}
+            </span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              {profile.vehicleNumber}
+            </span>
+          </div>
           <svg
             className={`h-4 w-4 text-gray-500 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
             xmlns="http://www.w3.org/2000/svg"

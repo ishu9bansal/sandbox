@@ -4,6 +4,7 @@ import { Step } from './types';
 import StepContent from './StepContent';
 import CompletionScreen from './CompletionScreen';
 
+// TODO: define stronger types for onSubmit and prefilled data
 export interface SurveyProps {
     steps: Step[];
     onSubmit: (data: Record<string, any>) => void;
