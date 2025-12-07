@@ -203,7 +203,10 @@ const styles = {
     fontFamily: "system-ui, sans-serif",
     padding: 24,
     maxWidth: 950,
-    margin: "auto"
+    margin: "auto",
+    background: "#1e1e1e",
+    color: "#e0e0e0",
+    minHeight: "100vh"
   },
   grid: {
     display: "grid",
@@ -217,43 +220,49 @@ const styles = {
     fontSize: 11,
     fontWeight: 600,
     padding: "2px 0",
-    borderBottom: "1px solid #c5cce0",
+    borderBottom: "1px solid #3a4050",
     borderRadius: 4,
-    background: "#f4f6ff"
+    background: "#441919ff",
+    color: "#b0b8d4"
   },
   head: {
     fontSize: 11,
     textAlign: "center",
-    opacity: 0.7
+    opacity: 0.6,
+    color: "#888"
   },
   label: {
     fontWeight: 600,
     fontSize: 13,
     textAlign: "right",
-    paddingRight: 6
+    paddingRight: 6,
+    color: "#b0b8d4"
   },
   cell: {
     height: 32,
     textAlign: "center",
     borderRadius: 6,
-    border: "1px solid #cfd6e4",
+    border: "1px solid #3a4050",
     fontSize: 14,
     outline: "none",
-    background: "#fbfcff"
+    background: "#2a2a2a",
+    color: "#e0e0e0"
   },
   zoneSeparatorLeft: {
-    borderLeft: "2px solid #8b95b5"
+    borderLeft: "2px solid #556080"
   },
   legend: {
     marginTop: 16,
     fontSize: 12,
-    color: "#444"
+    color: "#888"
   },
   json: {
     marginTop: 16,
-    background: "#f4f6ff",
+    background: "#2d2d2d",
     padding: 12,
     borderRadius: 8,
-    fontSize: 12
+    fontSize: 12,
+    color: "#b0b8d4",
+    border: "1px solid #3a4050"
   }
 };
