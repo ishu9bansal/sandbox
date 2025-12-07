@@ -41,6 +41,13 @@ export const projects: Project[] = [
     description: "Give your drivers seemless way to update their truck offload status",
     path: "/cng",
     icon: "🚛",
-  }
+  },
+  {
+    id: "perio",
+    name: "Perio Charting",
+    description: "Tooth charting application for dental professionals",
+    path: "/perio",
+    icon: "🦷",
+  },
   // Add your new projects here following this pattern
 ];
