@@ -193,7 +193,33 @@ export default function PerioApp() {
         Press <code>Shift</code> before typing to enter two-digit numbers.
       </div>
 
-      <pre style={styles.json}>{JSON.stringify(data, null, 2)}</pre>
+      <div style={styles.tableContainer}>
+        <h3 style={styles.tableTitle}>Results (Tab-separated - Copy & Paste to Excel)</h3>
+        <table style={styles.resultTable}>
+          <thead>
+            <tr style={styles.tableHeader}>
+              <th style={styles.tableCell}>Measurement</th>
+              {Array.from({ length: TEETH }).map((_, i) => (
+                <th key={i} style={styles.tableCell}>{i + 1}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {ROWS.map((rowName) => (
+              <tr key={rowName} style={styles.tableRow}>
+                <td style={{ ...styles.tableCell, fontWeight: 600, textAlign: "left" }}>
+                  {rowName}
+                </td>
+                {data[rowName].map((value, c) => (
+                  <td key={c} style={styles.tableCell}>
+                    {value || "-"}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
@@ -255,6 +281,37 @@ const styles = {
     marginTop: 16,
     fontSize: 12,
     color: "#888"
+  },
+  tableContainer: {
+    marginTop: 24,
+    border: "1px solid #3a4050",
+    borderRadius: 8,
+    padding: 16,
+    background: "#252525",
+    overflowX: "auto"
+  },
+  tableTitle: {
+    fontSize: 14,
+    fontWeight: 600,
+    marginBottom: 12,
+    color: "#b0b8d4"
+  },
+  resultTable: {
+    width: "100%",
+    borderCollapse: "collapse",
+    fontSize: 12
+  },
+  tableHeader: {
+    background: "#2a2a2a"
+  },
+  tableRow: {
+    borderBottom: "1px solid #3a4050"
+  },
+  tableCell: {
+    padding: "8px 12px",
+    border: "1px solid #3a4050",
+    textAlign: "center",
+    color: "#e0e0e0"
   },
   json: {
     marginTop: 16,
