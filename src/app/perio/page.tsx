@@ -14,10 +14,10 @@ const ZONES = [
 ];
 
 // partial: "", "-", "1", "12", "-1", "-12" (max 2 digits)
-const isValidPartial = (v) => /^-?\d{0,2}$/.test(v) || v === "";
+const isValidPartial = (v: string): boolean => /^-?\d{0,2}$/.test(v) || v === "";
 
 // complete: -99..99, but not "" or "-"
-const isComplete = (v) => {
+const isComplete = (v: string): boolean => {
   if (!/^-?\d{1,2}$/.test(v)) return false;
   const n = parseInt(v, 10);
   return n >= -99 && n <= 99;
@@ -37,14 +37,14 @@ export default function PerioApp() {
 
   const tableRef = useRef(null);
 
-  const focus = (r, c) => {
+  const focus = (r: number, c: number): void => {
     if (refs.current?.[r]?.[c]) {
       refs.current[r][c].focus();
       refs.current[r][c].select();
     }
   };
 
-  const next = (r, c) => {
+  const next = (r: number, c: number): void => {
     if (c < TEETH - 1) {
       focus(r, c + 1);
     } else if (r < ROWS.length - 1) {
@@ -52,7 +52,7 @@ export default function PerioApp() {
     }
   };
 
-  const prev = (r, c) => {
+  const prev = (r: number, c: number): void => {
     if (c > 0) {
       focus(r, c - 1);
     } else if (r > 0) {
@@ -60,18 +60,18 @@ export default function PerioApp() {
     }
   };
 
-  const setShiftMode = (r, c, value) => {
+  const setShiftMode = (r: number, c: number, value: boolean): void => {
     shiftModeRef.current[r][c] = value;
   };
 
-  const getShiftMode = (r, c) => shiftModeRef.current[r][c];
+  const getShiftMode = (r: number, c: number): boolean => shiftModeRef.current[r][c];
 
-  const handleChange = (r, c, raw) => {
+  const handleChange = (r: number, c: number, raw: string): void => {
     const v = raw.trim();
 
     if (!isValidPartial(v)) return;
 
-    const rowName = ROWS[r];
+    const rowName: "Buccal" | "Lingual" = ROWS[r] as "Buccal" | "Lingual";
 
     setData((d) => {
       const copy = { ...d, [rowName]: [...d[rowName]] };
@@ -99,9 +99,9 @@ export default function PerioApp() {
     }
   };
 
-  const handleKeyDown = (r, c, e) => {
+  const handleKeyDown = (r: number, c: number, e: React.KeyboardEvent<HTMLInputElement>): void => {
     const key = e.key;
-    const rowName = ROWS[r];
+    const rowName: "Buccal" | "Lingual" = ROWS[r] as "Buccal" | "Lingual";
     const v = data[rowName][c];
 
     if (key === "Shift") {
@@ -191,10 +191,12 @@ export default function PerioApp() {
         {ROWS.map((rowName, r) => (
           <React.Fragment key={rowName}>
             <div style={styles.label}>{rowName}</div>
-            {data[rowName].map((value, c) => (
+            {data[rowName as "Buccal" | "Lingual"].map((value: string, c: number) => (
               <input
                 key={c}
-                ref={(el) => (refs.current[r][c] = el)}
+                ref={(el) => {
+                  if (el) refs.current[r][c] = el;
+                }}
                 value={value}
                 inputMode="numeric"
                 maxLength={3} // allow "-99"
@@ -242,7 +244,7 @@ export default function PerioApp() {
                 <td style={{ ...styles.tableCell, fontWeight: 600, textAlign: "left" }}>
                   {rowName}
                 </td>
-                {data[rowName].map((value, c) => (
+                {data[rowName as "Buccal" | "Lingual"].map((value: string, c: number) => (
                   <td key={c} style={styles.tableCell}>
                     {value || "-"}
                   </td>
@@ -274,7 +276,7 @@ const styles = {
     marginTop: 12
   },
   zoneLabel: {
-    textAlign: "center",
+    textAlign: "center" as const,
     fontSize: 11,
     fontWeight: 600,
     padding: "2px 0",
@@ -285,20 +287,20 @@ const styles = {
   },
   head: {
     fontSize: 11,
-    textAlign: "center",
+    textAlign: "center" as const,
     opacity: 0.6,
     color: "#888"
   },
   label: {
     fontWeight: 600,
     fontSize: 13,
-    textAlign: "right",
+    textAlign: "right" as const,
     paddingRight: 6,
     color: "#b0b8d4"
   },
   cell: {
     height: 32,
-    textAlign: "center",
+    textAlign: "center" as const,
     borderRadius: 6,
     border: "1px solid #3a4050",
     fontSize: 14,
@@ -320,10 +322,10 @@ const styles = {
     borderRadius: 8,
     padding: 16,
     background: "#252525",
-    overflowX: "auto"
+    overflowX: "auto" as const
   },
   tableHeaderContainer: {
-    display: "flex",
+    display: "flex" as const,
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 12
@@ -342,15 +344,12 @@ const styles = {
     color: "#ffffff",
     border: "none",
     borderRadius: 6,
-    cursor: "pointer",
-    transition: "background 0.2s",
-    ":hover": {
-      background: "#0052a3"
-    }
+    cursor: "pointer" as const,
+    transition: "background 0.2s"
   },
   resultTable: {
     width: "100%",
-    borderCollapse: "collapse",
+    borderCollapse: "collapse" as const,
     fontSize: 12
   },
   tableHeader: {
@@ -362,7 +361,7 @@ const styles = {
   tableCell: {
     padding: "8px 12px",
     border: "1px solid #3a4050",
-    textAlign: "center",
+    textAlign: "center" as const,
     color: "#e0e0e0"
   },
   json: {
