@@ -35,6 +35,8 @@ export default function PerioApp() {
   // shiftMode[row][col] -> user pressed Shift before number, expect 2 digits
   const shiftModeRef = useRef(ROWS.map(() => Array(TEETH).fill(false)));
 
+  const tableRef = useRef(null);
+
   const focus = (r, c) => {
     if (refs.current?.[r]?.[c]) {
       refs.current[r][c].focus();
@@ -136,6 +138,28 @@ export default function PerioApp() {
     }
   };
 
+  const copyTableToClipboard = async () => {
+    if (!tableRef.current) return;
+    
+    try {
+      const table = tableRef.current;
+      const range = document.createRange();
+      range.selectNodeContents(table);
+      const selection = window.getSelection();
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+      
+      document.execCommand('copy');
+      selection?.removeAllRanges();
+      
+      // Visual feedback
+      alert('Table copied to clipboard!');
+    } catch (error) {
+      console.error('Failed to copy:', error);
+      alert('Failed to copy table');
+    }
+  };
+
   return (
     <div style={styles.app}>
       <h2>LGM Clinical Chart — Baseline</h2>
@@ -194,8 +218,16 @@ export default function PerioApp() {
       </div>
 
       <div style={styles.tableContainer}>
-        <h3 style={styles.tableTitle}>Results (Tab-separated - Copy & Paste to Excel)</h3>
-        <table style={styles.resultTable}>
+        <div style={styles.tableHeaderContainer}>
+          <h3 style={styles.tableTitle}>Results (Tab-separated - Copy & Paste to Excel)</h3>
+          <button 
+            onClick={copyTableToClipboard}
+            style={styles.copyButton}
+          >
+            📋 Copy Table
+          </button>
+        </div>
+        <table ref={tableRef} style={styles.resultTable}>
           <thead>
             <tr style={styles.tableHeader}>
               <th style={styles.tableCell}>Measurement</th>
@@ -290,11 +322,31 @@ const styles = {
     background: "#252525",
     overflowX: "auto"
   },
+  tableHeaderContainer: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12
+  },
   tableTitle: {
     fontSize: 14,
     fontWeight: 600,
-    marginBottom: 12,
+    margin: 0,
     color: "#b0b8d4"
+  },
+  copyButton: {
+    padding: "8px 16px",
+    fontSize: 12,
+    fontWeight: 600,
+    background: "#0066cc",
+    color: "#ffffff",
+    border: "none",
+    borderRadius: 6,
+    cursor: "pointer",
+    transition: "background 0.2s",
+    ":hover": {
+      background: "#0052a3"
+    }
   },
   resultTable: {
     width: "100%",
