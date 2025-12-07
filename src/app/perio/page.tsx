@@ -151,17 +151,17 @@ export default function PerioApp() {
               gridColumn: `span ${z.size}`
             }}
           >
-            Zone {z.label}
+            {z.label}
           </div>
         ))}
 
         {/* Row 2: Tooth numbers */}
-        <div />
-        {Array.from({ length: TEETH }).map((_, i) => (
+        {/* <div /> */}
+        {/* {Array.from({ length: TEETH }).map((_, i) => (
           <div key={i} style={styles.head}>
             {i + 1}
           </div>
-        ))}
+        ))} */}
 
         {/* Buccal / Lingual rows */}
         {ROWS.map((rowName, r) => (
