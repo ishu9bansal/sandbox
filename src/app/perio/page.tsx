@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { styles } from "./style";
 import QuickInputRow from "@/components/QuickInputRow";
+import ResultsTable from "@/components/ResultsTable";
 
 const TEETH = 18;
 const ROWS = ["Buccal", "Lingual"];
@@ -16,34 +17,10 @@ const ZONES = [
 ];
 
 export default function PerioApp() {
-  const [data, setData] = useState({
-    Buccal: Array(TEETH).fill(""),
-    Lingual: Array(TEETH).fill("")
-  });
-
-  const tableRef = useRef<HTMLTableElement | null>(null);
-
-  const copyTableToClipboard = async () => {
-    if (!tableRef.current) return;
-    
-    try {
-      const table = tableRef.current;
-      const range = document.createRange();
-      range.selectNodeContents(table);
-      const selection = window.getSelection();
-      selection?.removeAllRanges();
-      selection?.addRange(range);
-      
-      document.execCommand('copy');
-      selection?.removeAllRanges();
-      
-      // Visual feedback
-      alert('Table copied to clipboard!');
-    } catch (error) {
-      console.error('Failed to copy:', error);
-      alert('Failed to copy table');
-    }
-  };
+  const [data, setData] = useState([
+    Array(TEETH).fill(""),
+    Array(TEETH).fill("")
+  ]);
 
   return (
     <div style={styles.app}>
@@ -75,12 +52,12 @@ export default function PerioApp() {
         {/* Buccal / Lingual rows */}
         {ROWS.map((rowName, r) => (
           <QuickInputRow
-            key={rowName}
+            key={r}
             name={rowName}
             columns={TEETH}
-            values={data[rowName as "Buccal" | "Lingual"]}
+            values={data[r]}
             onRowChange={(values) =>
-              setData((d) => ({ ...d, [rowName]: values }))
+              setData((d) => ({ ...d, [r]: values }))
             }
             zoneSeparators={[0, 3, 6, 9, 12, 15]}
             labelStyle={styles.label}
@@ -113,41 +90,23 @@ export default function PerioApp() {
         Press <code>Shift</code> before typing to enter two-digit numbers.
       </div>
 
-      <div style={styles.tableContainer}>
-        <div style={styles.tableHeaderContainer}>
-          <h3 style={styles.tableTitle}>Results (Tab-separated - Copy & Paste to Excel)</h3>
-          <button 
-            onClick={copyTableToClipboard}
-            style={styles.copyButton}
-          >
-            📋 Copy Table
-          </button>
-        </div>
-        <table ref={tableRef} style={styles.resultTable}>
-          <thead>
-            <tr style={styles.tableHeader}>
-              <th style={styles.tableCell}>Measurement</th>
-              {Array.from({ length: TEETH }).map((_, i) => (
-                <th key={i} style={styles.tableCell}>{i + 1}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {ROWS.map((rowName) => (
-              <tr key={rowName} style={styles.tableRow}>
-                <td style={{ ...styles.tableCell, fontWeight: 600, textAlign: "left" }}>
-                  {rowName}
-                </td>
-                {data[rowName as "Buccal" | "Lingual"].map((value: string, c: number) => (
-                  <td key={c} style={styles.tableCell}>
-                    {value || "-"}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <ResultsTable
+        title="Results (Tab-separated - Copy & Paste to Excel)"
+        rows={ROWS.map((rowName, r) => ({
+          label: rowName,
+          values: data[r]
+        }))}
+        columns={TEETH}
+        showCopyButton={true}
+        containerStyle={styles.tableContainer}
+        headerContainerStyle={styles.tableHeaderContainer}
+        titleStyle={styles.tableTitle}
+        copyButtonStyle={styles.copyButton}
+        tableStyle={styles.resultTable}
+        headerStyle={styles.tableHeader}
+        cellStyle={styles.tableCell}
+        rowStyle={styles.tableRow}
+      />
     </div>
   );
 }
