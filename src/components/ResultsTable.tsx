@@ -69,16 +69,6 @@ const ResultsTable = ({
       )}
 
       <table ref={tableRef} style={tableStyle}>
-        <thead>
-          <tr style={headerStyle}>
-            <th style={cellStyle}>Measurement</th>
-            {Array.from({ length: columns }).map((_, i) => (
-              <th key={i} style={cellStyle}>
-                {i + 1}
-              </th>
-            ))}
-          </tr>
-        </thead>
         <tbody>
           {rows.map((row) => (
             <tr key={row.label} style={rowStyle}>

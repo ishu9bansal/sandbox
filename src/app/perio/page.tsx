@@ -41,14 +41,6 @@ export default function PerioApp() {
           </div>
         ))}
 
-        {/* Row 2: Tooth numbers */}
-        {/* <div /> */}
-        {/* {Array.from({ length: TEETH }).map((_, i) => (
-          <div key={i} style={styles.head}>
-            {i + 1}
-          </div>
-        ))} */}
-
         {/* Buccal / Lingual rows */}
         {ROWS.map((rowName, r) => (
           <QuickInputRow
