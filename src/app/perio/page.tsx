@@ -32,6 +32,8 @@ interface QuickInputRowProps {
   cellStyle?: React.CSSProperties;
   separatorStyle?: React.CSSProperties;
   inputProps?: Partial<React.InputHTMLAttributes<HTMLInputElement>>;
+  onNextFocus?: () => void;
+  onPrevFocus?: () => void;
 }
 
 function QuickInputRow({
@@ -44,11 +46,21 @@ function QuickInputRow({
   cellStyle,
   separatorStyle,
   inputProps,
+  onNextFocus,
+  onPrevFocus,
 }: QuickInputRowProps) {
   const inputRefs = useRef<(HTMLInputElement | null)[]>(Array(columns).fill(null));
   const shiftModeRef = useRef<boolean[]>(Array(columns).fill(false));
 
   const focus = (c: number): void => {
+    if (c < 0) {
+      onPrevFocus && onPrevFocus();
+      return;
+    }
+    if (c >= columns) {
+      onNextFocus && onNextFocus();
+      return;
+    }
     const el = inputRefs.current[c];
     if (el) {
       el.focus();
@@ -56,13 +68,9 @@ function QuickInputRow({
     }
   };
 
-  const next = (c: number): void => {
-    if (c < columns - 1) focus(c + 1);
-  };
+  const next = (c: number): void => focus(c + 1);
 
-  const prev = (c: number): void => {
-    if (c > 0) focus(c - 1);
-  };
+  const prev = (c: number): void => focus(c - 1);
 
   const setShiftMode = (c: number, value: boolean): void => {
     shiftModeRef.current[c] = value;
@@ -217,6 +225,20 @@ export default function PerioApp() {
             inputProps={{
               inputMode: "numeric",
               maxLength: 3
+            }}
+            onNextFocus={() => {
+              if (r === 0) {
+                // Move from Buccal to Lingual
+                const firstLingualInput = document.querySelectorAll('input')[TEETH];
+                (firstLingualInput as HTMLInputElement)?.focus();
+              }
+            }}
+            onPrevFocus={() => {
+              if (r === 1) {
+                // Move from Lingual to Buccal
+                const lastBuccalInput = document.querySelectorAll('input')[TEETH - 1];
+                (lastBuccalInput as HTMLInputElement)?.focus();
+              }
             }}
           />
         ))}
