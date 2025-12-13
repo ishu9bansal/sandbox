@@ -16,13 +16,11 @@ const ZONES = [
 
 // partial: "", "-", "1", "12", "-1", "-12" (max 2 digits)
 const isValidPartial = (v: string): boolean => /^-?\d{0,2}$/.test(v) || v === "";
-
-// complete: -99..99, but not "" or "-"
-const isComplete = (v: string): boolean => {
-  if (!/^-?\d{1,2}$/.test(v)) return false;
-  const n = parseInt(v, 10);
-  return n >= -99 && n <= 99;
-};
+const isPartial = (v: string, shiftMode: boolean): boolean => {
+  if (!/^-?\d{1,2}$/.test(v)) return true;
+  const num = v.slice(v.startsWith("-") ? 1 : 0);
+  return num.length < (shiftMode ? 2 : 1);
+}
 
 interface QuickInputRowProps {
   name: string;
@@ -79,19 +77,11 @@ function QuickInputRow({
     const updated = [...values];
     updated[c] = v;
     onRowChange(updated);
-
-    const inShiftMode = getShiftMode(c);
-
-    // If user signaled 2-digit entry with Shift:
-    if (inShiftMode) {
-      if (v.length === 1) return; // wait for second digit
+    
+    if (!isPartial(v, getShiftMode(c))) {
       setShiftMode(c, false);
-      if (isComplete(v)) next(c);
-      return;
+      next(c);
     }
-
-    // Normal behaviour: any complete value auto-advances
-    if (isComplete(v)) next(c);
   };
 
   const handleKeyDown = (c: number, e: React.KeyboardEvent<HTMLInputElement>): void => {
