@@ -2,103 +2,94 @@
 
 import { useState } from "react";
 import { styles } from "./style";
-import QuickInputRow from "@/components/QuickInputRow";
 import ResultsTable from "@/components/ResultsTable";
+import PerioInput from "./PerioInput";
 
 const TEETH = 18;
-const ROWS = ["Buccal", "Lingual"];
-const ZONES = [
-  { label: "3", size: 3 },
-  { label: "2", size: 3 },
-  { label: "1", size: 3 },
-  { label: "1", size: 3 },
-  { label: "2", size: 3 },
-  { label: "3", size: 3 }
-];
 
 export default function PerioApp() {
-  const [data, setData] = useState([
-    Array(TEETH).fill(""),
-    Array(TEETH).fill("")
-  ]);
+  const [savedEntries, setSavedEntries] = useState<{ label: string, values: string[]}[]>([]);
+  const [data, setData] = useState(Array(TEETH).fill(""));
+  const onNextFocus = () => {
+    // Focus on submit button
+    const submitButton = document.getElementById("submit-button");
+    submitButton?.focus();
+  }
+  const onSubmit = () => {
+    // append to saved local storage
+    // const savedData = localStorage.getItem("perioData");
+    // const parsedData = savedData ? JSON.parse(savedData) : [];
+    // parsedData.push(data);
+    // localStorage.setItem("perioData", JSON.stringify(parsedData));
+    setSavedEntries([{
+      label: `Entry ${savedEntries.length + 1}`,
+      values: data
+    }, ...savedEntries]);
+    // clear current data
+    setData(Array(TEETH).fill(""));
+  }
 
   return (
     <div style={styles.app}>
       <h2>LGM Clinical Chart — Baseline</h2>
 
-      <div style={styles.grid}>
-        {/* Row 1: Zone labels */}
-        <div /> {/* top-left empty */}
-        {ZONES.map((z, i) => (
-          <div
-            key={i}
-            style={{
-              ...styles.zoneLabel,
-              gridColumn: `span ${z.size}`
-            }}
-          >
-            {z.label}
-          </div>
-        ))}
-
-        {/* Buccal / Lingual rows */}
-        {ROWS.map((rowName, r) => (
-          <QuickInputRow
-            key={r}
-            name={rowName}
-            columns={TEETH}
-            values={data[r]}
-            onRowChange={(values) =>
-              setData((d) => ({ ...d, [r]: values }))
-            }
-            zoneSeparators={[0, 3, 6, 9, 12, 15]}
-            labelStyle={styles.label}
-            cellStyle={styles.cell}
-            separatorStyle={styles.zoneSeparatorLeft}
-            inputProps={{
-              inputMode: "numeric",
-              maxLength: 3
-            }}
-            onNextFocus={() => {
-              if (r === 0) {
-                // Move from Buccal to Lingual
-                const firstLingualInput = document.querySelectorAll('input')[TEETH];
-                (firstLingualInput as HTMLInputElement)?.focus();
-              }
-            }}
-            onPrevFocus={() => {
-              if (r === 1) {
-                // Move from Lingual to Buccal
-                const lastBuccalInput = document.querySelectorAll('input')[TEETH - 1];
-                (lastBuccalInput as HTMLInputElement)?.focus();
-              }
-            }}
-          />
-        ))}
-      </div>
+      <PerioInput
+        label="Buccal"
+        data={data}
+        setData={setData}
+        onNextFocus={onNextFocus}
+      />
 
       <div style={styles.legend}>
         <strong>Legend:</strong> values from -99 to 99. Negative = recession.
         Press <code>Shift</code> before typing to enter two-digit numbers.
       </div>
 
-      <ResultsTable
-        title="Results (Tab-separated - Copy & Paste to Excel)"
-        rows={ROWS.map((rowName, r) => ({
-          label: rowName,
-          values: data[r]
-        }))}
-        columns={TEETH}
-        showCopyButton={true}
-        containerStyle={styles.tableContainer}
-        headerContainerStyle={styles.tableHeaderContainer}
-        titleStyle={styles.tableTitle}
-        copyButtonStyle={styles.copyButton}
-        tableStyle={styles.resultTable}
-        headerStyle={styles.tableHeader}
-        cellStyle={styles.tableCell}
-        rowStyle={styles.tableRow}
-      />
+      <div style={{ display: "flex", justifyContent: "flex-end"}}>
+        <button
+          onClick={() => {
+            setData(Array(TEETH).fill(""));
+          }}
+          style={{ marginTop: 16 }}
+        >
+          Clear All
+        </button>
+        {/* Submit Button */}
+        <button style={{ marginTop: 16, marginLeft: 8 }} onClick={onSubmit}>
+          Submit
+        </button>
+      </div>
+      <ResultRow title="Latest Entry" values={data} />
+      {(
+        <div>
+          <h3>Saved Entries</h3>
+          {savedEntries.map((entry) => (
+            <ResultRow key={entry.label} title={entry.label} values={entry.values} />
+          ))}
+        </div>
+      )}
     </div>
+  );
+}
+
+function ResultRow({ title, values }: { title: string; values: string[] }) {
+  return (
+    <ResultsTable
+      title={title}
+      rows={[{
+        label: "Buccal",
+        values: values
+      }]}
+      columns={values.length}
+      showCopyButton={true}
+      containerStyle={styles.tableContainer}
+      headerContainerStyle={styles.tableHeaderContainer}
+      titleStyle={styles.tableTitle}
+      copyButtonStyle={styles.copyButton}
+      tableStyle={styles.resultTable}
+      headerStyle={styles.tableHeader}
+      cellStyle={styles.tableCell}
+      rowStyle={styles.tableRow}
+    />
   );
 }
