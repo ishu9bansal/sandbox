@@ -27,6 +27,9 @@ export default function PerioApp() {
     }, ...savedEntries]);
     // clear current data
     setData(Array(TEETH).fill(""));
+    // focus back to first input
+    const firstInput = document.querySelector('input') as HTMLInputElement;
+    firstInput?.focus();
   }
 
   return (
@@ -55,7 +58,7 @@ export default function PerioApp() {
           Clear All
         </button>
         {/* Submit Button */}
-        <button style={{ marginTop: 16, marginLeft: 8 }} onClick={onSubmit}>
+        <button style={{ marginTop: 16, marginLeft: 8 }} onClick={onSubmit} id="submit-button">
           Submit
         </button>
       </div>
