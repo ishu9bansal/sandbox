@@ -3,12 +3,15 @@
 import { useState } from "react";
 import { styles } from "./style";
 import ResultsTable from "@/components/ResultsTable";
+import DataTable, { Column } from "@/components/DataTable";
 import PerioInput from "./PerioInput";
 
 const TEETH = 18;
 
+type Entry = { id: string; label: string; values: string[] };
+
 export default function PerioApp() {
-  const [savedEntries, setSavedEntries] = useState<{ label: string, values: string[]}[]>([]);
+  const [savedEntries, setSavedEntries] = useState<Entry[]>([]);
   const [data, setData] = useState(Array(TEETH).fill(""));
   const onNextFocus = () => {
     // Focus on submit button
@@ -26,10 +29,8 @@ export default function PerioApp() {
     // const parsedData = savedData ? JSON.parse(savedData) : [];
     // parsedData.push(data);
     // localStorage.setItem("perioData", JSON.stringify(parsedData));
-    setSavedEntries([{
-      label: `Entry ${savedEntries.length + 1}`,
-      values: data
-    }, ...savedEntries]);
+    const id = typeof crypto !== "undefined" && "randomUUID" in crypto ? (crypto as any).randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    setSavedEntries([{ id, label: `Entry ${savedEntries.length + 1}`, values: data }, ...savedEntries]);
     // clear current data
     setData(Array(TEETH).fill(""));
     // focus back to first input
@@ -68,7 +69,25 @@ export default function PerioApp() {
         </button>
       </div>
       <ResultRow title="Latest Entry" values={data} />
-      <ResultSection savedEntries={savedEntries} />
+      <ResultSection
+        savedEntries={savedEntries}
+        onEdit={(row) => {
+          // Placeholder for future editing UX (inline/modal)
+          console.log("Edit requested for:", row);
+          alert("Edit not implemented yet. Coming soon!");
+        }}
+        onDelete={(row) => {
+          setSavedEntries(prev => prev.filter(e => e.id !== row.id));
+        }}
+        onBulkDelete={(rows) => {
+          const ids = new Set(rows.map(r => r.id));
+          setSavedEntries(prev => prev.filter(e => !ids.has(e.id)));
+        }}
+        onView={(row) => {
+          // Optional hook for row click
+          console.log("View row:", row);
+        }}
+      />
     </div>
   );
 }
@@ -93,11 +112,57 @@ function ResultRow({ title, values }: { title: string; values: string[] }) {
   );
 }
 
-function ResultSection({ savedEntries }: { savedEntries: { label: string, values: string[]}[] }) {
+function ResultSection({
+  savedEntries,
+  onEdit,
+  onDelete,
+  onBulkDelete,
+  onView
+}: {
+  savedEntries: Entry[];
+  onEdit?: (row: Entry) => void;
+  onDelete?: (row: Entry) => void;
+  onBulkDelete?: (rows: Entry[]) => void;
+  onView?: (row: Entry) => void;
+}) {
   if (savedEntries.length === 0) {
     return null;
   }
+
+  const columns: Column<Entry>[] = [
+    {
+      key: "label",
+      header: "Label",
+      sortable: true,
+      filterable: true,
+      accessor: (row) => row.label,
+    },
+    {
+      key: "values",
+      header: "Values",
+      sortable: true,
+      filterable: true,
+      accessor: (row) => row.values.join(" "),
+      render: (value) => String(value),
+    },
+  ];
+
   return (
-    null  // TODO: complete this component to show saved entries
+    <DataTable<Entry>
+      title="Saved Entries"
+      data={savedEntries}
+      columns={columns}
+      getRowId={(row) => row.id}
+      onEdit={onEdit}
+      onDelete={onDelete}
+      onBulkDelete={onBulkDelete}
+      onView={onView}
+      containerStyle={styles.tableContainer}
+      headerContainerStyle={styles.tableHeaderContainer}
+      titleStyle={styles.tableTitle}
+      tableStyle={styles.resultTable}
+      cellStyle={styles.tableCell}
+      rowStyle={styles.tableRow}
+    />
   );
 }
