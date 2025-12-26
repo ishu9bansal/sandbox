@@ -5,7 +5,6 @@ import { useRef } from "react";
 export interface ResultsTableProps {
   title?: string;
   rows: { label: string; values: string[] }[];
-  columns: number;
   showCopyButton?: boolean;
   tableStyle?: React.CSSProperties;
   containerStyle?: React.CSSProperties;
@@ -13,14 +12,12 @@ export interface ResultsTableProps {
   titleStyle?: React.CSSProperties;
   copyButtonStyle?: React.CSSProperties;
   cellStyle?: React.CSSProperties;
-  headerStyle?: React.CSSProperties;
   rowStyle?: React.CSSProperties;
 }
 
 const ResultsTable = ({
   title = "Results (Tab-separated - Copy & Paste to Excel)",
   rows,
-  columns,
   showCopyButton = true,
   tableStyle,
   containerStyle,
@@ -28,7 +25,6 @@ const ResultsTable = ({
   titleStyle,
   copyButtonStyle,
   cellStyle,
-  headerStyle,
   rowStyle
 }: ResultsTableProps) => {
   const tableRef = useRef<HTMLTableElement | null>(null);

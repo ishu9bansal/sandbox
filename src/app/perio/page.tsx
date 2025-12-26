@@ -15,6 +15,11 @@ export default function PerioApp() {
     const submitButton = document.getElementById("submit-button");
     submitButton?.focus();
   }
+  const onFocusReset = () => {
+    // Focus on the input at index
+    const firstInput = document.querySelector('input') as HTMLInputElement;
+    firstInput?.focus();
+  }
   const onSubmit = () => {
     // append to saved local storage
     // const savedData = localStorage.getItem("perioData");
@@ -28,16 +33,15 @@ export default function PerioApp() {
     // clear current data
     setData(Array(TEETH).fill(""));
     // focus back to first input
-    const firstInput = document.querySelector('input') as HTMLInputElement;
-    firstInput?.focus();
+    onFocusReset();
   }
 
   return (
     <div style={styles.app}>
-      <h2>LGM Clinical Chart — Baseline</h2>
+      <h2>LGM Clinical Chart</h2>
 
       <PerioInput
-        label="Buccal"
+        label=""
         data={data}
         setData={setData}
         onNextFocus={onNextFocus}
@@ -52,6 +56,7 @@ export default function PerioApp() {
         <button
           onClick={() => {
             setData(Array(TEETH).fill(""));
+            onFocusReset();
           }}
           style={{ marginTop: 16 }}
         >
@@ -80,17 +85,15 @@ function ResultRow({ title, values }: { title: string; values: string[] }) {
     <ResultsTable
       title={title}
       rows={[{
-        label: "Buccal",
+        label: "Values",
         values: values
       }]}
-      columns={values.length}
       showCopyButton={true}
       containerStyle={styles.tableContainer}
       headerContainerStyle={styles.tableHeaderContainer}
       titleStyle={styles.tableTitle}
       copyButtonStyle={styles.copyButton}
       tableStyle={styles.resultTable}
-      headerStyle={styles.tableHeader}
       cellStyle={styles.tableCell}
       rowStyle={styles.tableRow}
     />
