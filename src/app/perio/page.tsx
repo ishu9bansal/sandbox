@@ -68,14 +68,7 @@ export default function PerioApp() {
         </button>
       </div>
       <ResultRow title="Latest Entry" values={data} />
-      {(
-        <div>
-          <h3>Saved Entries</h3>
-          {savedEntries.map((entry) => (
-            <ResultRow key={entry.label} title={entry.label} values={entry.values} />
-          ))}
-        </div>
-      )}
+      <ResultSection savedEntries={savedEntries} />
     </div>
   );
 }
@@ -97,5 +90,14 @@ function ResultRow({ title, values }: { title: string; values: string[] }) {
       cellStyle={styles.tableCell}
       rowStyle={styles.tableRow}
     />
+  );
+}
+
+function ResultSection({ savedEntries }: { savedEntries: { label: string, values: string[]}[] }) {
+  if (savedEntries.length === 0) {
+    return null;
+  }
+  return (
+    null  // TODO: complete this component to show saved entries
   );
 }
