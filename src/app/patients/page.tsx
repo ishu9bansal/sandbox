@@ -18,7 +18,7 @@ export default function PatientsPage() {
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
 
   const generateId = () => {
-    return `patient-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    return `patient-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
   };
 
   const handleAddPatient = (patientData: Omit<Patient, 'id' | 'createdAt' | 'updatedAt'>) => {

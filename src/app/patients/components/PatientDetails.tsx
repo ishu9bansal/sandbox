@@ -128,13 +128,12 @@ export default function PatientDetails({ patient, onEdit, onDelete, onBack }: Pa
         <Button variant="outline" onClick={onEdit}>
           Edit Patient
         </Button>
-        <Button 
-          variant="secondary" 
+        <button
           onClick={onDelete}
-          className="!bg-red-600 !hover:bg-red-700 !text-white"
+          className="px-4 py-2 text-base font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 bg-red-600 text-white hover:bg-red-700 focus:ring-red-500"
         >
           Delete Patient
-        </Button>
+        </button>
       </div>
     </div>
   );
