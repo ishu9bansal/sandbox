@@ -24,6 +24,7 @@ interface QuickInputRowProps {
 
 export type QuickInputRowRef = {
   focusFirst: () => void;
+  focusLast: () => void;
 };
 
 const QuickInputRow = forwardRef<QuickInputRowRef, QuickInputRowProps>(function QuickInputRow({
@@ -116,6 +117,9 @@ const QuickInputRow = forwardRef<QuickInputRowRef, QuickInputRowProps>(function 
   useImperativeHandle(ref, () => ({
     focusFirst: () => {
       focus(0);
+    },
+    focusLast: () => {
+      focus(columns - 1);
     }
   }));
 
