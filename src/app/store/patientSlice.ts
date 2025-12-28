@@ -20,17 +20,32 @@ const initialState: PatientState = {
   patients: [],
 };
 
+// Helper function to generate unique patient IDs
+const generatePatientId = (): string => {
+  return `patient-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
+};
+
 const patientSlice = createSlice({
   name: 'patients',
   initialState,
   reducers: {
-    addPatient: (state, action: PayloadAction<Patient>) => {
-      state.patients.push(action.payload);
+    addPatient: (state, action: PayloadAction<Omit<Patient, 'id' | 'createdAt' | 'updatedAt'>>) => {
+      const now = new Date().toISOString();
+      const newPatient: Patient = {
+        ...action.payload,
+        id: generatePatientId(),
+        createdAt: now,
+        updatedAt: now,
+      };
+      state.patients.push(newPatient);
     },
     updatePatient: (state, action: PayloadAction<Patient>) => {
       const index = state.patients.findIndex(p => p.id === action.payload.id);
       if (index !== -1) {
-        state.patients[index] = action.payload;
+        state.patients[index] = {
+          ...action.payload,
+          updatedAt: new Date().toISOString(),
+        };
       }
     },
     deletePatient: (state, action: PayloadAction<string>) => {

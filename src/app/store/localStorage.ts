@@ -3,20 +3,30 @@ import { Middleware } from '@reduxjs/toolkit';
 const STORAGE_KEY = 'patient-management-state';
 
 // Middleware to save state to localStorage on every change
-export const localStorageMiddleware: Middleware = (store) => (next) => (action) => {
-  const result = next(action);
+export const localStorageMiddleware: Middleware = (store) => {
+  let lastState: string | null = null;
   
-  // Save state to localStorage after action is processed
-  if (typeof window !== 'undefined') {
-    try {
-      const state = store.getState();
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch (error) {
-      console.error('Error saving state to localStorage:', error);
+  return (next) => (action) => {
+    const result = next(action);
+    
+    // Save state to localStorage after action is processed
+    if (typeof window !== 'undefined') {
+      try {
+        const state = store.getState();
+        const serializedState = JSON.stringify(state);
+        
+        // Only save if state actually changed
+        if (serializedState !== lastState) {
+          localStorage.setItem(STORAGE_KEY, serializedState);
+          lastState = serializedState;
+        }
+      } catch (error) {
+        console.error('Error saving state to localStorage:', error);
+      }
     }
-  }
-  
-  return result;
+    
+    return result;
+  };
 };
 
 // Load state from localStorage

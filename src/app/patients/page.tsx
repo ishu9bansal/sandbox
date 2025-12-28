@@ -17,20 +17,8 @@ export default function PatientsPage() {
   const [currentView, setCurrentView] = useState<View>('list');
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
 
-  const generateId = () => {
-    return `patient-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
-  };
-
   const handleAddPatient = (patientData: Omit<Patient, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const now = new Date().toISOString();
-    const newPatient: Patient = {
-      ...patientData,
-      id: generateId(),
-      createdAt: now,
-      updatedAt: now,
-    };
-    
-    dispatch(addPatient(newPatient));
+    dispatch(addPatient(patientData));
     setCurrentView('list');
   };
 
@@ -40,7 +28,7 @@ export default function PatientsPage() {
         ...patientData,
         id: selectedPatient.id,
         createdAt: selectedPatient.createdAt,
-        updatedAt: new Date().toISOString(),
+        updatedAt: selectedPatient.updatedAt, // Will be updated by the reducer
       };
       
       dispatch(updatePatient(updatedPatient));
