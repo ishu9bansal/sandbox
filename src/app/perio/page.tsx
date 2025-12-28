@@ -136,6 +136,7 @@ function ResultSection({
       sortable: true,
       filterable: true,
       accessor: (row) => row.label,
+      width: "150px",
     },
     {
       key: "values",

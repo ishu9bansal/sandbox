@@ -190,6 +190,16 @@ export default function DataTable<T>(props: DataTableProps<T>) {
       </div>
 
       <table style={styles.table}>
+        <colgroup>
+          {/* Checkbox column */}
+          <col style={{ width: 50 }} />
+          {/* User-defined columns */}
+          {columns.map((col) => (
+            <col key={col.key} style={col.width ? { width: col.width } : undefined} />
+          ))}
+          {/* Actions column */}
+          <col style={{ width: 140 }} />
+        </colgroup>
         <thead>
           <tr>
             <th style={styles.cell}>
