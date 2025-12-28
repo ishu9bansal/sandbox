@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, forwardRef, useImperativeHandle } from "react";
 
 // partial: "", "-", "1", "12", "-1", "-12" (max 2 digits)
 const isValidPartial = (v: string): boolean => /^-?\d{0,2}$/.test(v) || v === "";
@@ -22,7 +22,11 @@ interface QuickInputRowProps {
   onPrevFocus?: () => void;
 }
 
-export default function QuickInputRow({
+export type QuickInputRowRef = {
+  focusFirst: () => void;
+};
+
+const QuickInputRow = forwardRef<QuickInputRowRef, QuickInputRowProps>(function QuickInputRow({
   name,
   columns,
   values,
@@ -34,7 +38,7 @@ export default function QuickInputRow({
   inputProps,
   onNextFocus,
   onPrevFocus,
-}: QuickInputRowProps) {
+}, ref) {
   const inputRefs = useRef<(HTMLInputElement | null)[]>(Array(columns).fill(null));
   const shiftModeRef = useRef<boolean[]>(Array(columns).fill(false));
 
@@ -109,6 +113,12 @@ export default function QuickInputRow({
     }
   };
 
+  useImperativeHandle(ref, () => ({
+    focusFirst: () => {
+      focus(0);
+    }
+  }));
+
   return (
     <>
       <div style={labelStyle}>{name}</div>
@@ -135,4 +145,6 @@ export default function QuickInputRow({
       })}
     </>
   );
-}
+});
+
+export default QuickInputRow;
