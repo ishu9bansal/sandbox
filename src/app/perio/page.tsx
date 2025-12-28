@@ -8,7 +8,7 @@ import PerioInput from "./PerioInput";
 
 const TEETH = 18;
 
-type Entry = { id: string; label: string; values: string[] };
+type Entry = { id: string; label: string; values: string[]; createdAt: number; updatedAt?: number; };
 
 export default function PerioApp() {
   const [savedEntries, setSavedEntries] = useState<Entry[]>([]);
@@ -30,7 +30,7 @@ export default function PerioApp() {
     // parsedData.push(data);
     // localStorage.setItem("perioData", JSON.stringify(parsedData));
     const id = typeof crypto !== "undefined" && "randomUUID" in crypto ? (crypto as any).randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    setSavedEntries([{ id, label: `Entry ${savedEntries.length + 1}`, values: data }, ...savedEntries]);
+    setSavedEntries([{ id, label: `Entry ${savedEntries.length + 1}`, values: data, createdAt: Date.now() }, ...savedEntries]);
     // clear current data
     setData(Array(TEETH).fill(""));
     // focus back to first input
@@ -100,7 +100,7 @@ function ResultRow({ title, values }: { title: string; values: string[] }) {
         label: "Values",
         values: values
       }]}
-      showCopyButton={true}
+      showCopyButton={false}
       containerStyle={styles.tableContainer}
       headerContainerStyle={styles.tableHeaderContainer}
       titleStyle={styles.tableTitle}
@@ -145,6 +145,15 @@ function ResultSection({
       filterable: true,
       accessor: (row) => row.values.join(" "),
       render: (value) => String(value),
+    },
+    {
+      key: "createdAt",
+      header: "Created At",
+      sortable: true,
+      filterable: true,
+      accessor: (row) => new Date(row.createdAt).toLocaleString(),
+      render: (value) => String(value),
+      width: "180px",
     },
   ];
 
