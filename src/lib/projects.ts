@@ -46,7 +46,7 @@ export const projects: Project[] = [
     id: "perio",
     name: "Perio Charting",
     description: "Tooth charting application for dental professionals",
-    path: "/perio",
+    path: "/periodontics",
     icon: "🦷",
   },
   {
@@ -55,6 +55,13 @@ export const projects: Project[] = [
     description: "Manage patient records with CRUD operations and data persistence",
     path: "/patients",
     icon: "🏥",
+  },
+  {
+    id: "perio-example",
+    name: "Perio Example Input",
+    description: "Tooth charting example",
+    path: "/perio",
+    icon: "🦷",
   },
   // Add your new projects here following this pattern
 ];
