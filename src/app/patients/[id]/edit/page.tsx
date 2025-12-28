@@ -1,21 +1,16 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import { updatePatient, Patient } from "@/app/store/patientSlice";
 import PatientForm from "../../components/PatientForm";
 
-interface EditPatientPageProps {
-  params: {
-    id: string;
-  };
-}
-
-export default function EditPatientPage({ params }: EditPatientPageProps) {
+export default function EditPatientPage() {
   const router = useRouter();
+  const { id: patient_id } = useParams();
   const dispatch = useAppDispatch();
   const patient = useAppSelector(state =>
-    state.patients.patients.find(p => p.id === params.id)
+    state.patients.patients.find(p => p.id === patient_id)
   );
 
   if (!patient) {

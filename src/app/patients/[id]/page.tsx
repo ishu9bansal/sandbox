@@ -1,22 +1,17 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
-import { deletePatient, Patient } from "@/app/store/patientSlice";
+import { deletePatient } from "@/app/store/patientSlice";
 import Button from "@/components/Button";
 import PatientDetails from "../components/PatientDetails";
 
-interface PatientPageProps {
-  params: {
-    id: string;
-  };
-}
-
-export default function PatientPage({ params }: PatientPageProps) {
+export default function PatientPage() {
   const router = useRouter();
+  const { id: patient_id } = useParams();
   const dispatch = useAppDispatch();
   const patient = useAppSelector(state =>
-    state.patients.patients.find(p => p.id === params.id)
+    state.patients.patients.find(p => p.id === patient_id)
   );
 
   if (!patient) {
@@ -45,7 +40,7 @@ export default function PatientPage({ params }: PatientPageProps) {
   };
 
   const handleBack = () => {
-    router.back();
+    router.push(`/patients`);
   };
 
   return (
