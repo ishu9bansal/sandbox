@@ -21,14 +21,6 @@ export type DataTableProps<T> = {
   onDelete?: (row: T) => void;
   onView?: (row: T) => void;
   onBulkDelete?: (rows: T[]) => void;
-  // Styles (optional) so parent can control appearance
-  containerStyle?: React.CSSProperties;
-  headerContainerStyle?: React.CSSProperties;
-  titleStyle?: React.CSSProperties;
-  tableStyle?: React.CSSProperties;
-  rowStyle?: React.CSSProperties;
-  cellStyle?: React.CSSProperties;
-  actionButtonStyle?: React.CSSProperties;
 };
 
 function asComparable(v: any): { v: string | number; isNumber: boolean } {
@@ -61,13 +53,6 @@ export default function DataTable<T>(props: DataTableProps<T>) {
     onDelete,
     onView,
     onBulkDelete,
-    containerStyle,
-    headerContainerStyle,
-    titleStyle,
-    tableStyle,
-    rowStyle,
-    cellStyle,
-    actionButtonStyle,
   } = props;
 
   const [selected, setSelected] = useState<Record<string, boolean>>({});
@@ -173,36 +158,23 @@ export default function DataTable<T>(props: DataTableProps<T>) {
   }
 
   return (
-    <div style={containerStyle}>
-      <div style={headerContainerStyle}>
-        <h3 style={titleStyle}>{title || "Results"}</h3>
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+    <div style={styles.container}>
+      <div style={styles.headerBar}>
+        <h3 style={styles.title}>{title || "Results"}</h3>
+        <div style={styles.actionsBar}>
           <input
             aria-label="Search"
             placeholder="Search..."
             value={globalQuery}
             onChange={(e) => setGlobalQuery(e.target.value)}
-            style={{
-              height: 30,
-              padding: "0 8px",
-              borderRadius: 6,
-              border: "1px solid #3a4050",
-              background: "#2a2a2a",
-              color: "#e0e0e0",
-              fontSize: 12,
-            }}
+            style={styles.searchInput}
           />
           <button
             onClick={() => onBulkDelete?.(selectedRows)}
             disabled={selectedRows.length === 0}
             style={{
-              padding: "8px 12px",
-              fontSize: 12,
-              fontWeight: 600,
+              ...styles.button,
               background: selectedRows.length ? "#cc3300" : "#555",
-              color: "#ffffff",
-              border: "none",
-              borderRadius: 6,
               cursor: selectedRows.length ? "pointer" : "not-allowed",
             }}
           >
@@ -210,26 +182,17 @@ export default function DataTable<T>(props: DataTableProps<T>) {
           </button>
           <button
             onClick={() => copyCsv(selectedRows.length ? selectedRows : sortedData)}
-            style={{
-              padding: "8px 12px",
-              fontSize: 12,
-              fontWeight: 600,
-              background: "#0066cc",
-              color: "#ffffff",
-              border: "none",
-              borderRadius: 6,
-              cursor: "pointer",
-            }}
+            style={{ ...styles.button, background: "#0066cc" }}
           >
             Copy {selectedRows.length ? "Selected" : "All"} CSV
           </button>
         </div>
       </div>
 
-      <table style={tableStyle}>
+      <table style={styles.table}>
         <thead>
           <tr>
-            <th style={cellStyle}>
+            <th style={styles.cell}>
               <input
                 type="checkbox"
                 checked={allSelected}
@@ -242,7 +205,7 @@ export default function DataTable<T>(props: DataTableProps<T>) {
             {columns.map((col) => (
               <th
                 key={col.key}
-                style={{ ...cellStyle, cursor: col.sortable ? "pointer" : "default" }}
+                style={{ ...styles.cell, cursor: col.sortable ? "pointer" : "default" }}
                 onClick={() => handleHeaderClick(col)}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: 6, justifyContent: "center" }}>
@@ -253,13 +216,13 @@ export default function DataTable<T>(props: DataTableProps<T>) {
                 </div>
               </th>
             ))}
-            <th style={cellStyle}>Actions</th>
+            <th style={styles.cell}>Actions</th>
           </tr>
           {/* Filter row */}
           <tr>
-            <th style={cellStyle}></th>
+            <th style={styles.cell}></th>
             {columns.map((col) => (
-              <th key={col.key} style={cellStyle}>
+              <th key={col.key} style={styles.cell}>
                 {col.filterable ? (
                   <input
                     aria-label={`Filter ${col.header}`}
@@ -268,29 +231,20 @@ export default function DataTable<T>(props: DataTableProps<T>) {
                     onChange={(e) =>
                       setFilters((prev) => ({ ...prev, [col.key]: e.target.value }))
                     }
-                    style={{
-                      height: 28,
-                      padding: "0 6px",
-                      width: "100%",
-                      borderRadius: 6,
-                      border: "1px solid #3a4050",
-                      background: "#2a2a2a",
-                      color: "#e0e0e0",
-                      fontSize: 12,
-                    }}
+                    style={styles.filterInput}
                   />
                 ) : null}
               </th>
             ))}
-            <th style={cellStyle}></th>
+            <th style={styles.cell}></th>
           </tr>
         </thead>
         <tbody>
           {sortedData.map((row, i) => {
             const id = getRowId(row, i);
             return (
-              <tr key={id} style={rowStyle} onClick={(e) => onRowClick(e, row)}>
-                <td style={cellStyle}>
+              <tr key={id} style={styles.row} onClick={(e) => onRowClick(e, row)}>
+                <td style={styles.cell}>
                   <input
                     type="checkbox"
                     checked={!!selected[id]}
@@ -301,28 +255,19 @@ export default function DataTable<T>(props: DataTableProps<T>) {
                 {columns.map((col) => {
                   const value = getCellValue(row, col);
                   return (
-                    <td key={col.key} style={cellStyle}>
+                    <td key={col.key} style={styles.cell}>
                       {col.render ? col.render(value, row) : String(Array.isArray(value) ? value.join(" ") : value)}
                     </td>
                   );
                 })}
-                <td style={cellStyle}>
-                  <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
+                <td style={styles.cell}>
+                  <div style={styles.actionGroup}>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         onEdit?.(row);
                       }}
-                      style={{
-                        padding: "4px 8px",
-                        fontSize: 12,
-                        borderRadius: 6,
-                        border: "1px solid #3a4050",
-                        background: "#2a2a2a",
-                        color: "#e0e0e0",
-                        cursor: "pointer",
-                        ...(actionButtonStyle || {}),
-                      }}
+                      style={styles.actionButton}
                     >
                       Edit
                     </button>
@@ -331,16 +276,7 @@ export default function DataTable<T>(props: DataTableProps<T>) {
                         e.stopPropagation();
                         onDelete?.(row);
                       }}
-                      style={{
-                        padding: "4px 8px",
-                        fontSize: 12,
-                        borderRadius: 6,
-                        border: "1px solid #3a4050",
-                        background: "#552222",
-                        color: "#ffffff",
-                        cursor: "pointer",
-                        ...(actionButtonStyle || {}),
-                      }}
+                      style={{ ...styles.actionButton, background: "#552222", color: "#ffffff" }}
                     >
                       Delete
                     </button>
@@ -351,7 +287,7 @@ export default function DataTable<T>(props: DataTableProps<T>) {
           })}
           {sortedData.length === 0 && (
             <tr>
-              <td colSpan={columns.length + 2} style={cellStyle}>
+              <td colSpan={columns.length + 2} style={styles.cell}>
                 No results
               </td>
             </tr>
@@ -361,3 +297,90 @@ export default function DataTable<T>(props: DataTableProps<T>) {
     </div>
   );
 }
+
+const styles: Record<string, React.CSSProperties> = {
+  container: {
+    marginTop: 24,
+    border: "1px solid #3a4050",
+    borderRadius: 8,
+    padding: 16,
+    background: "#252525",
+    overflowX: "auto",
+  },
+  headerBar: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+    gap: 12,
+  },
+  actionsBar: {
+    display: "flex",
+    gap: 8,
+    alignItems: "center",
+  },
+  title: {
+    fontSize: 14,
+    fontWeight: 600,
+    margin: 0,
+    color: "#b0b8d4",
+  },
+  searchInput: {
+    height: 30,
+    padding: "0 8px",
+    borderRadius: 6,
+    border: "1px solid #3a4050",
+    background: "#2a2a2a",
+    color: "#e0e0e0",
+    fontSize: 12,
+  },
+  button: {
+    padding: "8px 12px",
+    fontSize: 12,
+    fontWeight: 600,
+    background: "#0066cc",
+    color: "#ffffff",
+    border: "none",
+    borderRadius: 6,
+    cursor: "pointer",
+    transition: "background 0.2s ease",
+  },
+  table: {
+    width: "100%",
+    borderCollapse: "collapse",
+    fontSize: 12,
+  },
+  row: {
+    borderBottom: "1px solid #3a4050",
+  },
+  cell: {
+    padding: "8px 12px",
+    border: "1px solid #3a4050",
+    textAlign: "center",
+    color: "#e0e0e0",
+  },
+  filterInput: {
+    height: 28,
+    padding: "0 6px",
+    width: "100%",
+    borderRadius: 6,
+    border: "1px solid #3a4050",
+    background: "#2a2a2a",
+    color: "#e0e0e0",
+    fontSize: 12,
+  },
+  actionGroup: {
+    display: "flex",
+    gap: 8,
+    justifyContent: "center",
+  },
+  actionButton: {
+    padding: "4px 8px",
+    fontSize: 12,
+    borderRadius: 6,
+    border: "1px solid #3a4050",
+    background: "#2a2a2a",
+    color: "#e0e0e0",
+    cursor: "pointer",
+  },
+};

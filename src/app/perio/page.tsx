@@ -157,12 +157,6 @@ function ResultSection({
       onDelete={onDelete}
       onBulkDelete={onBulkDelete}
       onView={onView}
-      containerStyle={styles.tableContainer}
-      headerContainerStyle={styles.tableHeaderContainer}
-      titleStyle={styles.tableTitle}
-      tableStyle={styles.resultTable}
-      cellStyle={styles.tableCell}
-      rowStyle={styles.tableRow}
     />
   );
 }
