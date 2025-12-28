@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
+import ReduxProvider from "@/app/store/ReduxProvider";
 
 export const metadata: Metadata = {
   title: "Sandbox - Web Projects Playground",
@@ -16,15 +17,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
-        <div className="flex min-h-screen">
-          <Sidebar />
-          <div className="flex-1 flex flex-col">
-            <Navbar />
-            <main className="flex-1 p-6 bg-gray-50 dark:bg-gray-900">
-              {children}
-            </main>
+        <ReduxProvider>
+          <div className="flex min-h-screen">
+            <Sidebar />
+            <div className="flex-1 flex flex-col">
+              <Navbar />
+              <main className="flex-1 p-6 bg-gray-50 dark:bg-gray-900">
+                {children}
+              </main>
+            </div>
           </div>
-        </div>
+        </ReduxProvider>
       </body>
     </html>
   );

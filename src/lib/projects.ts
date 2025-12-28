@@ -49,5 +49,12 @@ export const projects: Project[] = [
     path: "/perio",
     icon: "🦷",
   },
+  {
+    id: "patients",
+    name: "Patient Management",
+    description: "Manage patient records with CRUD operations and data persistence",
+    path: "/patients",
+    icon: "🏥",
+  },
   // Add your new projects here following this pattern
 ];
