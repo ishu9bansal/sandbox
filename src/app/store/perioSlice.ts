@@ -19,10 +19,12 @@ export interface PerioRecord {
 
 export interface PerioState {
   records: PerioRecord[];
+  freshId: string | null;
 }
 
 const initialState: PerioState = {
   records: [],
+  freshId: null,
 };
 
 const STUDY_LIMIT = 3;
@@ -61,6 +63,7 @@ const perioSlice = createSlice({
         updatedAt: now,
       };
       state.records.push(newRecord);
+      state.freshId = newRecord.id;
     },
     updatePerioRecord: (state, action: PayloadAction<PerioRecord>) => {
       const index = state.records.findIndex(r => r.id === action.payload.id);
@@ -80,12 +83,16 @@ const perioSlice = createSlice({
     setPerioRecords: (state, action: PayloadAction<PerioRecord[]>) => {
       state.records = action.payload;
     },
+    resetFreshId: (state) => {
+      state.freshId = null;
+    },
   },
 });
 
-export const { addPerioRecord, updatePerioRecord, deletePerioRecord, deletePerioRecords, setPerioRecords } = perioSlice.actions;
+export const { addPerioRecord, updatePerioRecord, deletePerioRecord, deletePerioRecords, setPerioRecords, resetFreshId } = perioSlice.actions;
 export default perioSlice.reducer;
 
 export const selectPerioRecords = (state: { perio: PerioState }) => state.perio.records;
 export const selectPerioRecordById = (id: any) => (state: { perio: PerioState }) =>
   state.perio.records.find(record => record.id === id);
+export const selectFreshPerioRecordId = (state: { perio: PerioState }) => state.perio.freshId;
