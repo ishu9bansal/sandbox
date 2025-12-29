@@ -1,0 +1,119 @@
+import { useRef } from "react";
+import { calculateColumnsFromZones, calculateZoneSeparators } from "./utils";
+import QuickInputRow, { QuickInputRowRef } from "@/components/QuickInputRow";
+import { styles } from "./style";
+
+interface PerioInputProps {
+  data: string[][];
+  zones: { label: string; size: number; }[];
+  onUpdate: (data: string[][]) => void;
+  onNextFocus?: () => void;
+  onPrevFocus?: () => void;
+}
+export default function PerioInput({ data, zones, onUpdate, onNextFocus, onPrevFocus }: PerioInputProps) {
+  const handleChange = (row: number, vs: string[]) => {
+    const updatedData = [...data];
+    updatedData[row] = vs;
+    onUpdate(updatedData);
+  };
+  const COLUMNS = calculateColumnsFromZones(zones);
+  const ZONE_SEPARATORS = calculateZoneSeparators(zones);
+  const inputRefs = useRef<(QuickInputRowRef | null)[]>(Array(4).fill(null));
+  const focus = (c: number, fromBehind: boolean = false): void => {
+    const el = inputRefs.current[c];
+    if (el) {
+      const focus = fromBehind ? el.focusLast : el.focusFirst;
+      focus();
+    }
+  };
+
+
+  return (
+    <div style={styles.grid}>
+      <ZoneMarkers zones={zones} />
+      <QuickInputRow
+        ref={(el) => {
+          if (el) inputRefs.current[0] = el;
+        }}
+        name={'Buccal'}
+        columns={COLUMNS}
+        values={data[0]}
+        onRowChange={(vs) => handleChange(0, vs)}
+        zoneSeparators={ZONE_SEPARATORS}
+        labelStyle={styles.label}
+        cellStyle={styles.cell}
+        separatorStyle={styles.zoneSeparatorLeft}
+        inputProps={{ inputMode: "tel", maxLength: 3 }}
+        onNextFocus={() => focus(1)}
+        onPrevFocus={onPrevFocus}
+      />
+      <QuickInputRow
+        ref={(el) => {
+          if (el) inputRefs.current[1] = el;
+        }}
+        name={'Lingual'}
+        columns={COLUMNS}
+        values={data[1]}
+        onRowChange={(vs) => handleChange(1, vs)}
+        zoneSeparators={ZONE_SEPARATORS}
+        labelStyle={styles.label}
+        cellStyle={styles.cell}
+        separatorStyle={styles.zoneSeparatorLeft}
+        inputProps={{ inputMode: "tel", maxLength: 3 }}
+        onNextFocus={() => focus(2)}
+        onPrevFocus={() => focus(0, true)}
+      />
+      <QuickInputRow
+        ref={(el) => {
+          if (el) inputRefs.current[2] = el;
+        }}
+        name={'Lingual'}
+        columns={COLUMNS}
+        values={data[2]}
+        onRowChange={(vs) => handleChange(2, vs)}
+        zoneSeparators={ZONE_SEPARATORS}
+        labelStyle={styles.label}
+        cellStyle={styles.cell}
+        separatorStyle={styles.zoneSeparatorLeft}
+        inputProps={{ inputMode: "tel", maxLength: 3 }}
+        onNextFocus={() => focus(3)}
+        onPrevFocus={() => focus(1, true)}
+      />
+      <QuickInputRow
+        ref={(el) => {
+          if (el) inputRefs.current[3] = el;
+        }}
+        name={'Buccal'}
+        columns={COLUMNS}
+        values={data[3]}
+        onRowChange={(vs) => handleChange(3, vs)}
+        zoneSeparators={ZONE_SEPARATORS}
+        labelStyle={styles.label}
+        cellStyle={styles.cell}
+        separatorStyle={styles.zoneSeparatorLeft}
+        inputProps={{ inputMode: "tel", maxLength: 3 }}
+        onNextFocus={onNextFocus}
+        onPrevFocus={() => focus(2, true)}
+      />
+    </div>
+  );
+}
+
+function ZoneMarkers({ zones }: { zones: { label: string; size: number }[] }) {
+  return (
+    <>
+      <div /> {/* top-left empty */}
+      {zones.map((z, i) => (
+        <div
+          key={i}
+          style={{
+            ...styles.zoneLabel,
+            gridColumn: `span ${z.size}`
+          }}
+        >
+          {z.label}
+        </div>
+      ))}
+    </>
+  );
+}

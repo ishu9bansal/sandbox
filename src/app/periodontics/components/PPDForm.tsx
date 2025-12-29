@@ -4,10 +4,8 @@ import { useRef, useState } from "react";
 import Card from "@/components/Card";
 import Button from "@/components/Button";
 import { PPD, Teeth } from "@/app/store/perioSlice";
-import { styles } from "./style";
-import { calculateTeethFromZones, calculateZoneSeparators } from "@/app/perio/utils";
-import QuickInputRow, { QuickInputRowRef } from "@/components/QuickInputRow";
 import { deriveDataFromValues, deriveValues, deriveZones } from "./utils";
+import PerioInput from "./PerioInput";
 
 interface PPDFormProps {
   teeth: Teeth;
@@ -48,7 +46,7 @@ export default function PPDForm({ data, teeth, onSubmit, onCancel }: PPDFormProp
     <Card title={"Edit PPD Values"}>
       <form ref={submitRef} onSubmit={handleSubmit} className="space-y-4 overflow-x-auto">
         <div className="inline-block min-w-max">
-          <PerioInput data={values} onUpdate={setValues} onNextFocus={handleFocusSubmit} />
+          <PerioInput data={values} zones={deriveZones(PPDMapping[0])} onUpdate={setValues} onNextFocus={handleFocusSubmit} />
         </div>
         <div className="flex gap-3 justify-end pt-4">
           <Button variant="outline" onClick={onCancel} type="button">
@@ -60,124 +58,6 @@ export default function PPDForm({ data, teeth, onSubmit, onCancel }: PPDFormProp
         </div>
       </form>
     </Card>
-  );
-}
-
-
-const ZONES = deriveZones(PPDMapping[0]);
-
-interface PerioInputProps {
-  data: string[][];
-  onUpdate: (data: string[][]) => void;
-  onNextFocus?: () => void;
-  onPrevFocus?: () => void;
-}
-function PerioInput({ data, onUpdate, onNextFocus, onPrevFocus }: PerioInputProps) {
-  const handleChange = (row: number, vs: string[]) => {
-    const updatedData = [...data];
-    updatedData[row] = vs;
-    onUpdate(updatedData);
-  };
-  const COLUMNS = calculateTeethFromZones(ZONES);
-  const ZONE_SEPARATORS = calculateZoneSeparators(ZONES);
-  const inputRefs = useRef<(QuickInputRowRef | null)[]>(Array(4).fill(null));
-  const focus = (c: number, fromBehind: boolean = false): void => {
-    const el = inputRefs.current[c];
-    if (el) {
-      const focus = fromBehind ? el.focusLast : el.focusFirst;
-      focus();
-    }
-  };
-
-
-  return (
-    <div style={styles.grid}>
-      <ZoneMarkers zones={ZONES} />
-      <QuickInputRow
-        ref={(el) => {
-          if (el) inputRefs.current[0] = el;
-        }}
-        name={'Buccal'}
-        columns={COLUMNS}
-        values={data[0]}
-        onRowChange={(vs) => handleChange(0, vs)}
-        zoneSeparators={ZONE_SEPARATORS}
-        labelStyle={styles.label}
-        cellStyle={styles.cell}
-        separatorStyle={styles.zoneSeparatorLeft}
-        inputProps={{ inputMode: "tel", maxLength: 3 }}
-        onNextFocus={() => focus(1)}
-        onPrevFocus={onPrevFocus}
-      />
-      <QuickInputRow
-        ref={(el) => {
-          if (el) inputRefs.current[1] = el;
-        }}
-        name={'Lingual'}
-        columns={COLUMNS}
-        values={data[1]}
-        onRowChange={(vs) => handleChange(1, vs)}
-        zoneSeparators={ZONE_SEPARATORS}
-        labelStyle={styles.label}
-        cellStyle={styles.cell}
-        separatorStyle={styles.zoneSeparatorLeft}
-        inputProps={{ inputMode: "tel", maxLength: 3 }}
-        onNextFocus={() => focus(2)}
-        onPrevFocus={() => focus(0, true)}
-      />
-      <QuickInputRow
-        ref={(el) => {
-          if (el) inputRefs.current[2] = el;
-        }}
-        name={'Lingual'}
-        columns={COLUMNS}
-        values={data[2]}
-        onRowChange={(vs) => handleChange(2, vs)}
-        zoneSeparators={ZONE_SEPARATORS}
-        labelStyle={styles.label}
-        cellStyle={styles.cell}
-        separatorStyle={styles.zoneSeparatorLeft}
-        inputProps={{ inputMode: "tel", maxLength: 3 }}
-        onNextFocus={() => focus(3)}
-        onPrevFocus={() => focus(1, true)}
-      />
-      <QuickInputRow
-        ref={(el) => {
-          if (el) inputRefs.current[3] = el;
-        }}
-        name={'Buccal'}
-        columns={COLUMNS}
-        values={data[3]}
-        onRowChange={(vs) => handleChange(3, vs)}
-        zoneSeparators={ZONE_SEPARATORS}
-        labelStyle={styles.label}
-        cellStyle={styles.cell}
-        separatorStyle={styles.zoneSeparatorLeft}
-        inputProps={{ inputMode: "tel", maxLength: 3 }}
-        onNextFocus={onNextFocus}
-        onPrevFocus={() => focus(2, true)}
-      />
-    </div>
-  );
-}
-
-
-function ZoneMarkers({ zones }: { zones: { label: string; size: number }[] }) {
-  return (
-    <>
-      <div /> {/* top-left empty */}
-      {zones.map((z, i) => (
-        <div
-          key={i}
-          style={{
-            ...styles.zoneLabel,
-            gridColumn: `span ${z.size}`
-          }}
-        >
-          {z.label}
-        </div>
-      ))}
-    </>
   );
 }
 
