@@ -2,16 +2,16 @@
 
 import Card from "@/components/Card";
 import Button from "@/components/Button";
-import { Patient } from "@/app/store/patientSlice";
+import { PerioRecord } from "@/app/store/perioSlice";
 
-interface PatientDetailsProps {
-  patient: Patient;
+interface PerioRecordDetailsProps {
+  record: PerioRecord;
   onEdit: () => void;
   onDelete: () => void;
   onBack: () => void;
 }
 
-export default function PatientDetails({ patient, onEdit, onDelete, onBack }: PatientDetailsProps) {
+export default function PerioRecordDetails({ record, onEdit, onDelete, onBack }: PerioRecordDetailsProps) {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString('en-US', {
       year: 'numeric',
@@ -25,7 +25,7 @@ export default function PatientDetails({ patient, onEdit, onDelete, onBack }: Pa
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Patient Details</h2>
+        <h2 className="text-2xl font-bold">Record Details</h2>
         <Button variant="outline" onClick={onBack}>
           ← Back to List
         </Button>
@@ -35,61 +35,12 @@ export default function PatientDetails({ patient, onEdit, onDelete, onBack }: Pa
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-              Name
+              Label
             </label>
             <p className="text-lg font-semibold text-gray-900 dark:text-white">
-              {patient.name}
+              {record.label}
             </p>
           </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-              Age
-            </label>
-            <p className="text-lg font-semibold text-gray-900 dark:text-white">
-              {patient.age} years
-            </p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-              Sex
-            </label>
-            <p className="text-lg font-semibold text-gray-900 dark:text-white">
-              {patient.sex}
-            </p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-              Contact
-            </label>
-            <p className="text-lg font-semibold text-gray-900 dark:text-white">
-              {patient.contact}
-            </p>
-          </div>
-
-          {patient.email && (
-            <div>
-              <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                Email
-              </label>
-              <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                {patient.email}
-              </p>
-            </div>
-          )}
-
-          {patient.address && (
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                Address
-              </label>
-              <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                {patient.address}
-              </p>
-            </div>
-          )}
         </div>
       </Card>
 
@@ -100,7 +51,7 @@ export default function PatientDetails({ patient, onEdit, onDelete, onBack }: Pa
               Created At
             </label>
             <p className="text-sm text-gray-900 dark:text-white">
-              {formatDate(patient.createdAt)}
+              {formatDate(record.createdAt)}
             </p>
           </div>
 
@@ -109,7 +60,7 @@ export default function PatientDetails({ patient, onEdit, onDelete, onBack }: Pa
               Last Updated
             </label>
             <p className="text-sm text-gray-900 dark:text-white">
-              {formatDate(patient.updatedAt)}
+              {formatDate(record.updatedAt)}
             </p>
           </div>
 
@@ -118,7 +69,7 @@ export default function PatientDetails({ patient, onEdit, onDelete, onBack }: Pa
               Patient ID
             </label>
             <p className="text-sm font-mono text-gray-900 dark:text-white">
-              {patient.id}
+              {record.id}
             </p>
           </div>
         </div>
@@ -126,13 +77,13 @@ export default function PatientDetails({ patient, onEdit, onDelete, onBack }: Pa
 
       <div className="flex gap-3 justify-end">
         <Button variant="outline" onClick={onEdit}>
-          Edit Patient
+          Edit Record
         </Button>
         <button
           onClick={onDelete}
           className="px-4 py-2 text-base font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 bg-red-600 text-white hover:bg-red-700 focus:ring-red-500"
         >
-          Delete Patient
+          Delete Record
         </button>
       </div>
     </div>
