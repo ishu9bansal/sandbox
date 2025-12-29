@@ -26,7 +26,7 @@ export default function LGMForm({ data, teeth, onSubmit, onCancel }: LGMFormProp
         </div>
         <div className="flex gap-3 justify-end pt-4">
           <Button variant="outline" onClick={onCancel} type="button">
-            Cancel
+            Back
           </Button>
           <Button variant="primary" type="submit">
             Submit

@@ -26,7 +26,7 @@ export default function PPDForm({ data, teeth, onSubmit, onCancel }: PPDFormProp
         </div>
         <div className="flex gap-3 justify-end pt-4">
           <Button variant="outline" onClick={onCancel} type="button">
-            Cancel
+            Back
           </Button>
           <Button variant="primary" type="submit">
             Next
