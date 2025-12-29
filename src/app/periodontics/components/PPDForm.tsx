@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Card from "@/components/Card";
 import Button from "@/components/Button";
 import { PPD, Teeth } from "@/app/store/perioSlice";
 import { styles } from "./style";
 import { calculateTeethFromZones, calculateZoneSeparators } from "@/app/perio/utils";
-import QuickInputRow from "@/components/QuickInputRow";
+import QuickInputRow, { QuickInputRowRef } from "@/components/QuickInputRow";
 
 interface PPDFormProps {
   teeth: Teeth;
@@ -90,11 +90,18 @@ export default function PPDForm({ data, teeth, onSubmit, onCancel }: PPDFormProp
     const updatedData = deriveDataFromValues(values);
     onSubmit(updatedData);
   };
+  const submitRef = useRef<HTMLFormElement>(null);
+  const handleFocusSubmit = () => {
+    const el = submitRef.current;
+    if (el) {
+      el.focus();
+    }
+  }
   return (
     <Card title={"Edit PPD Values"}>
-      <form onSubmit={handleSubmit} className="space-y-4 overflow-x-auto">
+      <form ref={submitRef} onSubmit={handleSubmit} className="space-y-4 overflow-x-auto">
         <div className="inline-block min-w-max">
-          <PerioInput data={values} onUpdate={setValues} />
+          <PerioInput data={values} onUpdate={setValues} onNextFocus={handleFocusSubmit} />
         </div>
         <div className="flex gap-3 justify-end pt-4">
           <Button variant="outline" onClick={onCancel} type="button">
@@ -110,7 +117,13 @@ export default function PPDForm({ data, teeth, onSubmit, onCancel }: PPDFormProp
 }
 
 
-function PerioInput({ data, onUpdate }: { data: string[][]; onUpdate: (data: string[][]) => void; }) {
+interface PerioInputProps {
+  data: string[][];
+  onUpdate: (data: string[][]) => void;
+  onNextFocus?: () => void;
+  onPrevFocus?: () => void;
+}
+function PerioInput({ data, onUpdate, onNextFocus, onPrevFocus }: PerioInputProps) {
   const handleChange = (row: number, vs: string[]) => {
     const updatedData = [...data];
     updatedData[row] = vs;
@@ -118,11 +131,23 @@ function PerioInput({ data, onUpdate }: { data: string[][]; onUpdate: (data: str
   };
   const COLUMNS = calculateTeethFromZones(ZONES);
   const ZONE_SEPARATORS = calculateZoneSeparators(ZONES);
+  const inputRefs = useRef<(QuickInputRowRef | null)[]>(Array(4).fill(null));
+  const focus = (c: number, fromBehind: boolean = false): void => {
+    const el = inputRefs.current[c];
+    if (el) {
+      const focus = fromBehind ? el.focusLast : el.focusFirst;
+      focus();
+    }
+  };
+
 
   return (
     <div style={styles.grid}>
       <ZoneMarkers zones={ZONES} />
       <QuickInputRow
+        ref={(el) => {
+          if (el) inputRefs.current[0] = el;
+        }}
         name={'Buccal'}
         columns={COLUMNS}
         values={data[0]}
@@ -132,8 +157,13 @@ function PerioInput({ data, onUpdate }: { data: string[][]; onUpdate: (data: str
         cellStyle={styles.cell}
         separatorStyle={styles.zoneSeparatorLeft}
         inputProps={{ inputMode: "tel", maxLength: 3 }}
+        onNextFocus={() => focus(1)}
+        onPrevFocus={onPrevFocus}
       />
       <QuickInputRow
+        ref={(el) => {
+          if (el) inputRefs.current[1] = el;
+        }}
         name={'Lingual'}
         columns={COLUMNS}
         values={data[1]}
@@ -143,8 +173,13 @@ function PerioInput({ data, onUpdate }: { data: string[][]; onUpdate: (data: str
         cellStyle={styles.cell}
         separatorStyle={styles.zoneSeparatorLeft}
         inputProps={{ inputMode: "tel", maxLength: 3 }}
+        onNextFocus={() => focus(2)}
+        onPrevFocus={() => focus(0, true)}
       />
       <QuickInputRow
+        ref={(el) => {
+          if (el) inputRefs.current[2] = el;
+        }}
         name={'Lingual'}
         columns={COLUMNS}
         values={data[2]}
@@ -154,8 +189,13 @@ function PerioInput({ data, onUpdate }: { data: string[][]; onUpdate: (data: str
         cellStyle={styles.cell}
         separatorStyle={styles.zoneSeparatorLeft}
         inputProps={{ inputMode: "tel", maxLength: 3 }}
+        onNextFocus={() => focus(3)}
+        onPrevFocus={() => focus(1, true)}
       />
       <QuickInputRow
+        ref={(el) => {
+          if (el) inputRefs.current[3] = el;
+        }}
         name={'Buccal'}
         columns={COLUMNS}
         values={data[3]}
@@ -165,6 +205,8 @@ function PerioInput({ data, onUpdate }: { data: string[][]; onUpdate: (data: str
         cellStyle={styles.cell}
         separatorStyle={styles.zoneSeparatorLeft}
         inputProps={{ inputMode: "tel", maxLength: 3 }}
+        onNextFocus={onNextFocus}
+        onPrevFocus={() => focus(2, true)}
       />
     </div>
   );
