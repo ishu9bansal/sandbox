@@ -3,6 +3,7 @@
 import Card from "@/components/Card";
 import Button from "@/components/Button";
 import { PerioRecord } from "@/app/store/perioSlice";
+import TeethVisualization from "@/components/TeethVisualization";
 
 interface PerioRecordDetailsProps {
   record: PerioRecord;
@@ -40,6 +41,22 @@ export default function PerioRecordDetails({ record, onEdit, onDelete, onBack }:
             <p className="text-lg font-semibold text-gray-900 dark:text-white">
               {record.label}
             </p>
+          </div>
+        </div>
+        <TeethVisualization data={record.teeth} />
+        {/* Legend */}
+        <div className="mt-6 text-xs text-white space-y-1">
+          <div className="flex gap-2 items-center">
+              <div className="h-4 w-4 bg-green-300 border rounded"></div>
+              <span>Selected (O)</span>
+          </div>
+          <div className="flex gap-2 items-center">
+              <div className="h-4 w-4 bg-pink-300 border rounded"></div>
+              <span>Skipped (-)</span>
+          </div>
+          <div className="flex gap-2 items-center">
+              <div className="h-4 w-4 bg-gray-300 border rounded line-through text-black">X</div>
+              <span>Missing (X)</span>
           </div>
         </div>
       </Card>

@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-export type Tooth = 'X' | 'O' | 'S';    // 'X' = missing, 'O' = Selected, 'S' = Skipped
+export type Tooth = 'X' | 'O' | '-';    // 'X' = missing, 'O' = Selected, 'S' = Skipped
 export type Teeth = { [toothNumber: string]: Tooth; } // e.g., { "11": "value"};
 export type PPD_Tooth = number[]; // e.g., [3,4,5,2,3,4]; for 6 sites
 export type LGM_Tooth = number[]; // e.g., [0,1,1,0,2,1]; for 6 sites
@@ -28,7 +28,8 @@ const initialState: PerioState = {
 const STUDY_LIMIT = 3;
 const defaltLabel = (position: number): Tooth => {
     if (position>7) return 'X'; // generally missing wisdom teeth
-    return position <= STUDY_LIMIT ? 'O' : 'S';
+    if (position <= STUDY_LIMIT) return 'O'
+    return '-';
 }
 
 export const generateDefaultTeeth = (): Teeth => {
