@@ -6,15 +6,16 @@ import { styles } from "./style";
 interface PerioInputProps {
   data: string[][];
   zones: { label: string; size: number; }[];
-  onUpdate: (data: string[][]) => void;
+  onUpdate?: (data: string[][]) => void;
   onNextFocus?: () => void;
   onPrevFocus?: () => void;
+  disabled?: boolean;
 }
-export default function PerioInput({ data, zones, onUpdate, onNextFocus, onPrevFocus }: PerioInputProps) {
+export default function PerioInput({ data, zones, onUpdate, onNextFocus, onPrevFocus, disabled }: PerioInputProps) {
   const handleChange = (row: number, vs: string[]) => {
     const updatedData = [...data];
     updatedData[row] = vs;
-    onUpdate(updatedData);
+    onUpdate?.(updatedData);
   };
   const COLUMNS = calculateColumnsFromZones(zones);
   const ZONE_SEPARATORS = calculateZoneSeparators(zones);
@@ -43,7 +44,7 @@ export default function PerioInput({ data, zones, onUpdate, onNextFocus, onPrevF
         labelStyle={styles.label}
         cellStyle={styles.cell}
         separatorStyle={styles.zoneSeparatorLeft}
-        inputProps={{ inputMode: "tel", maxLength: 3 }}
+        inputProps={{ inputMode: "tel", maxLength: 3, disabled }}
         onNextFocus={() => focus(1)}
         onPrevFocus={onPrevFocus}
       />
@@ -59,7 +60,7 @@ export default function PerioInput({ data, zones, onUpdate, onNextFocus, onPrevF
         labelStyle={styles.label}
         cellStyle={styles.cell}
         separatorStyle={styles.zoneSeparatorLeft}
-        inputProps={{ inputMode: "tel", maxLength: 3 }}
+        inputProps={{ inputMode: "tel", maxLength: 3, disabled }}
         onNextFocus={() => focus(2)}
         onPrevFocus={() => focus(0, true)}
       />
@@ -75,7 +76,7 @@ export default function PerioInput({ data, zones, onUpdate, onNextFocus, onPrevF
         labelStyle={styles.label}
         cellStyle={styles.cell}
         separatorStyle={styles.zoneSeparatorLeft}
-        inputProps={{ inputMode: "tel", maxLength: 3 }}
+        inputProps={{ inputMode: "tel", maxLength: 3, disabled }}
         onNextFocus={() => focus(3)}
         onPrevFocus={() => focus(1, true)}
       />
@@ -91,7 +92,7 @@ export default function PerioInput({ data, zones, onUpdate, onNextFocus, onPrevF
         labelStyle={styles.label}
         cellStyle={styles.cell}
         separatorStyle={styles.zoneSeparatorLeft}
-        inputProps={{ inputMode: "tel", maxLength: 3 }}
+        inputProps={{ inputMode: "tel", maxLength: 3, disabled }}
         onNextFocus={onNextFocus}
         onPrevFocus={() => focus(2, true)}
       />

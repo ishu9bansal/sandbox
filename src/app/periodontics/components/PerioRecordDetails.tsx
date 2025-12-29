@@ -4,6 +4,9 @@ import Card from "@/components/Card";
 import Button from "@/components/Button";
 import { PerioRecord } from "@/app/store/perioSlice";
 import TeethVisualization from "@/components/TeethVisualization";
+import PerioInput from "./PerioInput";
+import { deriveValues, deriveZones } from "./utils";
+import { LGMMapping, PPDMapping } from "./constants";
 
 interface PerioRecordDetailsProps {
   record: PerioRecord;
@@ -27,9 +30,20 @@ export default function PerioRecordDetails({ record, onEdit, onDelete, onBack }:
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Record Details</h2>
-        <Button variant="outline" onClick={onBack}>
-          ← Back to List
-        </Button>
+        <div className="flex gap-3 justify-end">
+          <Button variant="outline" onClick={onBack}>
+            ← Back to List
+          </Button>
+          <Button variant="outline" onClick={onEdit}>
+            Edit Record
+          </Button>
+          <button
+            onClick={onDelete}
+            className="px-4 py-2 text-base font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 bg-red-600 text-white hover:bg-red-700 focus:ring-red-500"
+          >
+            Delete Record
+          </button>
+        </div>
       </div>
 
       <Card title="Personal Information">
@@ -59,6 +73,8 @@ export default function PerioRecordDetails({ record, onEdit, onDelete, onBack }:
               <span>Missing (X)</span>
           </div>
         </div>
+        <PerioInput data={deriveValues(record.ppd, PPDMapping)} zones={deriveZones(PPDMapping[0])} disabled={true} />
+        <PerioInput data={deriveValues(record.lgm, LGMMapping)} zones={deriveZones(LGMMapping[0])} disabled={true} />
       </Card>
 
       <Card title="Record Information">
@@ -91,18 +107,6 @@ export default function PerioRecordDetails({ record, onEdit, onDelete, onBack }:
           </div>
         </div>
       </Card>
-
-      <div className="flex gap-3 justify-end">
-        <Button variant="outline" onClick={onEdit}>
-          Edit Record
-        </Button>
-        <button
-          onClick={onDelete}
-          className="px-4 py-2 text-base font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 bg-red-600 text-white hover:bg-red-700 focus:ring-red-500"
-        >
-          Delete Record
-        </button>
-      </div>
     </div>
   );
 }
