@@ -64,3 +64,4 @@ export const { addPatient, updatePatient, deletePatient, deletePatients, setPati
 export default patientSlice.reducer;
 
 export const selectAllPatients = (state: { patients: PatientState }) => state.patients.patients;
+export const selectPatientById = (id: string | null) => (state: { patients: PatientState }) => state.patients.patients.find(p => p.id === id);

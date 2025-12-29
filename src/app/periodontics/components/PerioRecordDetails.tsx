@@ -7,6 +7,9 @@ import TeethVisualization from "@/components/TeethVisualization";
 import PerioInput from "./PerioInput";
 import { deriveValues, deriveZones } from "./utils";
 import { LGMMapping, PPDMapping } from "./constants";
+import PatientCard from "@/app/patients/components/PatientCard";
+import { useSelector } from "react-redux";
+import { selectPatientById } from "@/app/store/patientSlice";
 
 interface PerioRecordDetailsProps {
   record: PerioRecord;
@@ -25,6 +28,7 @@ export default function PerioRecordDetails({ record, onEdit, onDelete, onBack }:
       minute: '2-digit',
     });
   };
+  const patient = useSelector(selectPatientById(record.patientId || null));
 
   return (
     <div className="space-y-6">
@@ -89,6 +93,14 @@ export default function PerioRecordDetails({ record, onEdit, onDelete, onBack }:
             LGM Values
           </label>
           <PerioInput data={deriveValues(record.lgm, LGMMapping)} zones={deriveZones(LGMMapping[0])} disabled={true} />
+        </div>
+        <div className="my-6 pt-4 border-t border-gray-300 dark:border-gray-600">
+          <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+            Assigned Patient
+          </label>
+          { patient &&
+            <PatientCard patient={patient} />
+          }
         </div>
       </Card>
 
