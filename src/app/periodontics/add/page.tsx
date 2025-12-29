@@ -2,16 +2,16 @@
 
 import { useRouter } from "next/navigation";
 import { useAppDispatch } from "@/app/store/hooks";
-import { addPatient, Patient } from "@/app/store/patientSlice";
-import PatientForm from "../components/PatientForm";
+import PerioRecordForm from "../components/PerioRecordForm";
+import { addPerioRecord, PerioRecord } from "@/app/store/perioSlice";
 
-export default function AddPatientPage() {
+export default function AddRecordPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const handleAddPatient = (patientData: Omit<Patient, 'id' | 'createdAt' | 'updatedAt'>) => {
-    dispatch(addPatient(patientData));
-    router.push('/patients');
+  const handleAddRecord = (record: Omit<PerioRecord, 'id' | 'createdAt' | 'updatedAt'>) => {
+    dispatch(addPerioRecord(record));
+    router.push('/periodontics');
   };
 
   const handleCancel = () => {
@@ -20,8 +20,8 @@ export default function AddPatientPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <PatientForm
-        onSubmit={handleAddPatient}
+      <PerioRecordForm
+        onSubmit={handleAddRecord}
         onCancel={handleCancel}
       />
     </div>

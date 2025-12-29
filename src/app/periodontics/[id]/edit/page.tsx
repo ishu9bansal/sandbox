@@ -2,38 +2,36 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
-import { updatePatient, Patient } from "@/app/store/patientSlice";
-import PatientForm from "../../components/PatientForm";
+import PerioRecordForm from "../../components/PerioRecordForm";
+import { PerioRecord, selectPerioRecordById, updatePerioRecord } from "@/app/store/perioSlice";
 
 export default function EditPatientPage() {
   const router = useRouter();
-  const { id: patient_id } = useParams();
+  const { id: record_id } = useParams();
   const dispatch = useAppDispatch();
-  const patient = useAppSelector(state =>
-    state.patients.patients.find(p => p.id === patient_id)
-  );
+  const record = useAppSelector(selectPerioRecordById(record_id));
 
-  if (!patient) {
-    return (
+  if (!record) {
+    return ( 
       <div className="max-w-2xl mx-auto text-center py-12">
-        <h2 className="text-2xl font-bold mb-4">Patient Not Found</h2>
+        <h2 className="text-2xl font-bold mb-4">Record Not Found</h2>
         <p className="text-gray-600 dark:text-gray-300 mb-4">
-          The patient you're trying to edit doesn't exist.
+          The record you're trying to edit doesn't exist.
         </p>
       </div>
     );
   }
 
-  const handleUpdatePatient = (patientData: Omit<Patient, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const updatedPatient: Patient = {
-      ...patientData,
-      id: patient.id,
-      createdAt: patient.createdAt,
-      updatedAt: patient.updatedAt,
+  const handleUpdate = (newRecord: Omit<PerioRecord, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const updatedRecord: PerioRecord = {
+      ...newRecord,
+      id: record.id,
+      createdAt: record.createdAt,
+      updatedAt: record.updatedAt,
     };
 
-    dispatch(updatePatient(updatedPatient));
-    router.push(`/patients/${patient.id}`);
+    dispatch(updatePerioRecord(updatedRecord));
+    router.push(`/periodontics/${record.id}`);
   };
 
   const handleCancel = () => {
@@ -42,9 +40,9 @@ export default function EditPatientPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <PatientForm
-        patient={patient}
-        onSubmit={handleUpdatePatient}
+      <PerioRecordForm
+        record={record}
+        onSubmit={handleUpdate}
         onCancel={handleCancel}
       />
     </div>

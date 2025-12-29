@@ -86,3 +86,5 @@ export const { addPerioRecord, updatePerioRecord, deletePerioRecord, deletePerio
 export default perioSlice.reducer;
 
 export const selectPerioRecords = (state: { perio: PerioState }) => state.perio.records;
+export const selectPerioRecordById = (id: any) => (state: { perio: PerioState }) =>
+  state.perio.records.find(record => record.id === id);
