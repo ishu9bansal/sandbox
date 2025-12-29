@@ -61,7 +61,7 @@ export default function TeethVisualization({ data }: { data: Teeth }) {
   };
 
   return (
-    <div className="inline-block border-2 border-gray-400 rounded-lg p-4 bg-gray-50">
+    <div className="inline-block border-2 border-gray-400 rounded-lg p-4 bg-gray-700">
       {/* Upper teeth */}
       <div className="flex gap-1 mb-6">
         {/* Upper Left (21-28) - reversed */}
