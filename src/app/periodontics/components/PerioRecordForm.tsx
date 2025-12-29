@@ -51,6 +51,8 @@ export default function PerioRecordForm({ record, onSubmit, onCancel }: PerioRec
       });
     }
   };
+  const handleLabelChange = (value: string) => handleChange('label', value);
+  const labels = ['Baseline', 'Follow Up'];
 
   return (
     <Card title={record ? "Edit Record" : "Add New Record"}>
@@ -59,11 +61,12 @@ export default function PerioRecordForm({ record, onSubmit, onCancel }: PerioRec
           <Input
             label="Label"
             value={formData.label}
-            onChange={(e) => handleChange('label', e.target.value)}
+            onChange={(e) => handleLabelChange(e.target.value)}
             placeholder="Enter record label"
             error={errors.label}
             required
           />
+          <QuickLabels labels={labels} onSelect={handleLabelChange} />
         </div>
         <div className="flex gap-3 justify-end pt-4">
           <Button variant="outline" onClick={onCancel} type="button">
@@ -75,5 +78,22 @@ export default function PerioRecordForm({ record, onSubmit, onCancel }: PerioRec
         </div>
       </form>
     </Card>
+  );
+}
+
+function QuickLabels({ labels, onSelect }: { labels: string[]; onSelect: (label: string) => void }) {
+  return (
+    <div className="mt-2 flex gap-2">
+      {labels.map((label) => (
+        <button
+          key={label}
+          type="button"
+          className="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-sm rounded hover:bg-gray-300 dark:hover:bg-gray-600"
+          onClick={() => onSelect(label)}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
   );
 }
