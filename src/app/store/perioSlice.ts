@@ -13,6 +13,7 @@ export interface PerioRecord {
   teeth: Teeth;
   ppd: PPD;
   lgm: LGM;
+  patientId? : string;
   createdAt: string;
   updatedAt: string;
 }

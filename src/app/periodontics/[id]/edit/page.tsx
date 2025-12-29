@@ -3,17 +3,18 @@
 import { useParams, useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import PerioRecordForm from "../../components/PerioRecordForm";
-import { LGM, PerioRecord, PPD, selectPerioRecordById, updatePerioRecord } from "@/app/store/perioSlice";
+import { LGM, PerioRecord, PPD, selectPerioRecordById, Teeth, updatePerioRecord } from "@/app/store/perioSlice";
 import { useState } from "react";
 import PPDForm from "../../components/PPDForm";
 import LGMForm from "../../components/LGMForm";
+import PatientForm from "../../components/PatientForm";
 
 export default function EditPatientPage() {
   const router = useRouter();
   const { id: record_id } = useParams();
   const dispatch = useAppDispatch();
   const record = useAppSelector(selectPerioRecordById(record_id));
-  const [view, setView] = useState<'basic' | 'ppd' | 'lgm'>('ppd');
+  const [view, setView] = useState<'basic' | 'ppd' | 'lgm' | 'patient'>('ppd');
 
   if (!record) {
     return ( 
@@ -26,30 +27,38 @@ export default function EditPatientPage() {
     );
   }
 
-  const handleBasicUpdate = (newRecord: Omit<PerioRecord, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const handleBasicUpdate = ({ label, teeth }: { label: string; teeth: Teeth; }) => {
     const updatedRecord: PerioRecord = {
-      ...newRecord,
-      id: record.id,
-      createdAt: record.createdAt,
-      updatedAt: record.updatedAt,
+      ...record,
+      label,
+      teeth,
     };
     dispatch(updatePerioRecord(updatedRecord));
     setView('ppd');
   };
 
-  const handlePPDUpdate = (newData: PPD) => {
+  const handlePPDUpdate = (ppd: PPD) => {
     const updatedRecord: PerioRecord = {
       ...record,
-      ppd: newData,
+      ppd,
     };
     dispatch(updatePerioRecord(updatedRecord));
     setView('lgm');
   };
 
-  const handleLGMUpdate = (newData: LGM) => {
+  const handleLGMUpdate = (lgm: LGM) => {
     const updatedRecord: PerioRecord = {
       ...record,
-      lgm: newData,
+      lgm,
+    };
+    dispatch(updatePerioRecord(updatedRecord));
+    setView('patient')
+  };
+  
+  const handlePatientUpdate = (patientId: string) => {
+    const updatedRecord: PerioRecord = {
+      ...record,
+      patientId,
     };
     dispatch(updatePerioRecord(updatedRecord));
     router.push(`/periodontics/${record.id}`);
@@ -82,6 +91,12 @@ export default function EditPatientPage() {
           data={record.lgm}
           onSubmit={handleLGMUpdate}
           onCancel={() => setView('ppd')}
+        />
+      }
+      { view === 'patient' &&
+        <PatientForm
+          onSubmit={handlePatientUpdate}
+          onCancel={() => setView('lgm')}
         />
       }
     </div>

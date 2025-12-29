@@ -5,31 +5,29 @@ import Card from "@/components/Card";
 import Button from "@/components/Button";
 import { LGM, Teeth } from "@/app/store/perioSlice";
 
-interface LGMFormProps {
-  teeth: Teeth;
-  data: LGM;
-  onSubmit: (data: LGM) => void;
+interface PatientFormProps {
+  onSubmit: (patient_id: string) => void;
   onCancel: () => void;
 }
 
-export default function LGMForm({ data, teeth, onSubmit, onCancel }: LGMFormProps) {
+export default function PatientForm({ onSubmit, onCancel }: PatientFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({});
+    onSubmit("");
   };
 
   return (
-    <Card title={"Edit LGM Values" }>
+    <Card title={"Assign to Patient" }>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          {/* Quick Input for LGM values */}
+          {/* Patient Select View */}
         </div>
         <div className="flex gap-3 justify-end pt-4">
           <Button variant="outline" onClick={onCancel} type="button">
             Back
           </Button>
           <Button variant="primary" type="submit">
-            Next
+            Submit
           </Button>
         </div>
       </form>
