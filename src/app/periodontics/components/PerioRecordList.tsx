@@ -42,6 +42,18 @@ export default function PerioRecordList({
       accessor: (record: PerioRecord) => record.patientId || "Unassigned",
       render: (patientId: string) => patientLabelMap[patientId] || "Unassigned",
     },
+    {
+      key: 'createdAt',
+      header: 'Created At',
+      sortable: true,
+      render: (value: string) => new Date(value).toLocaleDateString(),
+    },
+    {
+      key: 'updatedAt',
+      header: 'Last Updated',
+      sortable: true,
+      render: (value: string) => new Date(value).toLocaleDateString(),
+    }
   ], [patientLabelMap]);
 
   return (
