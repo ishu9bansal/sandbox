@@ -55,7 +55,7 @@ export default function EditPatientPage() {
     setView('patient')
   };
   
-  const handlePatientUpdate = (patientId: string) => {
+  const handlePatientUpdate = (patientId: string | null) => {
     const updatedRecord: PerioRecord = {
       ...record,
       patientId,

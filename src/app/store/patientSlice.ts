@@ -62,3 +62,5 @@ const patientSlice = createSlice({
 
 export const { addPatient, updatePatient, deletePatient, deletePatients, setPatients } = patientSlice.actions;
 export default patientSlice.reducer;
+
+export const selectAllPatients = (state: { patients: PatientState }) => state.patients.patients;
