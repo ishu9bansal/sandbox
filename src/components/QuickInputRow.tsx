@@ -70,6 +70,7 @@ const QuickInputRow = forwardRef<QuickInputRowRef, QuickInputRowProps>(function 
   const getShiftMode = (c: number): boolean => shiftModeRef.current[c];
 
   const handleChange = (c: number, raw: string): void => {
+    // TODO: handle negative input from mobile
     const v = raw.trim();
     if (!isValidPartial(v)) return;
 
@@ -141,7 +142,7 @@ const QuickInputRow = forwardRef<QuickInputRowRef, QuickInputRowProps>(function 
               ...cellStyle,
               ...(needsSeparator ? separatorStyle : {})
             }}
-            inputMode="numeric"
+            inputMode="tel"
             maxLength={3}
             {...inputProps}
           />
