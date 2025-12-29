@@ -70,7 +70,7 @@ export default function PerioRecordForm({ record, onSubmit, onCancel }: PerioRec
             Cancel
           </Button>
           <Button variant="primary" type="submit">
-            {record ? "Update Record" : "Add Record"}
+            Next
           </Button>
         </div>
       </form>

@@ -3,13 +3,17 @@
 import { useParams, useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import PerioRecordForm from "../../components/PerioRecordForm";
-import { PerioRecord, selectPerioRecordById, updatePerioRecord } from "@/app/store/perioSlice";
+import { LGM, PerioRecord, PPD, selectPerioRecordById, updatePerioRecord } from "@/app/store/perioSlice";
+import { useState } from "react";
+import PPDForm from "../../components/PPDForm";
+import LGMForm from "../../components/LGMForm";
 
 export default function EditPatientPage() {
   const router = useRouter();
   const { id: record_id } = useParams();
   const dispatch = useAppDispatch();
   const record = useAppSelector(selectPerioRecordById(record_id));
+  const [view, setView] = useState<'basic' | 'ppd' | 'lgm'>('ppd');
 
   if (!record) {
     return ( 
@@ -22,14 +26,31 @@ export default function EditPatientPage() {
     );
   }
 
-  const handleUpdate = (newRecord: Omit<PerioRecord, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const handleBasicUpdate = (newRecord: Omit<PerioRecord, 'id' | 'createdAt' | 'updatedAt'>) => {
     const updatedRecord: PerioRecord = {
       ...newRecord,
       id: record.id,
       createdAt: record.createdAt,
       updatedAt: record.updatedAt,
     };
+    dispatch(updatePerioRecord(updatedRecord));
+    setView('ppd');
+  };
 
+  const handlePPDUpdate = (newData: PPD) => {
+    const updatedRecord: PerioRecord = {
+      ...record,
+      ppd: newData,
+    };
+    dispatch(updatePerioRecord(updatedRecord));
+    setView('lgm');
+  };
+
+  const handleLGMUpdate = (newData: LGM) => {
+    const updatedRecord: PerioRecord = {
+      ...record,
+      lgm: newData,
+    };
     dispatch(updatePerioRecord(updatedRecord));
     router.push(`/periodontics/${record.id}`);
   };
@@ -40,11 +61,29 @@ export default function EditPatientPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <PerioRecordForm
-        record={record}
-        onSubmit={handleUpdate}
-        onCancel={handleCancel}
-      />
+      { view === 'basic' &&
+        <PerioRecordForm
+          record={record}
+          onSubmit={handleBasicUpdate}
+          onCancel={handleCancel}
+        />
+      }
+      { view === 'ppd' &&
+        <PPDForm
+          teeth={record.teeth}
+          data={record.ppd}
+          onSubmit={handlePPDUpdate}
+          onCancel={() => setView('basic')}
+        />
+      }
+      { view === 'lgm' &&
+        <LGMForm
+          teeth={record.teeth}
+          data={record.lgm}
+          onSubmit={handleLGMUpdate}
+          onCancel={() => setView('ppd')}
+        />
+      }
     </div>
   );
 }
