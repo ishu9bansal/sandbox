@@ -92,8 +92,8 @@ export default function PPDForm({ data, teeth, onSubmit, onCancel }: PPDFormProp
   };
   return (
     <Card title={"Edit PPD Values"}>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
+      <form onSubmit={handleSubmit} className="space-y-4 overflow-x-auto">
+        <div className="inline-block min-w-max">
           <PerioInput data={values} onUpdate={setValues} />
         </div>
         <div className="flex gap-3 justify-end pt-4">
