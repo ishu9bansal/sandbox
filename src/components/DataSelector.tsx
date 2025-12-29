@@ -5,8 +5,9 @@ interface DataSelectorProps<T> {
   selected: T | null;
   onSelect: (datum: T | null) => void;
   renderer: (datum: T | null) => JSX.Element;
+  toString: (datum: T | null) => string;
 }
-export default function DataSelector<T>({ data, selected, onSelect, renderer }: DataSelectorProps<T>) {
+export default function DataSelector<T>({ data, selected, onSelect, renderer, toString }: DataSelectorProps<T>) {
   // TODO: Implement search/filtering
   return (
     <div>
@@ -25,7 +26,7 @@ export default function DataSelector<T>({ data, selected, onSelect, renderer }: 
         <option value={-1}>-- Select Patient --</option>
         {data.map((datum, index) => (
           <option key={index} value={index}>
-            {renderer(datum)}
+            {toString(datum)}
           </option>
         ))}
       </select>

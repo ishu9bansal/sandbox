@@ -95,6 +95,7 @@ export default function EditPatientPage() {
       }
       { view === 'patient' &&
         <PatientForm
+          patient_id={record.patientId || null}
           onSubmit={handlePatientUpdate}
           onCancel={() => setView('lgm')}
         />
