@@ -2,7 +2,8 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { updatePatient, Patient } from "@/store/patientSlice";
+import { updatePatient } from "@/store/patientSlice";
+import { Patient } from '@/models/patient';
 import PatientForm from "../../components/PatientForm";
 
 export default function EditPatientPage() {

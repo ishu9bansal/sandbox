@@ -1,16 +1,5 @@
+import { Patient } from '@/models/patient';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-export interface Patient {
-  id: string;
-  name: string;
-  age: number;
-  sex: 'Male' | 'Female' | 'Other';
-  contact: string;
-  email?: string;
-  address?: string;
-  createdAt: string;
-  updatedAt: string;
-}
 
 export interface PatientState {
   patients: Patient[];

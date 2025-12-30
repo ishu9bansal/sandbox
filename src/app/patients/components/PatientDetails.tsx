@@ -2,7 +2,7 @@
 
 import Card from "@/components/Card";
 import Button from "@/components/Button";
-import { Patient } from "@/store/patientSlice";
+import { Patient } from '@/models/patient';
 import PatientCard from "./PatientCard";
 
 interface PatientDetailsProps {
