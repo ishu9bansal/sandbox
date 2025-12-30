@@ -151,11 +151,6 @@ export default function DataTable<T>(props: DataTableProps<T>) {
     }
   }
 
-  function onRowClick(e: React.MouseEvent, row: T) {
-    const target = e.target as HTMLElement;
-    if (target.closest("button, input, a")) return; // avoid accidental triggers
-    onView?.(row);
-  }
 
   return (
     <div style={styles.container}>
@@ -252,42 +247,16 @@ export default function DataTable<T>(props: DataTableProps<T>) {
         <tbody>
           {sortedData.map((row, i) => {
             const id = getRowId(row, i);
-            return (
-              <tr key={id} style={styles.row} onClick={(e) => onRowClick(e, row)}>
-                <td style={styles.cell}>
-                  <input
-                    type="checkbox"
-                    checked={!!selected[id]}
-                    onChange={() => toggleRow(id)}
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                </td>
-                {columns.map((col) => {
-                  const value = getCellValue(row, col);
-                  return (
-                    <td key={col.key} style={styles.cell}>
-                      {col.render ? col.render(value, row) : String(Array.isArray(value) ? value.join(" ") : value)}
-                    </td>
-                  );
-                })}
-                <td style={styles.cell}>
-                  <div style={styles.actionGroup}>
-                    <ActionButton
-                      label="Edit"
-                      row={row}
-                      onAction={onEdit}
-                      styles={styles.actionButton}
-                    />
-                    <ActionButton
-                      label="Delete"
-                      row={row}
-                      onAction={onDelete}
-                      styles={{ ...styles.actionButton, background: "#552222", color: "#ffffff" }}
-                    />
-                  </div>
-                </td>
-              </tr>
-            );
+            return <DataTableRow
+              key={getRowId(row, i)}
+              row={row}
+              columns={columns}
+              onView={onView}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              selected={!!selected[id]}
+              toggleRow={() => toggleRow(id)}
+            />
           })}
           {sortedData.length === 0 && (
             <tr>
@@ -299,6 +268,60 @@ export default function DataTable<T>(props: DataTableProps<T>) {
         </tbody>
       </table>
     </div>
+  );
+}
+
+
+type DataTableRowProps<T> = {
+  row: T;
+  columns: Column<T>[];
+  onView?: (row: T) => void;
+  onEdit?: (row: T) => void;
+  onDelete?: (row: T) => void;
+  selected: boolean;
+  toggleRow: () => void;
+};
+function DataTableRow<T>({ row, columns, onView, selected, toggleRow, onDelete, onEdit }: DataTableRowProps<T>) {
+  function onRowClick(e: React.MouseEvent) {
+    const target = e.target as HTMLElement;
+    if (target.closest("button, input, a")) return; // avoid accidental triggers
+    onView?.(row);
+  }
+  return (
+    <tr style={styles.row} onClick={onRowClick}>
+      <td style={styles.cell}>
+        <input
+          type="checkbox"
+          checked={selected}
+          onChange={toggleRow}
+          onClick={(e) => e.stopPropagation()}
+        />
+      </td>
+      {columns.map((col) => {
+        const value = getCellValue(row, col);
+        return (
+          <td key={col.key} style={styles.cell}>
+            {col.render ? col.render(value, row) : String(Array.isArray(value) ? value.join(" ") : value)}
+          </td>
+        );
+      })}
+      <td style={styles.cell}>
+        <div style={styles.actionGroup}>
+          <ActionButton
+            label="Edit"
+            row={row}
+            onAction={onEdit}
+            styles={styles.actionButton}
+          />
+          <ActionButton
+            label="Delete"
+            row={row}
+            onAction={onDelete}
+            styles={{ ...styles.actionButton, background: "#552222", color: "#ffffff" }}
+          />
+        </div>
+      </td>
+    </tr>
   );
 }
 
