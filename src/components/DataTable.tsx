@@ -224,25 +224,11 @@ export default function DataTable<T>(props: DataTableProps<T>) {
             <th style={styles.cell}>Actions</th>
           </tr>
           {/* Filter row */}
-          <tr>
-            <th style={styles.cell}></th>
-            {columns.map((col) => (
-              <th key={col.key} style={styles.cell}>
-                {col.filterable ? (
-                  <input
-                    aria-label={`Filter ${col.header}`}
-                    placeholder={`Filter...`}
-                    value={filters[col.key] || ""}
-                    onChange={(e) =>
-                      setFilters((prev) => ({ ...prev, [col.key]: e.target.value }))
-                    }
-                    style={styles.filterInput}
-                  />
-                ) : null}
-              </th>
-            ))}
-            <th style={styles.cell}></th>
-          </tr>
+          <FilterRow
+            columns={columns}
+            onFilterChange={(key, val) => setFilters((prev) => ({ ...prev, [key]: val }))}
+            filters={filters}
+          />
         </thead>
         <tbody>
           {sortedData.map((row, i) => {
@@ -265,6 +251,32 @@ export default function DataTable<T>(props: DataTableProps<T>) {
   );
 }
 
+type FilterRowProps<T> = {
+  columns: Column<T>[];
+  onFilterChange: (key: string, value: string) => void;
+  filters: Record<string, string>;
+};
+function FilterRow<T>({ columns, onFilterChange, filters }: FilterRowProps<T>) {
+  return (
+    <tr>
+      <th style={styles.cell}></th>
+      {columns.map((col) => (
+        <th key={col.key} style={styles.cell}>
+          {col.filterable ? (
+            <input
+              aria-label={`Filter ${col.header}`}
+              placeholder={`Filter...`}
+              value={filters[col.key] || ""}
+              onChange={(e) => onFilterChange(col.key, e.target.value)}
+              style={styles.filterInput}
+            />
+          ) : null}
+        </th>
+      ))}
+      <th style={styles.cell}></th>
+    </tr>
+  );
+}
 
 function EmptyView({ visible = true, colSpan }: { colSpan: number, visible?: boolean }) {
   if (!visible) return null;
