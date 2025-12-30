@@ -272,24 +272,18 @@ export default function DataTable<T>(props: DataTableProps<T>) {
                 })}
                 <td style={styles.cell}>
                   <div style={styles.actionGroup}>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onEdit?.(row);
-                      }}
-                      style={styles.actionButton}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDelete?.(row);
-                      }}
-                      style={{ ...styles.actionButton, background: "#552222", color: "#ffffff" }}
-                    >
-                      Delete
-                    </button>
+                    <ActionButton
+                      label="Edit"
+                      row={row}
+                      onAction={onEdit}
+                      styles={styles.actionButton}
+                    />
+                    <ActionButton
+                      label="Delete"
+                      row={row}
+                      onAction={onDelete}
+                      styles={{ ...styles.actionButton, background: "#552222", color: "#ffffff" }}
+                    />
                   </div>
                 </td>
               </tr>
@@ -305,6 +299,27 @@ export default function DataTable<T>(props: DataTableProps<T>) {
         </tbody>
       </table>
     </div>
+  );
+}
+
+type ActionButtonProps<T> = {
+  label: string;
+  row: T;
+  onAction?: (row: T) => void;
+  styles?: React.CSSProperties;
+};
+
+function ActionButton<T>({ label, row, onAction, styles }: ActionButtonProps<T>) {
+  return (
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        onAction?.(row);
+      }}
+      style={styles}
+    >
+      {label}
+    </button>
   );
 }
 
