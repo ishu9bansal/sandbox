@@ -258,19 +258,24 @@ export default function DataTable<T>(props: DataTableProps<T>) {
               toggleRow={() => toggleRow(id)}
             />
           })}
-          {sortedData.length === 0 && (
-            <tr>
-              <td colSpan={columns.length + 2} style={styles.cell}>
-                No results
-              </td>
-            </tr>
-          )}
+          <EmptyView colSpan={columns.length + 2} visible={sortedData.length === 0} />
         </tbody>
       </table>
     </div>
   );
 }
 
+
+function EmptyView({ visible = true, colSpan }: { colSpan: number, visible?: boolean }) {
+  if (!visible) return null;
+  return (
+    <tr>
+      <td colSpan={colSpan} style={styles.cell}>
+        No results
+      </td>
+    </tr>
+  );
+}
 
 type DataTableRowProps<T> = {
   row: T;
