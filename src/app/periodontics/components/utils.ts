@@ -1,5 +1,5 @@
 
-import { LGM, PPD } from "@/app/store/perioSlice";
+import { LGM, PPD } from "@/store/perioSlice";
 
 const deriveToothSiteFromPosition = (row: number, col: number, mapping: string[][]): [string, number] => {
   const key = mapping[row][col];

@@ -2,9 +2,9 @@
 
 import { useMemo } from "react";
 import DataTable, { Column } from "@/components/DataTable";
-import { PerioRecord } from "@/app/store/perioSlice";
+import { PerioRecord } from "@/store/perioSlice";
 import { useSelector } from "react-redux";
-import { selectAllPatients } from "@/app/store/patientSlice";
+import { selectAllPatients } from "@/store/patientSlice";
 
 interface PerioRecordListProps {
   records: PerioRecord[];

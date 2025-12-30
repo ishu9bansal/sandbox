@@ -1,9 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import PerioRecordForm from "../components/PerioRecordForm";
-import { addPerioRecord, PerioRecord, resetFreshId, selectFreshPerioRecordId } from "@/app/store/perioSlice";
+import { addPerioRecord, PerioRecord, resetFreshId, selectFreshPerioRecordId } from "@/store/perioSlice";
 import { useEffect } from "react";
 
 export default function AddRecordPage() {

@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import DataTable, { Column } from "@/components/DataTable";
-import { Patient } from "@/app/store/patientSlice";
+import { Patient } from "@/store/patientSlice";
 
 interface PatientListProps {
   patients: Patient[];

@@ -1,6 +1,6 @@
 "use client";
 
-import { Teeth } from "@/app/store/perioSlice";
+import { Teeth } from "@/store/perioSlice";
 
 // Component to visualize teeth data in anatomical layout
 // FDI dental notation: First digit = quadrant (1-4), second digit = tooth position (1-8)

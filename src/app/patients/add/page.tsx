@@ -1,8 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useAppDispatch } from "@/app/store/hooks";
-import { addPatient, Patient } from "@/app/store/patientSlice";
+import { useAppDispatch } from "@/store/hooks";
+import { addPatient, Patient } from "@/store/patientSlice";
 import PatientForm from "../components/PatientForm";
 
 export default function AddPatientPage() {

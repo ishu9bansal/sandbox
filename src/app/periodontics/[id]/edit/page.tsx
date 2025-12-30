@@ -1,9 +1,9 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import PerioRecordForm from "../../components/PerioRecordForm";
-import { LGM, PerioRecord, PPD, selectPerioRecordById, Teeth, updatePerioRecord } from "@/app/store/perioSlice";
+import { LGM, PerioRecord, PPD, selectPerioRecordById, Teeth, updatePerioRecord } from "@/store/perioSlice";
 import { useState } from "react";
 import PPDForm from "../../components/PPDForm";
 import LGMForm from "../../components/LGMForm";

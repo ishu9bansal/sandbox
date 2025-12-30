@@ -5,7 +5,7 @@ import BlogCard from "@/components/BlogCard";
 import Button from "@/components/Button";
 import { OGMetadata } from "@/utils/ogMetadata";
 import { BlogMetadata } from "@/lib/blogs";
-import { useHydrationSafety } from "../hooks/hydrationSafety";
+import { useHydrationSafety } from "@/hooks/hydrationSafety";
 
 interface BlogsPageClientProps {
   blogs: (OGMetadata | BlogMetadata)[];

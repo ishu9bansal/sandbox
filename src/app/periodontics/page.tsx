@@ -1,8 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
-import { deletePerioRecord, deletePerioRecords, PerioRecord } from "@/app/store/perioSlice";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { deletePerioRecord, deletePerioRecords, PerioRecord } from "@/store/perioSlice";
 import Button from "@/components/Button";
 import PerioRecordList from "./components/PerioRecordList";
 

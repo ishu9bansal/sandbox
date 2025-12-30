@@ -4,7 +4,7 @@ import { useState } from "react";
 import Card from "@/components/Card";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
-import { generateDefaultTeeth, PerioRecord } from "@/app/store/perioSlice";
+import { generateDefaultTeeth, PerioRecord } from "@/store/perioSlice";
 
 interface PerioRecordFormProps {
   record?: PerioRecord;

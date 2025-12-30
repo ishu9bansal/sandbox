@@ -1,4 +1,4 @@
-import { Patient } from "@/app/store/patientSlice";
+import { Patient } from "@/store/patientSlice";
 import Card from "@/components/Card";
 
 export default function PatientCard({ patient }: { patient: Patient }) {

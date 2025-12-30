@@ -1,8 +1,8 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
-import { deletePatient } from "@/app/store/patientSlice";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { deletePatient } from "@/store/patientSlice";
 import Button from "@/components/Button";
 import PatientDetails from "../components/PatientDetails";
 

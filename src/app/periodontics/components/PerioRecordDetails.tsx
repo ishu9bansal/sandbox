@@ -2,14 +2,14 @@
 
 import Card from "@/components/Card";
 import Button from "@/components/Button";
-import { PerioRecord } from "@/app/store/perioSlice";
+import { PerioRecord } from "@/store/perioSlice";
 import TeethVisualization from "@/components/TeethVisualization";
 import PerioInput from "./PerioInput";
 import { deriveValues, deriveZones } from "./utils";
 import { LGMMapping, PPDMapping } from "./constants";
 import PatientCard from "@/app/patients/components/PatientCard";
 import { useSelector } from "react-redux";
-import { selectPatientById } from "@/app/store/patientSlice";
+import { selectPatientById } from "@/store/patientSlice";
 
 interface PerioRecordDetailsProps {
   record: PerioRecord;

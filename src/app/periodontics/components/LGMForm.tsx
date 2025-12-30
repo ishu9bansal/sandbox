@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import Card from "@/components/Card";
 import Button from "@/components/Button";
-import { LGM, Teeth } from "@/app/store/perioSlice";
+import { LGM, Teeth } from "@/store/perioSlice";
 import PerioInput from "./PerioInput";
 import { deriveDataFromValues, deriveValues, deriveZones } from "./utils";
 import { LGMMapping } from "./constants";
