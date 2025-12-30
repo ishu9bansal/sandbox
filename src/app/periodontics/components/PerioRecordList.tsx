@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import DataTable, { Column } from "@/components/DataTable";
-import { PerioRecord } from "@/store/perioSlice";
+import { PerioRecord } from '@/models/perio';
 import { useSelector } from "react-redux";
 import { selectAllPatients } from "@/store/patientSlice";
 

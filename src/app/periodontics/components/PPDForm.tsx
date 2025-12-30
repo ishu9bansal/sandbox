@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import Card from "@/components/Card";
 import Button from "@/components/Button";
-import { PPD, Teeth } from "@/store/perioSlice";
+import { PPD, Teeth } from "@/models/perio";
 import { deriveDataFromValues, deriveValues, deriveZones } from "./utils";
 import PerioInput from "./PerioInput";
 import { PPDMapping } from "./constants";

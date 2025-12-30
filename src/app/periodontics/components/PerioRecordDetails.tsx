@@ -2,7 +2,7 @@
 
 import Card from "@/components/Card";
 import Button from "@/components/Button";
-import { PerioRecord } from "@/store/perioSlice";
+import { PerioRecord } from '@/models/perio';
 import TeethVisualization from "@/components/TeethVisualization";
 import PerioInput from "./PerioInput";
 import { deriveValues, deriveZones } from "./utils";

@@ -3,7 +3,8 @@
 import { useParams, useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import PerioRecordForm from "../../components/PerioRecordForm";
-import { LGM, PerioRecord, PPD, selectPerioRecordById, Teeth, updatePerioRecord } from "@/store/perioSlice";
+import { selectPerioRecordById, updatePerioRecord } from "@/store/perioSlice";
+import { PerioRecord, LGM, PPD, Teeth } from '@/models/perio';
 import { useState } from "react";
 import PPDForm from "../../components/PPDForm";
 import LGMForm from "../../components/LGMForm";

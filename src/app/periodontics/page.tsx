@@ -2,7 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { deletePerioRecord, deletePerioRecords, PerioRecord } from "@/store/perioSlice";
+import { deletePerioRecord, deletePerioRecords } from "@/store/perioSlice";
+import { PerioRecord } from '@/models/perio';
 import Button from "@/components/Button";
 import PerioRecordList from "./components/PerioRecordList";
 
