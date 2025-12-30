@@ -164,23 +164,27 @@ export default function DataTable<T>(props: DataTableProps<T>) {
             onChange={(e) => setGlobalQuery(e.target.value)}
             style={styles.searchInput}
           />
-          <button
-            onClick={() => onBulkDelete?.(selectedRows)}
+          <BulkActionButton
+            label="Delect Selected"
             disabled={selectedRows.length === 0}
-            style={{
+            rows={selectedRows}
+            onAction={onBulkDelete}
+            styles={{
               ...styles.button,
-              background: selectedRows.length ? "#cc3300" : "#555",
-              cursor: selectedRows.length ? "pointer" : "not-allowed",
+              background: "#cc3300",
+              cursor: "pointer",
             }}
-          >
-            Delete Selected
-          </button>
-          <button
-            onClick={() => copyCsv(selectedRows.length ? selectedRows : sortedData)}
-            style={{ ...styles.button, background: "#0066cc" }}
-          >
-            Copy {selectedRows.length ? "Selected" : "All"} CSV
-          </button>
+          />
+          <BulkActionButton
+            label="Copy Selected CSV"
+            disabled={selectedRows.length === 0}
+            rows={selectedRows}
+            onAction={copyCsv}
+            styles={{
+              ...styles.button,
+              background: "#0066cc",
+            }}
+          />
         </div>
       </div>
 
@@ -339,6 +343,32 @@ function DataTableRow<T>({ row, columns, onView, selected, toggleRow, onDelete, 
         </div>
       </td>
     </tr>
+  );
+}
+
+type BulkActionButtonProps<T> = {
+  label: string;
+  rows: T[];
+  onAction?: (rows: T[]) => void;
+  styles?: React.CSSProperties;
+  disabled?: boolean;
+}
+function BulkActionButton<T>({ label, rows, onAction, disabled, styles }: BulkActionButtonProps<T>) {
+  const disabledOverride = disabled ? { 
+    background: "#555",
+    cursor: "not-allowed",
+  } : {};
+  return (
+    <button
+      onClick={() => onAction?.(rows)}
+      disabled={disabled}
+      style={{
+        ...styles,
+        ...disabledOverride,
+      }}
+    >
+      {label}
+    </button>
   );
 }
 
