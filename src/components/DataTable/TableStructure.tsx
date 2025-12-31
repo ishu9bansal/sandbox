@@ -3,13 +3,13 @@ import DataTableRow from "./DataTableRow";
 import FilterRow from "./FilterRow";
 import HeaderRow from "./HeaderRow";
 import { styles } from "./styles";
-import { Column, DataTableProps } from "./types";
+import { BulkAction, Column } from "./types";
 
 type TableStructureProps<T> = {
   title: string;
   query: string;
   setQuery: (q: string) => void;
-  bulkActions?: DataTableProps<T>["bulkActions"];
+  bulkActions?: BulkAction<T>[];
   selectedRows: T[];
   columns: Column<T>[];
   data: T[];
@@ -18,7 +18,7 @@ type TableStructureProps<T> = {
   filters: Record<string, string>;
   onFilterChange: (key: string, value: string) => void;
   onRowClick?: (row: T) => void;
-  getRowId: DataTableProps<T>["getRowId"];
+  getRowId: (row: T) => string;
   onSortToggle: (colKey: string) => void;
 }
 export default function TableStructure<T>({ title, query, setQuery, bulkActions, selectedRows, columns, data, sortKey, sortDir, filters, onFilterChange, onRowClick, getRowId, onSortToggle }: TableStructureProps<T>) {
