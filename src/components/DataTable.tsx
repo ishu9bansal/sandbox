@@ -1,5 +1,6 @@
 "use client";
 
+import { compareNumOrString } from "@/utils/helpers";
 import React, { useMemo, useState } from "react";
 
 export type Column<T> = {
@@ -57,16 +58,6 @@ export type DataTableProps<T> = {
   bulkActions?: BulkAction<T>[];
   rowActions?: RowAction<T>[];
 };
-
-function compareNumOrString(a: number | string, b: number | string, sortDir: "asc" | "desc" = "asc"): number {
-  const factor = sortDir === "asc" ? 1 : -1;
-  if (typeof a === "number" && typeof b === "number") {
-    return factor * (a - b);
-  }
-  const sa = String(a);
-  const sb = String(b);
-  return factor * sa.localeCompare(sb);
-}
 
 export default function DataTable<T>(props: DataTableProps<T>) {
   const {
