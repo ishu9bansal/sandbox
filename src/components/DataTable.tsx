@@ -5,12 +5,33 @@ import React, { useMemo, useState } from "react";
 export type Column<T> = {
   key: string;
   header: string;
+  sortable: boolean;
+  filterable: boolean;
+  accessor: (row: T) => string;
+  render: (row: T) => React.ReactNode;
+  width?: number | string;
+};
+/** T: Something that can be indexed by string keys */
+export function columnBuilder<T>({ key, header, sortable, filterable, accessor, render, width }: {
+  key: string;
+  header?: string;
   sortable?: boolean;
   filterable?: boolean;
   accessor?: (row: T) => any;
-  render?: (value: any, row: T) => React.ReactNode;
+  render?: (row: T) => React.ReactNode;
   width?: number | string;
-};
+}): Column<T> {
+  const valueAtKey = (row: T) => String((row as any)[key]);
+  return {
+    key,
+    header: header || key,
+    sortable: !!sortable,
+    filterable: !!filterable,
+    accessor: accessor || valueAtKey,
+    render: render || valueAtKey,
+    width,
+  };
+}
 
 export type BulkAction<T> = {
   key?: string;
@@ -308,7 +329,7 @@ function DataTableRow<T>({ row, columns, onView, selected, toggleRow, onDelete, 
         const value = getCellValue(row, col);
         return (
           <td key={col.key} style={styles.cell}>
-            {col.render ? col.render(value, row) : String(Array.isArray(value) ? value.join(" ") : value)}
+            {col.render ? col.render(row) : String(Array.isArray(value) ? value.join(" ") : value)}
           </td>
         );
       })}

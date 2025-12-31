@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo } from "react";
-import DataTable, { Column } from "@/components/DataTable";
+import DataTable, { Column, columnBuilder } from "@/components/DataTable";
 import { PerioRecord } from '@/models/perio';
 import { useSelector } from "react-redux";
 import { selectAllPatients } from "@/store/patientSlice";
@@ -30,36 +30,35 @@ export default function PerioRecordList({
     });
     return map;
   }, [patients]);
+  const patientAccessor = useCallback((record: PerioRecord) => {
+    const key = record.patientId || "";
+    return patientLabelMap[key] || "Unassigned";
+  }, [patientLabelMap]);
   const columns: Column<PerioRecord>[] = useMemo(() => [
-    {
+    columnBuilder({
       key: 'label',
       header: 'Label',
       filterable: true,
-      accessor: (record: PerioRecord) => record.label,
-      render: (label: string) => label,
-    },
-    {
+    }),
+    columnBuilder({
       key: 'patient',
       header: 'Patient',
       filterable: true,
-      accessor: (record: PerioRecord) => record.patientId || "Unassigned",
-      render: (patientId: string) => patientLabelMap[patientId] || "Unassigned",
-    },
-    {
+      accessor: patientAccessor,
+    }),
+    columnBuilder({
       key: 'createdAt',
       header: 'Created At',
       sortable: true,
-      accessor: (record: PerioRecord) => record.createdAt,
-      render: (value: string) => new Date(value).toLocaleDateString(),
-    },
-    {
+      accessor: (record: PerioRecord) => new Date(record.createdAt).toLocaleDateString(),
+    }),
+    columnBuilder({
       key: 'updatedAt',
       header: 'Last Updated',
       sortable: true,
-      accessor: (record: PerioRecord) => record.updatedAt,
-      render: (value: string) => new Date(value).toLocaleDateString(),
-    }
-  ], [patientLabelMap]);
+      accessor: (record: PerioRecord) => new Date(record.updatedAt).toLocaleDateString(),
+    }),
+  ], [patientAccessor]);
 
   const copyAction = useCallback((records: PerioRecord[]) => copyCsv(records, columns), [columns]);
 
@@ -109,7 +108,7 @@ function copyCsv(records: PerioRecord[], visibleCols: Column<PerioRecord>[]) {
     .map((row) =>
       visibleCols
         .map((c) => csvEscape(
-            c.render?.(c.accessor?.(row), row)
+            c.render?.(row)
           )
         )
         .join(",")
