@@ -5,9 +5,10 @@ import { useCallback, useMemo, useState } from "react";
 import { styles } from "./styles";
 import { Column, DataTableProps } from "./types";
 import ActionButton from "./ActionButton";
-import BulkActionButton from "./BulkActionButton";
 import FilterRow from "./FilterRow";
 import DataTableRow from "./DataTableRow";
+import ActionBar from "./ActionBar";
+import ActionGroup from "./ActionGroup";
 
 export default function DataTable<T>(props: DataTableProps<T>) {
   const {
@@ -78,21 +79,7 @@ export default function DataTable<T>(props: DataTableProps<T>) {
     );
   }, [setSelected, selected, getRowId]);
 
-  const renderRowActions = useCallback((row: T) => {
-    return (
-      <div style={styles.actionGroup}>
-        {rowActions?.map((action) => (
-          <ActionButton
-            key={action.key || action.label}
-            label={action.label}
-            row={row}
-            onAction={action.action}
-            buttonStyles={action.buttonStyles}
-          />
-        ))}
-      </div>
-    );
-  }, [rowActions]);
+  const renderRowActions = useCallback((row: T) => <ActionGroup rowActions={rowActions} row={row} />, [rowActions]);
 
   const extendedColumns = useMemo(() => [
     {
@@ -151,28 +138,12 @@ export default function DataTable<T>(props: DataTableProps<T>) {
     <div style={styles.container}>
       <div style={styles.headerBar}>
         <h3 style={styles.title}>{title || "Results"}</h3>
-        <div style={styles.actionsBar}>
-          <input
-            aria-label="Search"
-            placeholder="Search..."
-            value={globalQuery}
-            onChange={(e) => setGlobalQuery(e.target.value)}
-            style={styles.searchInput}
-          />
-          {bulkActions?.map((action) => (
-            <BulkActionButton
-              key={action.key || action.label}
-              label={action.label}
-              disabled={selectedRows.length === 0}
-              rows={selectedRows}
-              onAction={action.action}
-              styles={{
-                ...styles.button,
-                ...action.buttonStyles,
-              }}
-            />
-          ))}
-        </div>
+        <ActionBar
+          searchValue={globalQuery}
+          onSearchValueChange={setGlobalQuery}
+          bulkActions={bulkActions}
+          selectedRows={selectedRows}
+        />
       </div>
 
       <table style={styles.table}>
