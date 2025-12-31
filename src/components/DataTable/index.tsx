@@ -18,10 +18,13 @@ export default function DataTable<T>(props: DataTableProps<T>) {
   } = props;
   // TODO: clean up logic using custom hooks
   const { sortKey, sortDir, onSortToggle } = useSortState();
-  const [selected, setSelected] = useState<Record<string, boolean>>({});
-
-  const allIds = useMemo(() => data.map((row) => getRowId(row)), [data, getRowId]);
-
+  const {
+    isSelected,
+    allSelected,
+    someSelected,
+    toggleRow,
+    toggleAll,
+  } = useRowSelection(data, getRowId);
   const {
     predicate,
     filters,
@@ -43,38 +46,20 @@ export default function DataTable<T>(props: DataTableProps<T>) {
     });
     return copy;
   }, [filteredData, sortKey, sortDir, columns]);
+  const selectedRows = useMemo(() => sortedData.filter(isSelected), [sortedData, isSelected]);
 
   const renderRowCheckbox = useCallback((row: T) => {
-    const id = getRowId(row);
-    function toggleRow(id: string) {
-      setSelected((prev) => ({ ...prev, [id]: !prev[id] }));
-    }
     return (
       <input
         type="checkbox"
-        checked={!!selected[id]}
-        onChange={() => toggleRow(id)}
+        checked={isSelected(row)}
+        onChange={() => toggleRow(row)}
         onClick={(e) => e.stopPropagation()}
       />
     );
-  }, [setSelected, selected, getRowId]);
+  }, [isSelected, toggleRow]);
 
   const renderGlobalCheckbox = useCallback(() => {
-    const allSelected = allIds.length > 0 && allIds.every((id) => selected[id]);
-    const someSelected = allIds.some((id) => selected[id]) && !allSelected;
-
-    function toggleAll() {
-      if (allSelected) {
-        setSelected({});
-      } else {
-        const m: Record<string, boolean> = {};
-        sortedData.forEach((row) => {
-          m[getRowId(row)] = true;
-        });
-        setSelected(m);
-      }
-    }
-
     return (
       <input
         type="checkbox"
@@ -85,7 +70,7 @@ export default function DataTable<T>(props: DataTableProps<T>) {
         onChange={toggleAll}
       />
     );
-  }, [allIds, selected, sortedData, getRowId]);
+  }, [allSelected, someSelected, toggleAll]);
 
   const renderRowActions = useCallback((row: T) => <ActionGroup rowActions={rowActions} row={row} />, [rowActions]);
 
@@ -114,9 +99,6 @@ export default function DataTable<T>(props: DataTableProps<T>) {
     },
   ], [columns, renderRowCheckbox, renderRowActions]);
 
-  const selectedRows = useMemo(() => {
-    return sortedData.filter((row) => selected[getRowId(row)]);
-  }, [sortedData, selected, getRowId]);
 
 
 
@@ -202,5 +184,38 @@ function useGlobalFilteringPredicate<T>(columns: Column<T>[]) {
     onFilterChange,
     query,
     setQuery,
+  };
+}
+
+function useRowSelection<T>(data: T[], getRowId: (row: T) => string) {
+  const [selected, setSelected] = useState<Record<string, boolean>>({});
+  const allIds = useMemo(() => data.map((row) => getRowId(row)), [data, getRowId]);
+  const toggleRow = useCallback((row: T) => {
+    const id = getRowId(row);
+    setSelected((prev) => ({ ...prev, [id]: !prev[id] }));
+  }, [setSelected]);
+  const allSelected = allIds.length > 0 && allIds.every((id) => selected[id]);
+  const someSelected = allIds.some((id) => selected[id]) && !allSelected;
+  const toggleAll = useCallback(() => {
+    if (allSelected) {
+      setSelected({});
+    } else {
+      const m: Record<string, boolean> = {};
+      data.forEach((row) => {
+        m[getRowId(row)] = true;
+      });
+      setSelected(m);
+    }
+  }, [allSelected, selected, data, getRowId, setSelected]);
+  const isSelected = useCallback((row: T) => {
+    const id = getRowId(row);
+    return !!selected[id];
+  }, [selected, getRowId]);
+  return {
+    isSelected,
+    allSelected,
+    someSelected,
+    toggleRow,
+    toggleAll,
   };
 }
