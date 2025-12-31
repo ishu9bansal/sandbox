@@ -20,7 +20,7 @@ export default function DataTable<T>(props: DataTableProps<T>) {
   const { sortKey, sortDir, onSortToggle } = useSortState();
   const [selected, setSelected] = useState<Record<string, boolean>>({});
 
-  const allIds = useMemo(() => data.map((row, i) => getRowId(row, i)), [data, getRowId]);
+  const allIds = useMemo(() => data.map((row) => getRowId(row)), [data, getRowId]);
 
   const {
     predicate,
@@ -68,9 +68,9 @@ export default function DataTable<T>(props: DataTableProps<T>) {
         setSelected({});
       } else {
         const m: Record<string, boolean> = {};
-        for (let i = 0; i < sortedData.length; i++) {
-          m[getRowId(sortedData[i], i)] = true;
-        }
+        sortedData.forEach((row) => {
+          m[getRowId(row)] = true;
+        });
         setSelected(m);
       }
     }
@@ -115,7 +115,7 @@ export default function DataTable<T>(props: DataTableProps<T>) {
   ], [columns, renderRowCheckbox, renderRowActions]);
 
   const selectedRows = useMemo(() => {
-    return sortedData.filter((row, i) => selected[getRowId(row, i)]);
+    return sortedData.filter((row) => selected[getRowId(row)]);
   }, [sortedData, selected, getRowId]);
 
 

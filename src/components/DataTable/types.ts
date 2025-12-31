@@ -31,7 +31,7 @@ export type DataTableProps<T> = {
   title?: string;
   data: T[];
   columns: Column<T>[];
-  getRowId: (row: T, index?: number) => string;
+  getRowId: (row: T) => string;
   onRowClick?: (row: T) => void;
   bulkActions?: BulkAction<T>[];
   rowActions?: RowAction<T>[];
