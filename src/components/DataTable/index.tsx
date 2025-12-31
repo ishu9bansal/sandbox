@@ -19,12 +19,16 @@ export default function DataTable<T>(props: DataTableProps<T>) {
   // TODO: clean up logic using custom hooks
   const { sortKey, sortDir, onSortToggle } = useSortState();
   const [selected, setSelected] = useState<Record<string, boolean>>({});
-  const [filters, setFilters] = useState<Record<string, string>>({});
-  const [globalQuery, setGlobalQuery] = useState("");
 
   const allIds = useMemo(() => data.map((row, i) => getRowId(row, i)), [data, getRowId]);
 
-  const predicate = useGlobalFilteringPredicate(columns, filters, globalQuery);
+  const {
+    predicate,
+    filters,
+    onFilterChange,
+    query,
+    setQuery,
+  } = useGlobalFilteringPredicate(columns);
   const filteredData = useMemo(() => data.filter((row) => predicate(row)), [data, predicate]);
 
   const sortedData = useMemo(() => {
@@ -120,8 +124,8 @@ export default function DataTable<T>(props: DataTableProps<T>) {
   return (
     <TableStructure
       title={title || "Results"}
-      query={globalQuery}
-      setQuery={setGlobalQuery}
+      query={query}
+      setQuery={setQuery}
       bulkActions={bulkActions}
       selectedRows={selectedRows}
       columns={extendedColumns}
@@ -130,7 +134,7 @@ export default function DataTable<T>(props: DataTableProps<T>) {
       sortDir={sortDir}
       onSortToggle={onSortToggle}
       filters={filters}
-      onFilterChange={(key: string, val: string) => setFilters((prev) => ({ ...prev, [key]: val }))}
+      onFilterChange={onFilterChange}
       onRowClick={onRowClick}
       getRowId={getRowId}
     />
@@ -179,15 +183,24 @@ function useFilterPredicate<T>(filters: Record<string, string>) {
   return filterPredicate;
 }
 
-function useGlobalFilteringPredicate<T>(columns: Column<T>[], filters: Record<string, string>, globalQuery: string) {
+function useGlobalFilteringPredicate<T>(columns: Column<T>[]) {
+  const [filters, setFilters] = useState<Record<string, string>>({});
+  const [query, setQuery] = useState("");
   const searchPredicate = useSearchPredicate(columns);
   const filterPredicate = useFilterPredicate<T>(filters);
-  const globalPredicate = useCallback((row: T) => {
-    if (!searchPredicate(row, globalQuery)) return false;
+  const predicate = useCallback((row: T) => {
+    if (!searchPredicate(row, query)) return false;
     for (const c of columns) {
       if (!filterPredicate(row, c)) return false;
     }
     return true;
-  }, [globalQuery, columns, searchPredicate, filterPredicate]);
-  return globalPredicate;
+  }, [query, columns, searchPredicate, filterPredicate]);
+  const onFilterChange = useCallback((key: string, val: string) => setFilters((prev) => ({ ...prev, [key]: val })), [setFilters]);
+  return {
+    predicate,
+    filters,
+    onFilterChange,
+    query,
+    setQuery,
+  };
 }
