@@ -52,12 +52,6 @@ function getCellValue<T>(row: T, col: Column<T>) {
   return raw;
 }
 
-function csvEscape(value: any): string {
-  let s = value == null ? "" : Array.isArray(value) ? value.join(" ") : String(value);
-  s = s.replace(/"/g, '""');
-  return `"${s}"`;
-}
-
 export default function DataTable<T>(props: DataTableProps<T>) {
   const {
     title,
@@ -148,22 +142,6 @@ export default function DataTable<T>(props: DataTableProps<T>) {
     } else {
       setSortKey(col.key);
       setSortDir("asc");
-    }
-  }
-
-  function copyCsv(rows: T[]) {
-    const visibleCols = columns; // include all configured columns
-    const header = visibleCols.map((c) => csvEscape(c.header)).join(",");
-    const body = rows
-      .map((row) =>
-        visibleCols
-          .map((c) => csvEscape(getCellValue(row, c)))
-          .join(",")
-      )
-      .join("\n");
-    const csv = header + "\n" + body;
-    if (typeof navigator !== "undefined" && navigator.clipboard) {
-      navigator.clipboard.writeText(csv);
     }
   }
 

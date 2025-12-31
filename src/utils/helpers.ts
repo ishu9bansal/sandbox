@@ -53,3 +53,14 @@ export function throttle<T extends (...args: any[]) => any>(
     }
   };
 }
+
+/**
+ * Copy text to clipboard
+ */
+export async function copyToClipboard(text: string): Promise<void> {
+  if (typeof navigator !== "undefined" && navigator.clipboard) {
+    await navigator.clipboard.writeText(text);
+  } else {
+    throw new Error("Clipboard API not supported");
+  }
+}
