@@ -23,7 +23,7 @@ export function columnBuilder<T>({ key, header, sortable, filterable, accessor, 
     sortable: !!sortable,
     filterable: !!filterable,
     accessor: accessor || valueAtKey,
-    render: render || valueAtKey,
+    render: render || accessor || valueAtKey,
     width,
   };
 }
