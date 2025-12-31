@@ -11,26 +11,25 @@ export type Column<T> = {
   render: (row: T) => React.ReactNode;
   width?: number | string;
 };
+
+export type ColumnBuilderOptions<T> = Partial<Column<T>> & { key: string };
 /** T: Something that can be indexed by string keys */
-export function columnBuilder<T>({ key, header, sortable, filterable, accessor, render, width }: {
-  key: string;
-  header?: string;
-  sortable?: boolean;
-  filterable?: boolean;
-  accessor?: (row: T) => any;
-  render?: (row: T) => React.ReactNode;
-  width?: number | string;
-}): Column<T> {
+export function columnBuilder<T>({ key, header, sortable, filterable, accessor, render, width }: ColumnBuilderOptions<T>): Column<T> {
   const valueAtKey = (row: T) => String((row as any)[key]);
+  const capitalized = key.charAt(0).toUpperCase() + key.slice(1);
   return {
     key,
-    header: header || key,
+    header: header || capitalized,
     sortable: !!sortable,
     filterable: !!filterable,
     accessor: accessor || valueAtKey,
     render: render || valueAtKey,
     width,
   };
+}
+
+export function columnsBuilder<T>(...columns: ColumnBuilderOptions<T>[]): Column<T>[] {
+  return columns.map((col) => columnBuilder<T>(col));
 }
 
 export type BulkAction<T> = {

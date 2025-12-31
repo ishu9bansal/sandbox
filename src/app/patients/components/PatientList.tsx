@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import DataTable, { Column } from "@/components/DataTable";
+import DataTable, { Column, columnsBuilder } from "@/components/DataTable";
 import { Patient } from '@/models/patient';
 
 interface PatientListProps {
@@ -19,7 +19,7 @@ export default function PatientList({
   onDelete, 
   onBulkDelete 
 }: PatientListProps) {
-  const columns: Column<Patient>[] = useMemo(() => [
+  const columns: Column<Patient>[] = useMemo(() => columnsBuilder(
     {
       key: 'name',
       header: 'Name',
@@ -51,9 +51,9 @@ export default function PatientList({
       header: 'Email',
       sortable: true,
       filterable: true,
-      render: (value) => value || '-',
+      render: (patient: Patient) => patient.email || '-',
     },
-  ], []);
+  ), []);
 
   const bulkActions = useMemo(() => [
     {
