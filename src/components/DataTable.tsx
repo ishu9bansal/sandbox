@@ -245,6 +245,7 @@ export default function DataTable<T>(props: DataTableProps<T>) {
               onDelete={onDelete}
               selected={!!selected[id]}
               toggleRow={() => toggleRow(id)}
+              rowActions={rowActions}
             />
           })}
           <EmptyView colSpan={columns.length + 2} visible={sortedData.length === 0} />
@@ -300,8 +301,9 @@ type DataTableRowProps<T> = {
   onDelete?: (row: T) => void;
   selected: boolean;
   toggleRow: () => void;
+  rowActions?: RowAction<T>[];
 };
-function DataTableRow<T>({ row, columns, onView, selected, toggleRow, onDelete, onEdit }: DataTableRowProps<T>) {
+function DataTableRow<T>({ row, columns, onView, selected, toggleRow, onDelete, onEdit, rowActions }: DataTableRowProps<T>) {
   function onRowClick(e: React.MouseEvent) {
     const target = e.target as HTMLElement;
     if (target.closest("button, input, a")) return; // avoid accidental triggers
@@ -324,18 +326,15 @@ function DataTableRow<T>({ row, columns, onView, selected, toggleRow, onDelete, 
       ))}
       <td style={styles.cell}>
         <div style={styles.actionGroup}>
-          <ActionButton
-            label="Edit"
-            row={row}
-            onAction={onEdit}
-            styles={styles.actionButton}
-          />
-          <ActionButton
-            label="Delete"
-            row={row}
-            onAction={onDelete}
-            styles={{ ...styles.actionButton, background: "#552222", color: "#ffffff" }}
-          />
+          {rowActions?.map((action) => (
+            <ActionButton
+              key={action.key || action.label}
+              label={action.label}
+              row={row}
+              onAction={action.action}
+              buttonStyles={action.buttonStyles}
+            />
+          ))}
         </div>
       </td>
     </tr>
@@ -372,17 +371,20 @@ type ActionButtonProps<T> = {
   label: string;
   row: T;
   onAction?: (row: T) => void;
-  styles?: React.CSSProperties;
+  buttonStyles?: React.CSSProperties;
 };
 
-function ActionButton<T>({ label, row, onAction, styles }: ActionButtonProps<T>) {
+function ActionButton<T>({ label, row, onAction, buttonStyles }: ActionButtonProps<T>) {
   return (
     <button
       onClick={(e) => {
         e.stopPropagation();
         onAction?.(row);
       }}
-      style={styles}
+      style={{
+        ...styles.actionButton,
+        ...buttonStyles,
+      }}
     >
       {label}
     </button>
