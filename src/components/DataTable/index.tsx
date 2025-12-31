@@ -2,13 +2,9 @@
 
 import { compareNumOrString } from "@/utils/helpers";
 import { useCallback, useMemo, useState } from "react";
-import { styles } from "./styles";
 import { Column, DataTableProps } from "./types";
-import FilterRow from "./FilterRow";
-import DataTableRow from "./DataTableRow";
-import ActionBar from "./ActionBar";
 import ActionGroup from "./ActionGroup";
-import HeaderRow from "./HeaderRow";
+import TableStructure from "./TableStructure";
 
 export default function DataTable<T>(props: DataTableProps<T>) {
   const {
@@ -151,67 +147,21 @@ export default function DataTable<T>(props: DataTableProps<T>) {
 
 
   return (
-    <div style={styles.container}>
-      <div style={styles.headerBar}>
-        <h3 style={styles.title}>{title || "Results"}</h3>
-        <ActionBar
-          searchValue={globalQuery}
-          onSearchValueChange={setGlobalQuery}
-          bulkActions={bulkActions}
-          selectedRows={selectedRows}
-        />
-      </div>
-
-      <table style={styles.table}>
-        <ColumnGroup columns={extendedColumns} />
-        <thead>
-          <HeaderRow
-            columns={extendedColumns}
-            sortKey={sortKey}
-            sortDir={sortDir}
-            onHeaderClick={handleHeaderClick}
-          />
-          {/* Filter row */}
-          <FilterRow
-            columns={extendedColumns}
-            onFilterChange={(key, val) => setFilters((prev) => ({ ...prev, [key]: val }))}
-            filters={filters}
-          />
-        </thead>
-        <tbody>
-          {sortedData.map((row) => (
-            <DataTableRow
-              key={getRowId(row)}
-              row={row}
-              columns={extendedColumns}
-              onClick={onRowClick}
-            />
-          ))}
-          <EmptyView colSpan={columns.length} visible={sortedData.length === 0} />
-        </tbody>
-      </table>
-    </div>
+    <TableStructure
+      title={title || "Results"}
+      query={globalQuery}
+      setQuery={setGlobalQuery}
+      bulkActions={bulkActions}
+      selectedRows={selectedRows}
+      columns={extendedColumns}
+      data={sortedData}
+      sortKey={sortKey}
+      sortDir={sortDir}
+      filters={filters}
+      onFilterChange={(key: string, val: string) => setFilters((prev) => ({ ...prev, [key]: val }))}
+      onRowClick={onRowClick}
+      getRowId={getRowId}
+      handleHeaderClick={handleHeaderClick}
+    />
   );
 }
-
-function ColumnGroup<T>({ columns }: { columns: Column<T>[] }) {
-  return (
-    <colgroup>
-      {columns.map((col) => (
-        <col key={col.key} style={col.width ? { width: col.width } : undefined} />
-      ))}
-    </colgroup>
-  );
-}
-
-function EmptyView({ visible = true, colSpan }: { colSpan: number, visible?: boolean }) {
-  if (!visible) return null;
-  return (
-    <tr>
-      <td colSpan={colSpan} style={styles.cell}>
-        No results
-      </td>
-    </tr>
-  );
-}
-
