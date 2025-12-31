@@ -2,7 +2,7 @@
 
 import { compareNumOrString } from "@/utils/helpers";
 import { useCallback, useMemo, useState } from "react";
-import { DataTableProps } from "./types";
+import { Column, DataTableProps } from "./types";
 import ActionGroup from "./ActionGroup";
 import TableStructure from "./TableStructure";
 
@@ -24,27 +24,36 @@ export default function DataTable<T>(props: DataTableProps<T>) {
 
   const allIds = useMemo(() => data.map((row, i) => getRowId(row, i)), [data, getRowId]);
 
-  const filteredData = useMemo(() => {
-    return data.filter((row) => {
-      const q = globalQuery.trim().toLowerCase();
-      if (q) {
-        const hay = columns
-          .map((c) => c.accessor(row))
-          .map((v) => (Array.isArray(v) ? v.join(" ") : String(v)))
-          .join(" ")
-          .toLowerCase();
-        if (!hay.includes(q)) return false;
-      }
-      for (const c of columns) {
-        const f = (filters[c.key] || "").trim().toLowerCase();
-        if (!f) continue;
-        const v = c.accessor(row);
-        const s = (Array.isArray(v) ? v.join(" ") : String(v)).toLowerCase();
-        if (!s.includes(f)) return false;
-      }
-      return true;
-    });
-  }, [data, columns, filters, globalQuery]);
+  const hayCalculator = useCallback((row: T) => {
+    return columns
+      .map((c) => c.accessor(row))
+      .join(" ")
+      .toLowerCase();
+  }, [columns]);
+
+  const searchPredicate = useCallback((row: T, query: string) => {
+    const q = query.trim().toLowerCase();
+    if (!q) return true;
+    return hayCalculator(row).includes(q);
+  }, [hayCalculator]);
+
+  const filterPredicate = useCallback((row: T, col: Column<T>) => {
+    const f = (filters[col.key] || "").trim().toLowerCase();
+    if (!f) return true;
+    const v = col.accessor(row).toLowerCase();
+    return v.includes(f);
+  }, [filters]);
+
+  const globalPredicate = useCallback((row: T) => {
+    if (!searchPredicate(row, globalQuery)) return false;
+    for (const c of columns) {
+      if (!filterPredicate(row, c)) return false;
+    }
+    return true;
+    
+  }, [globalQuery, columns, searchPredicate, filterPredicate]);
+
+  const filteredData = useMemo(() => data.filter((row) => globalPredicate(row)), [data, globalPredicate]);
 
   const sortedData = useMemo(() => {
     if (!sortKey) return filteredData;
@@ -169,4 +178,8 @@ function useSortState() {
     }
   }
   return { sortKey, sortDir, onSortToggle };
+}
+
+function useSearchPredicate() {
+  
 }
