@@ -82,16 +82,29 @@ export default function PerioRecordList({
     },
   ], [onBulkDelete, copyAction]);
 
+  const rowActions = useMemo(() => [
+    {
+      key: 'edit',
+      label: 'Edit',
+      action: onEdit,
+    },
+    {
+      key: 'delete',
+      label: 'Delete',
+      action: onDelete,
+      buttonStyles: { background: "#552222", color: "#ffffff" },
+    },
+  ], [onEdit, onDelete]);
+
   return (
     <DataTable
       title="Record List"
       data={records}
       columns={columns}
       getRowId={(record) => record.id}
-      onView={onView}
-      onEdit={onEdit}
-      onDelete={onDelete}
+      onRowClick={onView}
       bulkActions={bulkActions}
+      rowActions={rowActions}
     />
   );
 }

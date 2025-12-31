@@ -87,9 +87,7 @@ export default function PatientList({
       data={patients}
       columns={columns}
       getRowId={(patient) => patient.id}
-      onView={onView}
-      onEdit={onEdit}
-      onDelete={onDelete}
+      onRowClick={onView}
       bulkActions={bulkActions}
       rowActions={rowActions}
     />

@@ -53,9 +53,7 @@ export type DataTableProps<T> = {
   data: T[];
   columns: Column<T>[];
   getRowId: (row: T, index: number) => string;
-  onEdit?: (row: T) => void;
-  onDelete?: (row: T) => void;
-  onView?: (row: T) => void;
+  onRowClick?: (row: T) => void;
   bulkActions?: BulkAction<T>[];
   rowActions?: RowAction<T>[];
 };
@@ -76,9 +74,7 @@ export default function DataTable<T>(props: DataTableProps<T>) {
     data,
     columns,
     getRowId,
-    onEdit,
-    onDelete,
-    onView,
+    onRowClick,
     bulkActions,
     rowActions,
   } = props;
@@ -240,9 +236,7 @@ export default function DataTable<T>(props: DataTableProps<T>) {
               key={getRowId(row, i)}
               row={row}
               columns={columns}
-              onView={onView}
-              onEdit={onEdit}
-              onDelete={onDelete}
+              onClick={onRowClick}
               selected={!!selected[id]}
               toggleRow={() => toggleRow(id)}
               rowActions={rowActions}
@@ -296,18 +290,16 @@ function EmptyView({ visible = true, colSpan }: { colSpan: number, visible?: boo
 type DataTableRowProps<T> = {
   row: T;
   columns: Column<T>[];
-  onView?: (row: T) => void;
-  onEdit?: (row: T) => void;
-  onDelete?: (row: T) => void;
+  onClick?: (row: T) => void;
   selected: boolean;
   toggleRow: () => void;
   rowActions?: RowAction<T>[];
 };
-function DataTableRow<T>({ row, columns, onView, selected, toggleRow, onDelete, onEdit, rowActions }: DataTableRowProps<T>) {
+function DataTableRow<T>({ row, columns, onClick, selected, toggleRow, rowActions }: DataTableRowProps<T>) {
   function onRowClick(e: React.MouseEvent) {
     const target = e.target as HTMLElement;
     if (target.closest("button, input, a")) return; // avoid accidental triggers
-    onView?.(row);
+    onClick?.(row);
   }
   return (
     <tr style={styles.row} onClick={onRowClick}>
