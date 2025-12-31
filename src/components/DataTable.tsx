@@ -121,7 +121,7 @@ export default function DataTable<T>(props: DataTableProps<T>) {
     return (
       <input
         type="checkbox"
-        checked={selected[id]}
+        checked={!!selected[id]}
         onChange={() => toggleRow(id)}
         onClick={(e) => e.stopPropagation()}
       />
@@ -166,7 +166,7 @@ export default function DataTable<T>(props: DataTableProps<T>) {
       comparable: () => "",
       width: 140,
     },
-  ], [columns]);
+  ], [columns, renderRowCheckbox, renderRowActions]);
 
   const allSelected = allIds.length > 0 && allIds.every((id) => selected[id]);
   const someSelected = allIds.some((id) => selected[id]) && !allSelected;
@@ -269,8 +269,9 @@ export default function DataTable<T>(props: DataTableProps<T>) {
         </thead>
         <tbody>
           {sortedData.map((row, i) => {
+            const id = getRowId(row, i);
             return <DataTableRow
-              key={getRowId(row, i)}
+              key={id}
               row={row}
               columns={extendedColumns}
               onClick={onRowClick}
@@ -326,8 +327,6 @@ type DataTableRowProps<T> = {
 };
 function DataTableRow<T>({ row, columns, onClick }: DataTableRowProps<T>) {
   function onRowClick(e: React.MouseEvent) {
-    const target = e.target as HTMLElement;
-    if (target.closest("button, input, a")) return; // avoid accidental triggers
     onClick?.(row);
   }
   return (
