@@ -2,7 +2,7 @@
 
 import { compareNumOrString } from "@/utils/helpers";
 import { useCallback, useMemo, useState } from "react";
-import { Column, DataTableProps } from "./types";
+import { DataTableProps } from "./types";
 import ActionGroup from "./ActionGroup";
 import TableStructure from "./TableStructure";
 
@@ -135,12 +135,11 @@ export default function DataTable<T>(props: DataTableProps<T>) {
   }, [sortedData, selected, getRowId]);
 
 
-  function handleHeaderClick(col: Column<T>) {
-    if (!col.sortable) return;
-    if (sortKey === col.key) {
+  function onSortToggle(colKey: string) {
+    if (sortKey === colKey) {
       setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     } else {
-      setSortKey(col.key);
+      setSortKey(colKey);
       setSortDir("asc");
     }
   }
@@ -157,11 +156,11 @@ export default function DataTable<T>(props: DataTableProps<T>) {
       data={sortedData}
       sortKey={sortKey}
       sortDir={sortDir}
+      onSortToggle={onSortToggle}
       filters={filters}
       onFilterChange={(key: string, val: string) => setFilters((prev) => ({ ...prev, [key]: val }))}
       onRowClick={onRowClick}
       getRowId={getRowId}
-      handleHeaderClick={handleHeaderClick}
     />
   );
 }

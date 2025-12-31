@@ -19,9 +19,9 @@ type TableStructureProps<T> = {
   onFilterChange: (key: string, value: string) => void;
   onRowClick?: (row: T) => void;
   getRowId: DataTableProps<T>["getRowId"];
-  handleHeaderClick: (col: Column<T>) => void;
+  onSortToggle: (colKey: string) => void;
 }
-export default function TableStructure<T>({ title, query, setQuery, bulkActions, selectedRows, columns, data, sortKey, sortDir, filters, onFilterChange, onRowClick, getRowId, handleHeaderClick }: TableStructureProps<T>) {
+export default function TableStructure<T>({ title, query, setQuery, bulkActions, selectedRows, columns, data, sortKey, sortDir, filters, onFilterChange, onRowClick, getRowId, onSortToggle }: TableStructureProps<T>) {
   return (
     <div style={styles.container}>
       <div style={styles.headerBar}>
@@ -41,7 +41,7 @@ export default function TableStructure<T>({ title, query, setQuery, bulkActions,
             columns={columns}
             sortKey={sortKey}
             sortDir={sortDir}
-            onHeaderClick={handleHeaderClick}
+            onSortToggle={onSortToggle}
           />
           {/* Filter row */}
           <FilterRow

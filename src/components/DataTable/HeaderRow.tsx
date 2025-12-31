@@ -7,9 +7,9 @@ type HeaderRowProps<T> = {
   columns: Column<T>[];
   sortKey: string | null;
   sortDir: "asc" | "desc";
-  onHeaderClick: (col: Column<T>) => void;
+  onSortToggle: (colKey: string) => void;
 };
-export default function HeaderRow<T>({ columns, sortKey, sortDir, onHeaderClick }: HeaderRowProps<T>) {
+export default function HeaderRow<T>({ columns, sortKey, sortDir, onSortToggle }: HeaderRowProps<T>) {
   return (
     <tr>
       {columns.map((col) => (col.renderHeader ?
@@ -23,7 +23,7 @@ export default function HeaderRow<T>({ columns, sortKey, sortDir, onHeaderClick 
             column={col}
             sortKey={sortKey}
             sortDir={sortDir}
-            onHeaderClick={() => onHeaderClick(col)}
+            onHeaderClick={() => col.sortable && onSortToggle(col.key)}
           />
         )
       ))}
