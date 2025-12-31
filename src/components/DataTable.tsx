@@ -268,15 +268,14 @@ export default function DataTable<T>(props: DataTableProps<T>) {
           />
         </thead>
         <tbody>
-          {sortedData.map((row, i) => {
-            const id = getRowId(row, i);
-            return <DataTableRow
-              key={id}
+          {sortedData.map((row) => (
+            <DataTableRow
+              key={getRowId(row)}
               row={row}
               columns={extendedColumns}
               onClick={onRowClick}
             />
-          })}
+          ))}
           <EmptyView colSpan={columns.length} visible={sortedData.length === 0} />
         </tbody>
       </table>
