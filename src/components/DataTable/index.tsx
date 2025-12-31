@@ -24,35 +24,15 @@ export default function DataTable<T>(props: DataTableProps<T>) {
 
   const allIds = useMemo(() => data.map((row, i) => getRowId(row, i)), [data, getRowId]);
 
-  const hayCalculator = useCallback((row: T) => {
-    return columns
-      .map((c) => c.accessor(row))
-      .join(" ")
-      .toLowerCase();
-  }, [columns]);
-
-  const searchPredicate = useCallback((row: T, query: string) => {
-    const q = query.trim().toLowerCase();
-    if (!q) return true;
-    return hayCalculator(row).includes(q);
-  }, [hayCalculator]);
-
-  const filterPredicate = useCallback((row: T, col: Column<T>) => {
-    const f = (filters[col.key] || "").trim().toLowerCase();
-    if (!f) return true;
-    const v = col.accessor(row).toLowerCase();
-    return v.includes(f);
-  }, [filters]);
-
+  const searchPredicate = useSearchPredicate(columns);
+  const filterPredicate = useFilterPredicate<T>(filters);
   const globalPredicate = useCallback((row: T) => {
     if (!searchPredicate(row, globalQuery)) return false;
     for (const c of columns) {
       if (!filterPredicate(row, c)) return false;
     }
     return true;
-    
   }, [globalQuery, columns, searchPredicate, filterPredicate]);
-
   const filteredData = useMemo(() => data.filter((row) => globalPredicate(row)), [data, globalPredicate]);
 
   const sortedData = useMemo(() => {
@@ -180,6 +160,29 @@ function useSortState() {
   return { sortKey, sortDir, onSortToggle };
 }
 
-function useSearchPredicate() {
-  
+function useSearchPredicate<T>(columns: Column<T>[]) {
+  const hayCalculator = useCallback((row: T) => {
+    return columns
+      .map((c) => c.accessor(row))
+      .join(" ")
+      .toLowerCase();
+  }, [columns]);
+
+  const searchPredicate = useCallback((row: T, query: string) => {
+    const q = query.trim().toLowerCase();
+    if (!q) return true;
+    return hayCalculator(row).includes(q);
+  }, [hayCalculator]);
+
+  return searchPredicate;
+}
+
+function useFilterPredicate<T>(filters: Record<string, string>) {
+  const filterPredicate = useCallback((row: T, col: Column<T>) => {
+    const f = (filters[col.key] || "").trim().toLowerCase();
+    if (!f) return true;
+    const v = col.accessor(row).toLowerCase();
+    return v.includes(f);
+  }, [filters]);
+  return filterPredicate;
 }
