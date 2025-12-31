@@ -16,7 +16,7 @@ export default function DataTable<T>(props: DataTableProps<T>) {
     bulkActions,
     rowActions,
   } = props;
-
+  // TODO: clean up logic using custom hooks
   const [selected, setSelected] = useState<Record<string, boolean>>({});
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
