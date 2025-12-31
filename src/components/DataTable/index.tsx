@@ -4,7 +4,6 @@ import { compareNumOrString } from "@/utils/helpers";
 import { useCallback, useMemo, useState } from "react";
 import { styles } from "./styles";
 import { Column, DataTableProps } from "./types";
-import ActionButton from "./ActionButton";
 import FilterRow from "./FilterRow";
 import DataTableRow from "./DataTableRow";
 import ActionBar from "./ActionBar";
@@ -79,6 +78,34 @@ export default function DataTable<T>(props: DataTableProps<T>) {
     );
   }, [setSelected, selected, getRowId]);
 
+  const renderGlobalCheckbox = useCallback(() => {
+    const allSelected = allIds.length > 0 && allIds.every((id) => selected[id]);
+    const someSelected = allIds.some((id) => selected[id]) && !allSelected;
+
+    function toggleAll() {
+      if (allSelected) {
+        setSelected({});
+      } else {
+        const m: Record<string, boolean> = {};
+        for (let i = 0; i < sortedData.length; i++) {
+          m[getRowId(sortedData[i], i)] = true;
+        }
+        setSelected(m);
+      }
+    }
+
+    return (
+      <input
+        type="checkbox"
+        checked={allSelected}
+        ref={(el) => {
+          if (el) el.indeterminate = someSelected;
+        }}
+        onChange={toggleAll}
+      />
+    );
+  }, [allIds, selected, sortedData, getRowId]);
+
   const renderRowActions = useCallback((row: T) => <ActionGroup rowActions={rowActions} row={row} />, [rowActions]);
 
   const extendedColumns = useMemo(() => [
@@ -91,6 +118,7 @@ export default function DataTable<T>(props: DataTableProps<T>) {
       render: renderRowCheckbox,
       comparable: () => "",
       width: 50,
+      renderHeader: renderGlobalCheckbox,
     },
     ...columns,
     {
@@ -105,23 +133,10 @@ export default function DataTable<T>(props: DataTableProps<T>) {
     },
   ], [columns, renderRowCheckbox, renderRowActions]);
 
-  const allSelected = allIds.length > 0 && allIds.every((id) => selected[id]);
-  const someSelected = allIds.some((id) => selected[id]) && !allSelected;
   const selectedRows = useMemo(() => {
     return sortedData.filter((row, i) => selected[getRowId(row, i)]);
   }, [sortedData, selected, getRowId]);
 
-  function toggleAll() {
-    if (allSelected) {
-      setSelected({});
-    } else {
-      const m: Record<string, boolean> = {};
-      for (let i = 0; i < sortedData.length; i++) {
-        m[getRowId(sortedData[i], i)] = true;
-      }
-      setSelected(m);
-    }
-  }
 
   function handleHeaderClick(col: Column<T>) {
     if (!col.sortable) return;
@@ -147,40 +162,14 @@ export default function DataTable<T>(props: DataTableProps<T>) {
       </div>
 
       <table style={styles.table}>
-        <colgroup>
-          {/* User-defined columns */}
-          {extendedColumns.map((col) => (
-            <col key={col.key} style={col.width ? { width: col.width } : undefined} />
-          ))}
-        </colgroup>
+        <ColumnGroup columns={extendedColumns} />
         <thead>
-          <tr>
-            <th style={styles.cell}>
-              <input
-                type="checkbox"
-                checked={allSelected}
-                ref={(el) => {
-                  if (el) el.indeterminate = someSelected;
-                }}
-                onChange={toggleAll}
-              />
-            </th>
-            {columns.map((col) => (
-              <th
-                key={col.key}
-                style={{ ...styles.cell, cursor: col.sortable ? "pointer" : "default" }}
-                onClick={() => handleHeaderClick(col)}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: 6, justifyContent: "center" }}>
-                  <span>{col.header}</span>
-                  {sortKey === col.key && (
-                    <span aria-hidden>{sortDir === "asc" ? "▲" : "▼"}</span>
-                  )}
-                </div>
-              </th>
-            ))}
-            <th style={styles.cell}>Actions</th>
-          </tr>
+          <HeaderRow
+            columns={extendedColumns}
+            sortKey={sortKey}
+            sortDir={sortDir}
+            onHeaderClick={handleHeaderClick}
+          />
           {/* Filter row */}
           <FilterRow
             columns={extendedColumns}
@@ -201,6 +190,84 @@ export default function DataTable<T>(props: DataTableProps<T>) {
         </tbody>
       </table>
     </div>
+  );
+}
+
+function HeaderRow<T>({ columns, sortKey, sortDir, onHeaderClick }: {
+  columns: Column<T>[];
+  sortKey: string | null;
+  sortDir: "asc" | "desc";
+  onHeaderClick: (col: Column<T>) => void;
+}) {
+  return (
+    <tr>
+      {columns.map((col) => (col.renderHeader ?
+        (
+          <th style={styles.cell}>
+            {col.renderHeader()}
+          </th>
+        ) : (
+          <HeaderCell
+            key={col.key}
+            column={col}
+            sortKey={sortKey}
+            sortDir={sortDir}
+            onHeaderClick={() => onHeaderClick(col)}
+          />
+        )
+      ))}
+    </tr>
+  );
+}
+
+function HeaderCell<T>({ column, sortKey, sortDir, onHeaderClick }: {
+  column: Column<T>;
+  sortKey: string | null;
+  sortDir: "asc" | "desc";
+  onHeaderClick: () => void;
+}) {
+  return (
+    column.sortable ? (
+      <SortableHeaderCell
+        header={column.header}
+        sortDir={sortKey === column.key ? sortDir : null}
+        onSortToggle={onHeaderClick}
+      />
+    ) : (
+      <th style={styles.cell}>
+        {column.header}
+      </th>
+    )
+  );
+}
+
+function SortableHeaderCell<T>({ header, sortDir, onSortToggle }: {
+  header: string;
+  sortDir: "asc" | "desc" | null;
+  onSortToggle: () => void;
+}) {
+  return (
+    <th
+      style={{ ...styles.cell, cursor: "pointer" }}
+      onClick={onSortToggle}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 6, justifyContent: "center" }}>
+        <span>{header}</span>
+        {sortDir && (
+          <span aria-hidden>{sortDir === "asc" ? "▲" : "▼"}</span>
+        )}
+      </div>
+    </th>
+  );
+}
+
+function ColumnGroup<T>({ columns }: { columns: Column<T>[] }) {
+  return (
+    <colgroup>
+      {columns.map((col) => (
+        <col key={col.key} style={col.width ? { width: col.width } : undefined} />
+      ))}
+    </colgroup>
   );
 }
 

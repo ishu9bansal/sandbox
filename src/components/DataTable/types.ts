@@ -8,6 +8,7 @@ export type Column<T> = {
   render: (row: T) => React.ReactNode;
   comparable: (row: T) => string | number;
   width?: number | string;
+  renderHeader?: () => React.ReactNode;
 };
 
 export type ColumnBuilderOptions<T> = Partial<Column<T>> & { key: string };
