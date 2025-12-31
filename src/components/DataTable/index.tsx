@@ -15,36 +15,13 @@ export default function DataTable<T>({
   bulkActions,
   rowActions,
 }: DataTableProps<T>) {
-  const {
-    predicate,
-    filters,
-    onFilterChange,
-    query,
-    setQuery,
-  } = useGlobalFilteringPredicate(columns);
+  const { predicate, filters, onFilterChange, query, setQuery } = useFiltering(columns);
   const filteredData = useMemo(() => data.filter((row) => predicate(row)), [data, predicate]);
 
-  const { sortKey, sortDir, onSortToggle } = useSortState();
-  const sortedData = useMemo(() => {
-    if (!sortKey) return filteredData;
-    const col = columns.find((c) => c.key === sortKey);
-    if (!col) return filteredData;
-    const copy = [...filteredData];
-    copy.sort((a, b) => {
-      const av = col.comparable(a);
-      const bv = col.comparable(b);
-      return compareNumOrString(av, bv, sortDir);
-    });
-    return copy;
-  }, [filteredData, sortKey, sortDir, columns]);
+  const { sortKey, sortDir, onSortToggle, sort } = useSorting(columns);
+  const sortedData = useMemo(() => sort(filteredData), [filteredData, sort]);
 
-  const {
-    isSelected,
-    allSelected,
-    someSelected,
-    toggleRow,
-    toggleAll,
-  } = useRowSelection(data, getRowId);
+  const { isSelected, allSelected, someSelected, toggleRow, toggleAll } = useRowSelection(data, getRowId);
   const selectedRows = useMemo(() => sortedData.filter(isSelected), [sortedData, isSelected]);
 
   const renderRowCheckbox = useCallback((row: T) => {
@@ -123,7 +100,7 @@ export default function DataTable<T>({
 }
 
 
-function useSortState() {
+function useSorting<T>(columns: Column<T>[]) {
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   function onSortToggle(colKey: string) {
@@ -134,7 +111,19 @@ function useSortState() {
       setSortDir("asc");
     }
   }
-  return { sortKey, sortDir, onSortToggle };
+  const sort = useCallback((filteredData: T[]) => {
+    if (!sortKey) return filteredData;
+    const col = columns.find((c) => c.key === sortKey);
+    if (!col) return filteredData;
+    const copy = [...filteredData];
+    copy.sort((a, b) => {
+      const av = col.comparable(a);
+      const bv = col.comparable(b);
+      return compareNumOrString(av, bv, sortDir);
+    });
+    return copy;
+  }, [sortKey, sortDir, columns]);
+  return { sortKey, sortDir, onSortToggle, sort };
 }
 
 function useSearchPredicate<T>(columns: Column<T>[]) {
@@ -164,7 +153,7 @@ function useFilterPredicate<T>(filters: Record<string, string>) {
   return filterPredicate;
 }
 
-function useGlobalFilteringPredicate<T>(columns: Column<T>[]) {
+function useFiltering<T>(columns: Column<T>[]) {
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [query, setQuery] = useState("");
   const searchPredicate = useSearchPredicate(columns);
