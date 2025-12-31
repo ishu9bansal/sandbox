@@ -113,6 +113,30 @@ export default function DataTable<T>(props: DataTableProps<T>) {
     return copy;
   }, [filteredData, sortKey, sortDir, columns]);
 
+  const extendedColumns = useMemo(() => [
+    {
+      key: "__select__",
+      header: "",
+      sortable: false,
+      filterable: false,
+      accessor: () => "",
+      render: () => null,
+      comparable: () => "",
+      width: 50,
+    },
+    ...columns,
+    {
+      key: "__actions__",
+      header: "Actions",
+      sortable: false,
+      filterable: false,
+      accessor: () => "",
+      render: () => null,
+      comparable: () => "",
+      width: 140,
+    },
+  ], [columns]);
+
   const allSelected = allIds.length > 0 && allIds.every((id) => selected[id]);
   const someSelected = allIds.some((id) => selected[id]) && !allSelected;
   const selectedRows = useMemo(() => {
@@ -176,14 +200,10 @@ export default function DataTable<T>(props: DataTableProps<T>) {
 
       <table style={styles.table}>
         <colgroup>
-          {/* Checkbox column */}
-          <col style={{ width: 50 }} />
           {/* User-defined columns */}
-          {columns.map((col) => (
+          {extendedColumns.map((col) => (
             <col key={col.key} style={col.width ? { width: col.width } : undefined} />
           ))}
-          {/* Actions column */}
-          <col style={{ width: 140 }} />
         </colgroup>
         <thead>
           <tr>
@@ -215,7 +235,7 @@ export default function DataTable<T>(props: DataTableProps<T>) {
           </tr>
           {/* Filter row */}
           <FilterRow
-            columns={columns}
+            columns={extendedColumns}
             onFilterChange={(key, val) => setFilters((prev) => ({ ...prev, [key]: val }))}
             filters={filters}
           />
@@ -233,7 +253,7 @@ export default function DataTable<T>(props: DataTableProps<T>) {
               rowActions={rowActions}
             />
           })}
-          <EmptyView colSpan={columns.length + 2} visible={sortedData.length === 0} />
+          <EmptyView colSpan={columns.length} visible={sortedData.length === 0} />
         </tbody>
       </table>
     </div>
@@ -248,7 +268,6 @@ type FilterRowProps<T> = {
 function FilterRow<T>({ columns, onFilterChange, filters }: FilterRowProps<T>) {
   return (
     <tr>
-      <th style={styles.cell}></th>
       {columns.map((col) => (
         <th key={col.key} style={styles.cell}>
           {col.filterable ? (
@@ -262,7 +281,6 @@ function FilterRow<T>({ columns, onFilterChange, filters }: FilterRowProps<T>) {
           ) : null}
         </th>
       ))}
-      <th style={styles.cell}></th>
     </tr>
   );
 }
