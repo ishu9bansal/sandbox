@@ -17,9 +17,8 @@ export default function DataTable<T>(props: DataTableProps<T>) {
     rowActions,
   } = props;
   // TODO: clean up logic using custom hooks
+  const { sortKey, sortDir, onSortToggle } = useSortState();
   const [selected, setSelected] = useState<Record<string, boolean>>({});
-  const [sortKey, setSortKey] = useState<string | null>(null);
-  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [globalQuery, setGlobalQuery] = useState("");
 
@@ -135,14 +134,6 @@ export default function DataTable<T>(props: DataTableProps<T>) {
   }, [sortedData, selected, getRowId]);
 
 
-  function onSortToggle(colKey: string) {
-    if (sortKey === colKey) {
-      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
-    } else {
-      setSortKey(colKey);
-      setSortDir("asc");
-    }
-  }
 
 
   return (
@@ -163,4 +154,19 @@ export default function DataTable<T>(props: DataTableProps<T>) {
       getRowId={getRowId}
     />
   );
+}
+
+
+function useSortState() {
+  const [sortKey, setSortKey] = useState<string | null>(null);
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+  function onSortToggle(colKey: string) {
+    if (sortKey === colKey) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(colKey);
+      setSortDir("asc");
+    }
+  }
+  return { sortKey, sortDir, onSortToggle };
 }
