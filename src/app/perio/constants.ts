@@ -9,11 +9,11 @@ export const ZONES = [
 
 /**
  * TODO:
- * - [ ] Add notes for each record
+ * - [ ] Define a standard for perio charting
  * - [ ] Introduce custom bulk operations in Datatable
+ * - [ ] Add notes for each record
  * - [ ] Implement copy to csv for records
  * - [ ] Handle negative values in perio input
  * - [ ] Select missing teeth on record creation
  * - [ ] Generate quick input rows dynamically based on missing/selected teeth info
- * - [ ] Define a standard for perio charting
  */

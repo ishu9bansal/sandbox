@@ -12,6 +12,20 @@ export type Column<T> = {
   width?: number | string;
 };
 
+export type BulkAction<T> = {
+  key?: string;
+  label: string;
+  action: (rows: T[]) => void;
+  buttonStyles?: React.CSSProperties;
+}
+
+export type RowAction<T> = {
+  key?: string;
+  label: string;
+  action: (row: T) => void;
+  buttonStyles?: React.CSSProperties;
+}
+
 export type DataTableProps<T> = {
   title?: string;
   data: T[];
@@ -20,7 +34,8 @@ export type DataTableProps<T> = {
   onEdit?: (row: T) => void;
   onDelete?: (row: T) => void;
   onView?: (row: T) => void;
-  onBulkDelete?: (rows: T[]) => void;
+  bulkActions?: BulkAction<T>[];
+  rowActions?: RowAction<T>[];
 };
 
 function asComparable(v: any): { v: string | number; isNumber: boolean } {
@@ -52,7 +67,8 @@ export default function DataTable<T>(props: DataTableProps<T>) {
     onEdit,
     onDelete,
     onView,
-    onBulkDelete,
+    bulkActions,
+    rowActions,
   } = props;
 
   const [selected, setSelected] = useState<Record<string, boolean>>({});
@@ -164,27 +180,19 @@ export default function DataTable<T>(props: DataTableProps<T>) {
             onChange={(e) => setGlobalQuery(e.target.value)}
             style={styles.searchInput}
           />
-          <BulkActionButton
-            label="Delect Selected"
-            disabled={selectedRows.length === 0}
-            rows={selectedRows}
-            onAction={onBulkDelete}
-            styles={{
-              ...styles.button,
-              background: "#cc3300",
-              cursor: "pointer",
-            }}
-          />
-          <BulkActionButton
-            label="Copy Selected CSV"
-            disabled={selectedRows.length === 0}
-            rows={selectedRows}
-            onAction={copyCsv}
-            styles={{
-              ...styles.button,
-              background: "#0066cc",
-            }}
-          />
+          {bulkActions?.map((action) => (
+            <BulkActionButton
+              key={action.key || action.label}
+              label={action.label}
+              disabled={selectedRows.length === 0}
+              rows={selectedRows}
+              onAction={action.action}
+              styles={{
+                ...styles.button,
+                ...action.buttonStyles,
+              }}
+            />
+          ))}
         </div>
       </div>
 

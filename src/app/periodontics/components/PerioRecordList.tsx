@@ -56,6 +56,30 @@ export default function PerioRecordList({
     }
   ], [patientLabelMap]);
 
+  const copyCsv = (records: PerioRecord[]) => {
+    console.log("Copy CSV action triggered for records:", records.length);
+  };
+
+  const bulkActions = useMemo(() => [
+    {
+      key: 'delete',
+      label: 'Delete Selected',
+      action: onBulkDelete,
+      buttonStyles: {
+        background: "#cc3300",
+        cursor: "pointer",
+      },
+    },
+    {
+      key: 'copy',
+      label: 'Copy Selected CSV',
+      action: copyCsv,
+      buttonStyles: {
+        background: "#0066cc",
+      },
+    },
+  ], [onBulkDelete, copyCsv]);
+
   return (
     <DataTable
       title="Record List"
@@ -65,7 +89,7 @@ export default function PerioRecordList({
       onView={onView}
       onEdit={onEdit}
       onDelete={onDelete}
-      onBulkDelete={onBulkDelete}
+      bulkActions={bulkActions}
     />
   );
 }

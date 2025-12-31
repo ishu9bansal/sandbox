@@ -55,6 +55,18 @@ export default function PatientList({
     },
   ], []);
 
+  const bulkActions = useMemo(() => [
+    {
+      key: 'delete',
+      label: 'Delete Selected',
+      action: onBulkDelete,
+      buttonStyles: {
+        background: "#cc3300",
+        cursor: "pointer",
+      },
+    }
+  ], [onBulkDelete]);
+
   return (
     <DataTable
       title="Patient List"
@@ -64,7 +76,7 @@ export default function PatientList({
       onView={onView}
       onEdit={onEdit}
       onDelete={onDelete}
-      onBulkDelete={onBulkDelete}
+      bulkActions={bulkActions}
     />
   );
 }
