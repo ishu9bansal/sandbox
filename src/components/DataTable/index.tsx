@@ -24,16 +24,8 @@ export default function DataTable<T>(props: DataTableProps<T>) {
 
   const allIds = useMemo(() => data.map((row, i) => getRowId(row, i)), [data, getRowId]);
 
-  const searchPredicate = useSearchPredicate(columns);
-  const filterPredicate = useFilterPredicate<T>(filters);
-  const globalPredicate = useCallback((row: T) => {
-    if (!searchPredicate(row, globalQuery)) return false;
-    for (const c of columns) {
-      if (!filterPredicate(row, c)) return false;
-    }
-    return true;
-  }, [globalQuery, columns, searchPredicate, filterPredicate]);
-  const filteredData = useMemo(() => data.filter((row) => globalPredicate(row)), [data, globalPredicate]);
+  const predicate = useGlobalFilteringPredicate(columns, filters, globalQuery);
+  const filteredData = useMemo(() => data.filter((row) => predicate(row)), [data, predicate]);
 
   const sortedData = useMemo(() => {
     if (!sortKey) return filteredData;
@@ -185,4 +177,17 @@ function useFilterPredicate<T>(filters: Record<string, string>) {
     return v.includes(f);
   }, [filters]);
   return filterPredicate;
+}
+
+function useGlobalFilteringPredicate<T>(columns: Column<T>[], filters: Record<string, string>, globalQuery: string) {
+  const searchPredicate = useSearchPredicate(columns);
+  const filterPredicate = useFilterPredicate<T>(filters);
+  const globalPredicate = useCallback((row: T) => {
+    if (!searchPredicate(row, globalQuery)) return false;
+    for (const c of columns) {
+      if (!filterPredicate(row, c)) return false;
+    }
+    return true;
+  }, [globalQuery, columns, searchPredicate, filterPredicate]);
+  return globalPredicate;
 }
