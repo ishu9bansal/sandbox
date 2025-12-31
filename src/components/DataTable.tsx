@@ -21,7 +21,7 @@ export function columnBuilder<T>({ key, header, sortable, filterable, accessor, 
   return {
     key,
     header: header || capitalized,
-    sortable: !!sortable,
+    sortable: !!comparable || !!sortable,
     filterable: !!filterable,
     accessor: defaultAccessor,
     render: render || defaultAccessor,
