@@ -1,8 +1,10 @@
 "use client";
 
 import { useMemo } from "react";
-import DataTable, { Column, columnsBuilder } from "@/components/DataTable";
+import DataTable from "@/components/DataTable";
 import { Patient } from '@/models/patient';
+import { columnsBuilder } from "@/components/DataTable/columns";
+import { Column } from "@/components/DataTable/types";
 
 interface PatientListProps {
   patients: Patient[];

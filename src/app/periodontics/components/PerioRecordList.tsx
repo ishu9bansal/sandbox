@@ -1,7 +1,9 @@
 "use client";
 
 import { useCallback, useMemo } from "react";
-import DataTable, { Column, columnsBuilder } from "@/components/DataTable";
+import DataTable from "@/components/DataTable";
+import { columnsBuilder } from "@/components/DataTable/columns";
+import { Column } from "@/components/DataTable/types";
 import { PerioRecord } from '@/models/perio';
 import { useSelector } from "react-redux";
 import { selectAllPatients } from "@/store/patientSlice";
