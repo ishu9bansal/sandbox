@@ -1,7 +1,7 @@
 "use client";
 
 import { compareNumOrString } from "@/utils/helpers";
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 
 export type Column<T> = {
   key: string;
@@ -53,7 +53,7 @@ export type DataTableProps<T> = {
   title?: string;
   data: T[];
   columns: Column<T>[];
-  getRowId: (row: T, index: number) => string;
+  getRowId: (row: T, index?: number) => string;
   onRowClick?: (row: T) => void;
   bulkActions?: BulkAction<T>[];
   rowActions?: RowAction<T>[];
@@ -113,6 +113,37 @@ export default function DataTable<T>(props: DataTableProps<T>) {
     return copy;
   }, [filteredData, sortKey, sortDir, columns]);
 
+  const renderRowCheckbox = useCallback((row: T) => {
+    const id = getRowId(row);
+    function toggleRow(id: string) {
+      setSelected((prev) => ({ ...prev, [id]: !prev[id] }));
+    }
+    return (
+      <input
+        type="checkbox"
+        checked={selected[id]}
+        onChange={() => toggleRow(id)}
+        onClick={(e) => e.stopPropagation()}
+      />
+    );
+  }, [setSelected, selected, getRowId]);
+
+  const renderRowActions = useCallback((row: T) => {
+    return (
+      <div style={styles.actionGroup}>
+        {rowActions?.map((action) => (
+          <ActionButton
+            key={action.key || action.label}
+            label={action.label}
+            row={row}
+            onAction={action.action}
+            buttonStyles={action.buttonStyles}
+          />
+        ))}
+      </div>
+    );
+  }, [rowActions]);
+
   const extendedColumns = useMemo(() => [
     {
       key: "__select__",
@@ -120,7 +151,7 @@ export default function DataTable<T>(props: DataTableProps<T>) {
       sortable: false,
       filterable: false,
       accessor: () => "",
-      render: () => null,
+      render: renderRowCheckbox,
       comparable: () => "",
       width: 50,
     },
@@ -131,7 +162,7 @@ export default function DataTable<T>(props: DataTableProps<T>) {
       sortable: false,
       filterable: false,
       accessor: () => "",
-      render: () => null,
+      render: renderRowActions,
       comparable: () => "",
       width: 140,
     },
@@ -153,10 +184,6 @@ export default function DataTable<T>(props: DataTableProps<T>) {
       }
       setSelected(m);
     }
-  }
-
-  function toggleRow(id: string) {
-    setSelected((prev) => ({ ...prev, [id]: !prev[id] }));
   }
 
   function handleHeaderClick(col: Column<T>) {
@@ -242,15 +269,11 @@ export default function DataTable<T>(props: DataTableProps<T>) {
         </thead>
         <tbody>
           {sortedData.map((row, i) => {
-            const id = getRowId(row, i);
             return <DataTableRow
               key={getRowId(row, i)}
               row={row}
-              columns={columns}
+              columns={extendedColumns}
               onClick={onRowClick}
-              selected={!!selected[id]}
-              toggleRow={() => toggleRow(id)}
-              rowActions={rowActions}
             />
           })}
           <EmptyView colSpan={columns.length} visible={sortedData.length === 0} />
@@ -300,11 +323,8 @@ type DataTableRowProps<T> = {
   row: T;
   columns: Column<T>[];
   onClick?: (row: T) => void;
-  selected: boolean;
-  toggleRow: () => void;
-  rowActions?: RowAction<T>[];
 };
-function DataTableRow<T>({ row, columns, onClick, selected, toggleRow, rowActions }: DataTableRowProps<T>) {
+function DataTableRow<T>({ row, columns, onClick }: DataTableRowProps<T>) {
   function onRowClick(e: React.MouseEvent) {
     const target = e.target as HTMLElement;
     if (target.closest("button, input, a")) return; // avoid accidental triggers
@@ -312,32 +332,11 @@ function DataTableRow<T>({ row, columns, onClick, selected, toggleRow, rowAction
   }
   return (
     <tr style={styles.row} onClick={onRowClick}>
-      <td style={styles.cell}>
-        <input
-          type="checkbox"
-          checked={selected}
-          onChange={toggleRow}
-          onClick={(e) => e.stopPropagation()}
-        />
-      </td>
       {columns.map((col) => (
         <td key={col.key} style={styles.cell}>
           {col.render(row)}
         </td>
       ))}
-      <td style={styles.cell}>
-        <div style={styles.actionGroup}>
-          {rowActions?.map((action) => (
-            <ActionButton
-              key={action.key || action.label}
-              label={action.label}
-              row={row}
-              onAction={action.action}
-              buttonStyles={action.buttonStyles}
-            />
-          ))}
-        </div>
-      </td>
     </tr>
   );
 }
