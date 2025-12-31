@@ -6,25 +6,15 @@ import { Column, DataTableProps } from "./types";
 import ActionGroup from "./ActionGroup";
 import TableStructure from "./TableStructure";
 
-export default function DataTable<T>(props: DataTableProps<T>) {
-  const {
-    title,
-    data,
-    columns,
-    getRowId,
-    onRowClick,
-    bulkActions,
-    rowActions,
-  } = props;
-  // TODO: clean up logic using custom hooks
-  const { sortKey, sortDir, onSortToggle } = useSortState();
-  const {
-    isSelected,
-    allSelected,
-    someSelected,
-    toggleRow,
-    toggleAll,
-  } = useRowSelection(data, getRowId);
+export default function DataTable<T>({
+  title,
+  data,
+  columns,
+  getRowId,
+  onRowClick,
+  bulkActions,
+  rowActions,
+}: DataTableProps<T>) {
   const {
     predicate,
     filters,
@@ -34,6 +24,7 @@ export default function DataTable<T>(props: DataTableProps<T>) {
   } = useGlobalFilteringPredicate(columns);
   const filteredData = useMemo(() => data.filter((row) => predicate(row)), [data, predicate]);
 
+  const { sortKey, sortDir, onSortToggle } = useSortState();
   const sortedData = useMemo(() => {
     if (!sortKey) return filteredData;
     const col = columns.find((c) => c.key === sortKey);
@@ -46,6 +37,14 @@ export default function DataTable<T>(props: DataTableProps<T>) {
     });
     return copy;
   }, [filteredData, sortKey, sortDir, columns]);
+
+  const {
+    isSelected,
+    allSelected,
+    someSelected,
+    toggleRow,
+    toggleAll,
+  } = useRowSelection(data, getRowId);
   const selectedRows = useMemo(() => sortedData.filter(isSelected), [sortedData, isSelected]);
 
   const renderRowCheckbox = useCallback((row: T) => {
@@ -97,7 +96,7 @@ export default function DataTable<T>(props: DataTableProps<T>) {
       comparable: () => "",
       width: 140,
     },
-  ], [columns, renderRowCheckbox, renderRowActions]);
+  ], [columns, renderRowCheckbox, renderRowActions, renderGlobalCheckbox]);
 
 
 
