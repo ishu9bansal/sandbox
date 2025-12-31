@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo } from "react";
-import DataTable, { Column, columnBuilder } from "@/components/DataTable";
+import DataTable, { Column, columnsBuilder } from "@/components/DataTable";
 import { PerioRecord } from '@/models/perio';
 import { useSelector } from "react-redux";
 import { selectAllPatients } from "@/store/patientSlice";
@@ -34,31 +34,31 @@ export default function PerioRecordList({
     const key = record.patientId || "";
     return patientLabelMap[key] || "Unassigned";
   }, [patientLabelMap]);
-  const columns: Column<PerioRecord>[] = useMemo(() => [
-    columnBuilder({
+  const columns: Column<PerioRecord>[] = useMemo(() => columnsBuilder(
+    {
       key: 'label',
       header: 'Label',
       filterable: true,
-    }),
-    columnBuilder({
+    },
+    {
       key: 'patient',
       header: 'Patient',
       filterable: true,
       accessor: patientAccessor,
-    }),
-    columnBuilder({
+    },
+    {
       key: 'createdAt',
       header: 'Created At',
       sortable: true,
       accessor: (record: PerioRecord) => new Date(record.createdAt).toLocaleDateString(),
-    }),
-    columnBuilder({
+    },
+    {
       key: 'updatedAt',
       header: 'Last Updated',
       sortable: true,
       accessor: (record: PerioRecord) => new Date(record.updatedAt).toLocaleDateString(),
-    }),
-  ], [patientAccessor]);
+    },
+  ), [patientAccessor]);
 
   const copyAction = useCallback((records: PerioRecord[]) => copyCsv(records, columns), [columns]);
 

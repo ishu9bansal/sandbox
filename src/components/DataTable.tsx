@@ -13,7 +13,6 @@ export type Column<T> = {
 };
 
 export type ColumnBuilderOptions<T> = Partial<Column<T>> & { key: string };
-/** T: Something that can be indexed by string keys */
 export function columnBuilder<T>({ key, header, sortable, filterable, accessor, render, width }: ColumnBuilderOptions<T>): Column<T> {
   const valueAtKey = (row: T) => String((row as any)[key]);
   const capitalized = key.charAt(0).toUpperCase() + key.slice(1);
