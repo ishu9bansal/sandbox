@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo } from "react";
-import { DataTableProps } from "./types";
+import { Column, DataTableProps } from "./types";
 import ActionGroup from "./ActionGroup";
 import TableStructure from "./TableStructure";
 import useFiltering from "./useFiltering";
@@ -26,6 +26,62 @@ export default function DataTable<T>({
   const { isSelected, allSelected, someSelected, toggleRow, toggleAll } = useSelection(data, getRowId);
   const selectedRows = useMemo(() => sortedData.filter(isSelected), [sortedData, isSelected]);
 
+  const selectionColumn = useSelectionColumn(
+    isSelected,
+    toggleRow,
+    allSelected,
+    someSelected,
+    toggleAll,
+  );
+
+  const renderRowActions = useCallback((row: T) => <ActionGroup rowActions={rowActions} row={row} />, [rowActions]);
+
+  const extendedColumns = useMemo(() => [
+    selectionColumn,
+    ...columns,
+    {
+      key: "__actions__",
+      header: "Actions",
+      sortable: false,
+      filterable: false,
+      accessor: () => "",
+      render: renderRowActions,
+      comparable: () => "",
+      width: 140,
+    },
+  ], [columns, selectionColumn, renderRowActions]);
+
+
+
+
+
+  return (
+    <TableStructure
+      title={title || "Results"}
+      query={query}
+      setQuery={setQuery}
+      bulkActions={bulkActions}
+      selectedRows={selectedRows}
+      columns={extendedColumns}
+      data={sortedData}
+      sortKey={sortKey}
+      sortDir={sortDir}
+      onSortToggle={onSortToggle}
+      filters={filters}
+      onFilterChange={onFilterChange}
+      onRowClick={onRowClick}
+      getRowId={getRowId}
+    />
+  );
+}
+
+function useSelectionColumn<T>(
+  isSelected: (row: T) => boolean,
+  toggleRow: (row: T) => void,
+  allSelected: boolean,
+  someSelected: boolean,
+  toggleAll: () => void,
+): Column<T> {
   const renderRowCheckbox = useCallback((row: T) => {
     return (
       <input
@@ -50,9 +106,7 @@ export default function DataTable<T>({
     );
   }, [allSelected, someSelected, toggleAll]);
 
-  const renderRowActions = useCallback((row: T) => <ActionGroup rowActions={rowActions} row={row} />, [rowActions]);
-
-  const extendedColumns = useMemo(() => [
+  const selectionColumn = useMemo(() => (
     {
       key: "__select__",
       header: "",
@@ -63,40 +117,7 @@ export default function DataTable<T>({
       comparable: () => "",
       width: 50,
       renderHeader: renderGlobalCheckbox,
-    },
-    ...columns,
-    {
-      key: "__actions__",
-      header: "Actions",
-      sortable: false,
-      filterable: false,
-      accessor: () => "",
-      render: renderRowActions,
-      comparable: () => "",
-      width: 140,
-    },
-  ], [columns, renderRowCheckbox, renderRowActions, renderGlobalCheckbox]);
-
-
-
-
-
-  return (
-    <TableStructure
-      title={title || "Results"}
-      query={query}
-      setQuery={setQuery}
-      bulkActions={bulkActions}
-      selectedRows={selectedRows}
-      columns={extendedColumns}
-      data={sortedData}
-      sortKey={sortKey}
-      sortDir={sortDir}
-      onSortToggle={onSortToggle}
-      filters={filters}
-      onFilterChange={onFilterChange}
-      onRowClick={onRowClick}
-      getRowId={getRowId}
-    />
-  );
+    }
+  ), [renderRowCheckbox, renderGlobalCheckbox]);
+  return selectionColumn;
 }
