@@ -1,22 +1,14 @@
 "use client";
 
 import { useCallback, useMemo } from "react";
-import { Column, DataTableProps } from "./types";
+import { Column, DataTableProps, RowAction } from "./types";
 import ActionGroup from "./ActionGroup";
 import TableStructure from "./TableStructure";
 import useFiltering from "./useFiltering";
 import useSorting from "./useSorting";
 import useSelection from "./useSelection";
 
-export default function DataTable<T>({
-  title,
-  data,
-  columns,
-  getRowId,
-  onRowClick,
-  bulkActions,
-  rowActions,
-}: DataTableProps<T>) {
+export default function DataTable<T>({ title, data, columns, getRowId, onRowClick, bulkActions, rowActions }: DataTableProps<T>) {
   const { predicate, filters, onFilterChange, query, setQuery } = useFiltering(columns);
   const filteredData = useMemo(() => data.filter((row) => predicate(row)), [data, predicate]);
 
@@ -26,34 +18,14 @@ export default function DataTable<T>({
   const { isSelected, allSelected, someSelected, toggleRow, toggleAll } = useSelection(data, getRowId);
   const selectedRows = useMemo(() => sortedData.filter(isSelected), [sortedData, isSelected]);
 
-  const selectionColumn = useSelectionColumn(
-    isSelected,
-    toggleRow,
-    allSelected,
-    someSelected,
-    toggleAll,
-  );
-
-  const renderRowActions = useCallback((row: T) => <ActionGroup rowActions={rowActions} row={row} />, [rowActions]);
+  const selectionColumn = useSelectionColumn(isSelected, toggleRow, allSelected, someSelected, toggleAll);
+  const actionsColumn = useActionsColumn(rowActions || []);
 
   const extendedColumns = useMemo(() => [
     selectionColumn,
     ...columns,
-    {
-      key: "__actions__",
-      header: "Actions",
-      sortable: false,
-      filterable: false,
-      accessor: () => "",
-      render: renderRowActions,
-      comparable: () => "",
-      width: 140,
-    },
-  ], [columns, selectionColumn, renderRowActions]);
-
-
-
-
+    actionsColumn,
+  ], [columns, selectionColumn, actionsColumn]);
 
   return (
     <TableStructure
@@ -120,4 +92,21 @@ function useSelectionColumn<T>(
     }
   ), [renderRowCheckbox, renderGlobalCheckbox]);
   return selectionColumn;
+}
+
+function useActionsColumn<T>(rowActions: RowAction<T>[]): Column<T> {
+  const renderRowActions = useCallback((row: T) => <ActionGroup rowActions={rowActions} row={row} />, [rowActions]);
+  const actionsColumn = useMemo(() => (
+    {
+      key: "__actions__",
+      header: "Actions",
+      sortable: false,
+      filterable: false,
+      accessor: () => "",
+      render: renderRowActions,
+      comparable: () => "",
+      width: 140,
+    }
+  ), [renderRowActions]);
+  return actionsColumn;
 }
