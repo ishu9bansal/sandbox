@@ -9,20 +9,23 @@ export type Column<T> = {
   filterable: boolean;
   accessor: (row: T) => string;
   render: (row: T) => React.ReactNode;
+  comparable: (row: T) => string | number;
   width?: number | string;
 };
 
 export type ColumnBuilderOptions<T> = Partial<Column<T>> & { key: string };
-export function columnBuilder<T>({ key, header, sortable, filterable, accessor, render, width }: ColumnBuilderOptions<T>): Column<T> {
+export function columnBuilder<T>({ key, header, sortable, filterable, accessor, render, comparable, width }: ColumnBuilderOptions<T>): Column<T> {
   const valueAtKey = (row: T) => String((row as any)[key]);
   const capitalized = key.charAt(0).toUpperCase() + key.slice(1);
+  const defaultAccessor = accessor || valueAtKey;
   return {
     key,
     header: header || capitalized,
     sortable: !!sortable,
     filterable: !!filterable,
-    accessor: accessor || valueAtKey,
-    render: render || accessor || valueAtKey,
+    accessor: defaultAccessor,
+    render: render || defaultAccessor,
+    comparable: comparable || defaultAccessor,
     width,
   };
 }
@@ -57,18 +60,14 @@ export type DataTableProps<T> = {
   rowActions?: RowAction<T>[];
 };
 
-function asComparable(v: any): { v: string | number; isNumber: boolean } {
-  if (v == null) return { v: "", isNumber: false };
-  if (Array.isArray(v)) return asComparable(v.join(" "));
-  if (typeof v === "number") return { v, isNumber: true };
-  const n = Number(v);
-  if (!Number.isNaN(n) && String(v).trim() !== "") return { v: n, isNumber: true };
-  return { v: String(v).toLowerCase(), isNumber: false };
-}
-
-function getCellValue<T>(row: T, col: Column<T>) {
-  const raw = col.accessor ? col.accessor(row) : (row as any)[col.key];
-  return raw;
+function compareNumOrString(a: number | string, b: number | string, sortDir: "asc" | "desc" = "asc"): number {
+  const factor = sortDir === "asc" ? 1 : -1;
+  if (typeof a === "number" && typeof b === "number") {
+    return factor * (a - b);
+  }
+  const sa = String(a);
+  const sb = String(b);
+  return factor * sa.localeCompare(sb);
 }
 
 export default function DataTable<T>(props: DataTableProps<T>) {
@@ -97,7 +96,7 @@ export default function DataTable<T>(props: DataTableProps<T>) {
       const q = globalQuery.trim().toLowerCase();
       if (q) {
         const hay = columns
-          .map((c) => getCellValue(row, c))
+          .map((c) => c.accessor(row))
           .map((v) => (Array.isArray(v) ? v.join(" ") : String(v)))
           .join(" ")
           .toLowerCase();
@@ -106,7 +105,7 @@ export default function DataTable<T>(props: DataTableProps<T>) {
       for (const c of columns) {
         const f = (filters[c.key] || "").trim().toLowerCase();
         if (!f) continue;
-        const v = getCellValue(row, c);
+        const v = c.accessor(row);
         const s = (Array.isArray(v) ? v.join(" ") : String(v)).toLowerCase();
         if (!s.includes(f)) return false;
       }
@@ -120,14 +119,9 @@ export default function DataTable<T>(props: DataTableProps<T>) {
     if (!col) return filteredData;
     const copy = [...filteredData];
     copy.sort((a, b) => {
-      const av = asComparable(getCellValue(a, col));
-      const bv = asComparable(getCellValue(b, col));
-      if (av.isNumber && bv.isNumber) {
-        return sortDir === "asc" ? (av.v as number) - (bv.v as number) : (bv.v as number) - (av.v as number);
-      }
-      const sa = String(av.v);
-      const sb = String(bv.v);
-      return sortDir === "asc" ? sa.localeCompare(sb) : sb.localeCompare(sa);
+      const av = col.comparable(a);
+      const bv = col.comparable(b);
+      return compareNumOrString(av, bv, sortDir);
     });
     return copy;
   }, [filteredData, sortKey, sortDir, columns]);
@@ -323,14 +317,11 @@ function DataTableRow<T>({ row, columns, onView, selected, toggleRow, onDelete, 
           onClick={(e) => e.stopPropagation()}
         />
       </td>
-      {columns.map((col) => {
-        const value = getCellValue(row, col);
-        return (
-          <td key={col.key} style={styles.cell}>
-            {col.render ? col.render(row) : String(Array.isArray(value) ? value.join(" ") : value)}
-          </td>
-        );
-      })}
+      {columns.map((col) => (
+        <td key={col.key} style={styles.cell}>
+          {col.render(row)}
+        </td>
+      ))}
       <td style={styles.cell}>
         <div style={styles.actionGroup}>
           <ActionButton
