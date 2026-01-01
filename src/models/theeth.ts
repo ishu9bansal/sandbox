@@ -9,14 +9,14 @@ const COMMON_TOOTH_MAPPING = [
   [48, 47, 46, 45, 44, 43, 42, 41, 31, 32, 33, 34, 35, 36, 37, 38],
 ];
 
-class TeethGrid<DataType> {
-  quadrants: Quadrant<DataType>;
+class TeethGrid<T> {
+  quadrants: Quadrant<T>;
   private mapping: number[][];
-  constructor(data: Quadrant<DataType>, mapping: number[][] = COMMON_TOOTH_MAPPING) {
+  constructor(data: Quadrant<T>, mapping: number[][] = COMMON_TOOTH_MAPPING) {
     this.mapping = mapping;
     this.quadrants = data;
   }
-  getData(): DataType[][] {
+  getData(): T[][] {
     return this.quadrants;
   }
   getQuadrantAndPosition(r: number, c: number): { quadrant: number; position: number } | null {
@@ -26,21 +26,21 @@ class TeethGrid<DataType> {
     const position = -1 + qp%10;
     return { quadrant, position };
   }
-  getToothData(row: number, col: number): DataType | null {
+  getToothData(row: number, col: number): T | null {
     const qp = this.getQuadrantAndPosition(row, col);
     if (qp === null) return null;
     return this.quadrants[qp.quadrant][qp.position];
   }
-  updateToothData(row: number, col: number, data: DataType): void {
+  updateToothData(row: number, col: number, data: T): void {
     const qp = this.getQuadrantAndPosition(row, col);
     if (qp === null) return;
     this.quadrants[qp.quadrant][qp.position] = data;
     return;
   }
-  serialize<T>(renderer: (datum: DataType | null) => T): T[][] {
-    const results: T[][] = [];
+  serialize<S>(renderer: (datum: T | null) => S): S[][] {
+    const results: S[][] = [];
     for(let i=0; i<this.mapping.length; i++){
-      const resultRow: T[] = [];
+      const resultRow: S[] = [];
       for(let j=0; j<this.mapping[i].length; j++){
         resultRow.push(renderer(this.getToothData(i, j)));
       }
