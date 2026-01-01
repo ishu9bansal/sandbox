@@ -56,12 +56,5 @@ export const projects: Project[] = [
     path: "/patients",
     icon: "🏥",
   },
-  {
-    id: "perio-example",
-    name: "Perio Example Input",
-    description: "Tooth charting example",
-    path: "/perio",
-    icon: "🦷",
-  },
   // Add your new projects here following this pattern
 ];
