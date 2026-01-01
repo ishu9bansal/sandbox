@@ -4,13 +4,13 @@ import { useRef, useState } from "react";
 import Card from "@/components/Card";
 import Button from "@/components/Button";
 import { PPDRecord, TeethSelection } from "@/models/perio";
-import { deriveDataFromValues, deriveValues, deriveZones } from "./utils";
+import { dataUpdaterFromValues, deriveValues, deriveZones } from "./utils";
 import PerioInput from "./PerioInput";
 
 interface PPDFormProps {
   teeth: TeethSelection;
   data: PPDRecord;
-  onSubmit: (data: PPDRecord) => void;
+  onSubmit: (updater: (data: PPDRecord) => PPDRecord) => void;
   onCancel: () => void;
 }
 
@@ -18,8 +18,8 @@ export default function PPDForm({ data, teeth, onSubmit, onCancel }: PPDFormProp
   const [values, setValues] = useState<string[][]>(deriveValues(data));
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const updatedData = deriveDataFromValues(values);
-    onSubmit(updatedData);
+    const updateData = dataUpdaterFromValues(values);
+    onSubmit(updateData);
   };
   const submitRef = useRef<HTMLFormElement>(null);
   const handleFocusSubmit = () => {

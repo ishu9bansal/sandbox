@@ -1,7 +1,6 @@
 
-import { CommonMeasurement, createDefaultMeasure, DEFAULT_COMMON_MEASUREMENT, MeasurementArea, MeasurementSite } from "@/models/perio";
+import { CommonMeasurement, copy, MeasurementArea, MeasurementSite } from "@/models/perio";
 import { Quadrant } from "@/models/theeth";
-import { countAndTell } from "@/utils/helpers";
 
 const STUDY_LIMIT = 3;
 function generateAnnatomicalMapping(limit: number): {q: number, p: number}[][] {
@@ -43,26 +42,27 @@ export const deriveValues = (
   mapping = MAPPING,
   valueParserFn = valueParser,
 ): string[][] => {
-  // TODO: generalize by passing in parser function, then use it to produce 'state' pairs in custom hooks
   const parser = valueParserFn(data);
   return mapping.map((group) => group.map(parser));
 }
-export const deriveDataFromValues = (values: string[][], mapping = MAPPING): Quadrant<CommonMeasurement> => {
-  const data = createDefaultMeasure<CommonMeasurement>(DEFAULT_COMMON_MEASUREMENT);
-  for(let i=0; i<values.length; i++) {
-    for(let j=0; j<values[i].length; j++) {
-      const { s, a, q, p } = mapping[i][j];
-      const datum = data[q][p];
-      data[q][p] = { 
-        ...datum,
-        [a]: {
-          ...datum[a],
-          [s]: parseInt(values[i][j])
-        }
-      };
+export const dataUpdaterFromValues = (values: string[][], mapping = MAPPING) => {
+  return (data: Quadrant<CommonMeasurement>) => {
+    const updatedData = copy(data);
+    for(let i=0; i<values.length; i++) {
+      for(let j=0; j<values[i].length; j++) {
+        const { s, a, q, p } = mapping[i][j];
+        const datum = updatedData[q][p];
+        updatedData[q][p] = { 
+          ...datum,
+          [a]: {
+            ...datum[a],
+            [s]: parseInt(values[i][j])
+          }
+        };
+      }
     }
+    return updatedData;
   }
-  return data;
 }
 
 export function deriveZones(mapping = CONCATENATED_MAPPING, siteCount = siteOrder.length): { label: string; size: number }[] {

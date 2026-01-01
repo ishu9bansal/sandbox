@@ -39,19 +39,19 @@ export default function EditPatientPage() {
     setView('ppd');
   };
 
-  const handlePPDUpdate = (ppd: PPDRecord) => {
+  const handlePPDUpdate = (updater: (ppd: PPDRecord) => PPDRecord) => {
     const updatedRecord: PerioRecord = {
       ...record,
-      ppd,
+      ppd: updater(record.ppd),
     };
     dispatch(updatePerioRecord(updatedRecord));
     setView('lgm');
   };
 
-  const handleLGMUpdate = (lgm: LGMRecord) => {
+  const handleLGMUpdate = (updater: (lgm: LGMRecord) => LGMRecord) => {
     const updatedRecord: PerioRecord = {
       ...record,
-      lgm,
+      lgm: updater(record.lgm),
     };
     dispatch(updatePerioRecord(updatedRecord));
     setView('patient')

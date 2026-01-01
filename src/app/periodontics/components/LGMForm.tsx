@@ -5,12 +5,12 @@ import Card from "@/components/Card";
 import Button from "@/components/Button";
 import { LGMRecord, TeethSelection } from "@/models/perio";
 import PerioInput from "./PerioInput";
-import { deriveDataFromValues, deriveValues, deriveZones } from "./utils";
+import { dataUpdaterFromValues, deriveValues, deriveZones } from "./utils";
 
 interface LGMFormProps {
   teeth: TeethSelection;
   data: LGMRecord;
-  onSubmit: (data: LGMRecord) => void;
+  onSubmit: (updater: (data: LGMRecord) => LGMRecord) => void;
   onCancel: () => void;
 }
 
@@ -19,8 +19,8 @@ export default function LGMForm({ data, teeth, onSubmit, onCancel }: LGMFormProp
   const [values, setValues] = useState<string[][]>(deriveValues(data));
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const updatedData = deriveDataFromValues(values);
-    onSubmit(updatedData);
+    const updateData = dataUpdaterFromValues(values);
+    onSubmit(updateData);
   };
   const submitRef = useRef<HTMLFormElement>(null);
   const handleFocusSubmit = () => {

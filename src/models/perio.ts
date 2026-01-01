@@ -28,3 +28,10 @@ export const DEFAULT_COMMON_MEASUREMENT: CommonMeasurement = {
   Buccal: { Mesio: NaN, Mid: NaN, Disto: NaN },
   Lingual: { Mesio: NaN, Mid: NaN, Disto: NaN },
 };
+
+export function copy(data: Quadrant<CommonMeasurement>): Quadrant<CommonMeasurement> {
+  return data.map(quadrant => quadrant.map(tooth => ({
+    Buccal: { ...tooth.Buccal },
+    Lingual: { ...tooth.Lingual },
+  }))) as Quadrant<CommonMeasurement>;
+}
