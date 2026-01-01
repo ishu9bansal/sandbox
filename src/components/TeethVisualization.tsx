@@ -1,6 +1,7 @@
 "use client";
 
-import { Teeth } from "@/models/perio";
+import { SelectionMeasurement, TeethSelection } from "@/models/perio";
+import { COMMON_TOOTH_MAPPING, TeethGrid } from "@/models/theeth";
 
 // Component to visualize teeth data in anatomical layout
 // FDI dental notation: First digit = quadrant (1-4), second digit = tooth position (1-8)
@@ -43,19 +44,25 @@ const ToothCell = ({ tooth, status }: { tooth: string; status: string }) => {
   );
 };
 
-export default function TeethVisualization({ data }: { data: Teeth }) {
-  // Extract teeth by quadrant
-  const quadrant1 = [11, 12, 13, 14, 15, 16, 17, 18]; // Upper Right
-  const quadrant2 = [28, 27, 26, 25, 24, 23, 22, 21]; // Upper Left (reversed for visual)
-  const quadrant3 = [38, 37, 36, 35, 34, 33, 32, 31]; // Lower Left (reversed for visual)
-  const quadrant4 = [41, 42, 43, 44, 45, 46, 47, 48]; // Lower Right
+const MAPPING = [
+  COMMON_TOOTH_MAPPING[0].slice(0,8),
+  COMMON_TOOTH_MAPPING[0].slice(8),
+  COMMON_TOOTH_MAPPING[1].slice(0,8),
+  COMMON_TOOTH_MAPPING[1].slice(8),
+];
 
-  const renderQuadrant = (teeth: number[]) => {
+export default function TeethVisualization({ data }: { data: TeethSelection }) {
+  const teethGrid = new TeethGrid(data, MAPPING);
+  const serializedData = teethGrid.serialize((toothData, q, p) => {
+    const labelNum = 11 + q * 10 + p; // FDI notation
+    return { label: labelNum.toString(), status: toothData || '-' };
+  });
+  const renderQuadrant = (teeth: { label: string; status: SelectionMeasurement; }[]) => {
     return teeth.map((tooth) => (
       <ToothCell
-        key={tooth}
-        tooth={tooth.toString()}
-        status={data[tooth] || "-"}
+        key={tooth.label}
+        tooth={tooth.label}
+        status={tooth.status}
       />
     ));
   };
@@ -65,13 +72,13 @@ export default function TeethVisualization({ data }: { data: Teeth }) {
       {/* Upper teeth */}
       <div className="flex gap-1 mb-6">
         {/* Upper Left (21-28) - reversed */}
-        <div className="flex gap-1">{renderQuadrant(quadrant2)}</div>
+        <div className="flex gap-1">{renderQuadrant(serializedData[0])}</div>
 
         {/* Midline divider */}
         <div className="w-1 bg-gray-600 mx-2"></div>
 
         {/* Upper Right (11-18) */}
-        <div className="flex gap-1">{renderQuadrant(quadrant1)}</div>
+        <div className="flex gap-1">{renderQuadrant(serializedData[1])}</div>
       </div>
 
       {/* Midline separator */}
@@ -80,13 +87,13 @@ export default function TeethVisualization({ data }: { data: Teeth }) {
       {/* Lower teeth */}
       <div className="flex gap-1">
         {/* Lower Left (31-38) - reversed */}
-        <div className="flex gap-1">{renderQuadrant(quadrant3)}</div>
+        <div className="flex gap-1">{renderQuadrant(serializedData[2])}</div>
 
         {/* Midline divider */}
         <div className="w-1 bg-gray-600 mx-2"></div>
 
         {/* Lower Right (41-48) */}
-        <div className="flex gap-1">{renderQuadrant(quadrant4)}</div>
+        <div className="flex gap-1">{renderQuadrant(serializedData[3])}</div>
       </div>
     </div>
   );

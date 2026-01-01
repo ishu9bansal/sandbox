@@ -28,3 +28,7 @@ export interface PerioRecord {
   createdAt: string;
   updatedAt: string;
 }
+
+export function createDefaultMeasure<T>(emptyValue: T): Quadrant<T> {
+  return Array.from({ length: 4 }, () => Array.from({ length: 8 }, () => emptyValue)) as Quadrant<T>;
+}
