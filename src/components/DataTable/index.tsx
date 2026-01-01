@@ -10,6 +10,7 @@ import useSelection from "./useSelection";
 import FilterRow from "./FilterRow";
 import HeaderRow from "./HeaderRow";
 import { BulkActionGroup, SearchInput } from "./ActionBar";
+import DataTableRow from "./DataTableRow";
 
 export default function DataTable<T>({ title, data, columns, getRowId, onRowClick, bulkActions, rowActions }: DataTableProps<T>) {
   const { predicate, filters, onFilterChange, query, setQuery } = useFiltering(columns);
@@ -34,18 +35,18 @@ export default function DataTable<T>({ title, data, columns, getRowId, onRowClic
   const renderHeaderRow = useHeaderRow<T>(sortKey, sortDir, onSortToggle);
   const renderSearchInput = useSearchInput<T>(query, setQuery);
   const renderBulkActionGroup = useBulkActionGroup<T>(bulkActions, selectedRows);
+  const renderDataRows = useDataView<T>(getRowId, onRowClick);
 
   return (
     <TableStructure
       title={title || "Results"}
       columns={extendedColumns}
       data={sortedData}
-      onRowClick={onRowClick}
-      getRowId={getRowId}
       renderFilterRow={renderFilterRow}
       renderHeaderRow={renderHeaderRow}
       renderSearchInput={renderSearchInput}
       renderBulkActionGroup={renderBulkActionGroup}
+      renderDataRows={renderDataRows}
     />
   );
 }
@@ -149,4 +150,18 @@ function useBulkActionGroup<T>(bulkActions: BulkAction<T>[] | undefined, selecte
     <BulkActionGroup bulkActions={bulkActions} selectedRows={selectedRows} />
   ), [bulkActions, selectedRows]);
   return renderBulkActionGroup;
+}
+
+function useDataView<T>(getRowId: (row: T) => string, onRowClick?: (row: T) => void) {
+  const renderDataRows = useCallback((columns: Column<T>[], data: T[]) => {
+    return data.map((row) => (
+      <DataTableRow
+        key={getRowId(row)}
+        row={row}
+        columns={columns}
+        onClick={onRowClick}
+      />
+    ));
+  }, [getRowId, onRowClick]);
+  return renderDataRows;
 }

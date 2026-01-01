@@ -1,22 +1,17 @@
-import ActionBar, { BulkActionGroup, SearchInput } from "./ActionBar";
-import DataTableRow from "./DataTableRow";
-import FilterRow from "./FilterRow";
-import HeaderRow from "./HeaderRow";
 import { styles } from "./styles";
-import { BulkAction, Column } from "./types";
+import { Column } from "./types";
 
 type TableStructureProps<T> = {
   title: string;
   columns: Column<T>[];
   data: T[];
-  onRowClick?: (row: T) => void;
-  getRowId: (row: T) => string;
   renderFilterRow: (columns: Column<T>[]) => React.ReactNode;
   renderHeaderRow: (columns: Column<T>[]) => React.ReactNode;
   renderSearchInput: (columns: Column<T>[]) => React.ReactNode;
   renderBulkActionGroup: (columns: Column<T>[]) => React.ReactNode;
+  renderDataRows: (columns: Column<T>[], data: T[]) => React.ReactNode;
 }
-export default function TableStructure<T>({ title, columns, data, onRowClick, getRowId, renderFilterRow, renderHeaderRow, renderSearchInput, renderBulkActionGroup }: TableStructureProps<T>) {
+export default function TableStructure<T>({ title, columns, data, renderFilterRow, renderHeaderRow, renderSearchInput, renderBulkActionGroup, renderDataRows }: TableStructureProps<T>) {
   return (
     <div style={styles.container}>
       <div style={styles.headerBar}>
@@ -34,14 +29,7 @@ export default function TableStructure<T>({ title, columns, data, onRowClick, ge
           {renderFilterRow(columns)}
         </thead>
         <tbody>
-          {data.map((row) => (
-            <DataTableRow
-              key={getRowId(row)}
-              row={row}
-              columns={columns}
-              onClick={onRowClick}
-            />
-          ))}
+          {renderDataRows(columns, data)}
           <EmptyView colSpan={columns.length} visible={data.length === 0} />
         </tbody>
       </table>
