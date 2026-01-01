@@ -76,3 +76,32 @@ export function compareNumOrString(a: number | string, b: number | string, sortD
   const sb = String(b);
   return factor * sa.localeCompare(sb);
 }
+
+/**
+ * Count and tell
+ * E.g. [ 'A', 'A', 'B', 'C', 'A', 'B' ] => [{ value: 'A', count: 2 }, { value: 'B', count: 1 }, { value: 'C', count: 1 }, { value: 'A', count: 1 }, { value: 'B', count: 1 }]
+ * count continuous occurrences of values in array and return array of objects with value and count
+ */
+export function countAndTell<T>(arr: T[]): { value: T; count: number }[] {
+  const result: { value: T; count: number }[] = [];
+  let currentValue: T | null = null;
+  let currentCount = 0;
+
+  for (const item of arr) {
+    if (item === currentValue) {
+      currentCount++;
+    } else {
+      if (currentValue !== null) {
+        result.push({ value: currentValue, count: currentCount });
+      }
+      currentValue = item;
+      currentCount = 1;
+    }
+  }
+
+  if (currentValue !== null) {
+    result.push({ value: currentValue, count: currentCount });
+  }
+
+  return result;
+}

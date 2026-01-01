@@ -6,7 +6,6 @@ import Button from "@/components/Button";
 import { LGMRecord, TeethSelection } from "@/models/perio";
 import PerioInput from "./PerioInput";
 import { deriveDataFromValues, deriveValues, deriveZones } from "./utils";
-import { LGMMapping } from "./constants";
 
 interface LGMFormProps {
   teeth: TeethSelection;
@@ -17,10 +16,10 @@ interface LGMFormProps {
 
 
 export default function LGMForm({ data, teeth, onSubmit, onCancel }: LGMFormProps) {
-  const [values, setValues] = useState<string[][]>(deriveValues(data, LGMMapping));
+  const [values, setValues] = useState<string[][]>(deriveValues(data));
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const updatedData = deriveDataFromValues(values, LGMMapping);
+    const updatedData = deriveDataFromValues(values);
     onSubmit(updatedData);
   };
   const submitRef = useRef<HTMLFormElement>(null);
@@ -34,7 +33,7 @@ export default function LGMForm({ data, teeth, onSubmit, onCancel }: LGMFormProp
     <Card title={"Edit LGM Values" }>
       <form ref={submitRef} onSubmit={handleSubmit} className="space-y-4 overflow-x-auto">
         <div className="inline-block min-w-max">
-          <PerioInput data={values} zones={deriveZones(LGMMapping[0])} onUpdate={setValues} onNextFocus={handleFocusSubmit} />
+          <PerioInput data={values} zones={deriveZones()} onUpdate={setValues} onNextFocus={handleFocusSubmit} />
         </div>
         <div className="flex gap-3 justify-end pt-4">
           <Button variant="outline" onClick={onCancel} type="button">

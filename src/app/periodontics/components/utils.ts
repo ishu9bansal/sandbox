@@ -1,60 +1,62 @@
 
-import { LGMRecord, PPDRecord } from "@/models/perio";
+import { CommonMeasurement, createDefaultMeasure, DEFAULT_COMMON_MEASUREMENT, MeasurementArea, MeasurementSite } from "@/models/perio";
+import { Quadrant } from "@/models/theeth";
+import { countAndTell } from "@/utils/helpers";
 
-const deriveToothSiteFromPosition = (row: number, col: number, mapping: string[][]): [string, number] => {
-  const key = mapping[row][col];
-  const [tooth, site] = key.split("-");
-  return [tooth, parseInt(site)];
-};
-export const deriveValues = (data: PPDRecord | LGMRecord, mapping: string[][]): string[][] => {
-  const values: string[][] = [];
-  mapping.forEach((group, rowIdx) => {
-    values[rowIdx] = [];
-    group.forEach((_, colIdx) => {
-      const [tooth, site] = deriveToothSiteFromPosition(rowIdx, colIdx, mapping);
-      const toothPPD = data[tooth];
-      const value = toothPPD?.[site];
-      const strValue = (value !== undefined) ? value.toString() : "";
-      values[rowIdx][colIdx] = strValue;
-    });
-  });
-  return values;
+const STUDY_LIMIT = 3;
+function generateAnnatomicalMapping(limit: number): {q: number, p: number}[][] {
+  return [
+    Array.from({ length: limit }, (_, i) => ({ q: 0, p: (limit-1-i) })),
+    Array.from({ length: limit }, (_, i) => ({ q: 1, p: i })),
+    Array.from({ length: limit }, (_, i) => ({ q: 3, p: (limit-1-i) })),
+    Array.from({ length: limit }, (_, i) => ({ q: 2, p: i })),
+  ];
 }
-export const deriveDataFromValues = (values: string[][], mapping: string[][]): PPDRecord | LGMRecord => {
-  const data: PPDRecord | LGMRecord = {};
-  values.forEach((group, rowIdx) => {
-    group.forEach((val, colIdx) => {
-      const [tooth, site] = deriveToothSiteFromPosition(rowIdx, colIdx, mapping);
-      if (!data[tooth]) {
-        data[tooth] = [];
-      }
-      const num = parseInt(val);
-      data[tooth][site] = isNaN(num) ? 0 : num;
-    });
-  });
+const ANNATOMICAL_MAPPING = generateAnnatomicalMapping(STUDY_LIMIT);
+const siteOrder: MeasurementSite[] = ['Mesio', 'Mid', 'Disto'];
+const siteMapping = ANNATOMICAL_MAPPING.map(group => group.map(el => siteOrder.map(s => ({...el, s}))));
+function generateFlatMapping(siteMap: { s: MeasurementSite; q: number; p: number; }[][][], area: MeasurementArea) {
+  const arr = [
+    siteMap[0].flat().concat(siteMap[1].flat()),
+    siteMap[2].flat().concat(siteMap[3].flat()),
+  ];
+  return arr.map(group => group.map(({s, q, p}) => ({s, q, p, a: area})));
+}
+const BUCCAL_MAPPING = generateFlatMapping(siteMapping, 'Buccal');
+const LINGUAL_MAPPING = generateFlatMapping(siteMapping, 'Lingual');
+const MAPPING = [
+  BUCCAL_MAPPING[0],
+  LINGUAL_MAPPING[0],
+  LINGUAL_MAPPING[1],
+  BUCCAL_MAPPING[1],
+];
+export const deriveValues = (
+  data: Quadrant<CommonMeasurement>,
+  mapping = MAPPING,
+): string[][] => {
+  // TODO: generalize by passing in parser function, then use it to produce 'state' pairs in custom hooks
+  const parser = ({ s, a, q, p } : { s: MeasurementSite; a: MeasurementArea; q: number; p: number; }) => {
+    const datum = data[q][p];
+    if (!datum) return 'X'; // cross
+    return datum[a][s].toString();
+  };
+  return mapping.map((group) => group.map(parser));
+}
+export const deriveDataFromValues = (values: string[][], mapping = MAPPING): Quadrant<CommonMeasurement> => {
+  const data = createDefaultMeasure(DEFAULT_COMMON_MEASUREMENT);
+  for(let i=0; i<values.length; i++) {
+    for(let j=0; j<values[i].length; j++) {
+      const { s, a, q, p } = mapping[i][j];
+      data[q][p][a][s] = parseInt(values[i][j]);
+    }
+  }
   return data;
 }
 
-export function deriveZones(mapping: string[]): { label: string; size: number }[] {
-  const zones: { label: string; size: number }[] = [];
-  let currentLabel = "";
-  let currentSize = 0;
-  for (const key of mapping) {
-    const site = key.split("-")[0];
-    if (site !== currentLabel) {
-      if (currentSize > 0) {
-        zones.push({ label: currentLabel[1], size: currentSize });
-      }
-      currentLabel = site;
-      currentSize = 1;
-    } else {
-      currentSize += 1;
-    }
-  }
-  if (currentSize > 0) {
-    zones.push({ label: currentLabel[1], size: currentSize });
-  }
-  return zones;
+export function deriveZones(mapping = MAPPING): { label: string; size: number }[] {
+  const labels = mapping[0].map(el => (el.p+1).toString());
+  const counts = countAndTell(labels);
+  return counts.map(({ value, count }) => ({ label: value, size: count }));
 }
 
 export function calculateColumnsFromZones(zones: { size: number }[]): number {

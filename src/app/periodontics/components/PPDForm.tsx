@@ -6,7 +6,6 @@ import Button from "@/components/Button";
 import { PPDRecord, TeethSelection } from "@/models/perio";
 import { deriveDataFromValues, deriveValues, deriveZones } from "./utils";
 import PerioInput from "./PerioInput";
-import { PPDMapping } from "./constants";
 
 interface PPDFormProps {
   teeth: TeethSelection;
@@ -16,10 +15,10 @@ interface PPDFormProps {
 }
 
 export default function PPDForm({ data, teeth, onSubmit, onCancel }: PPDFormProps) {
-  const [values, setValues] = useState<string[][]>(deriveValues(data, PPDMapping));
+  const [values, setValues] = useState<string[][]>(deriveValues(data));
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const updatedData = deriveDataFromValues(values, PPDMapping);
+    const updatedData = deriveDataFromValues(values);
     onSubmit(updatedData);
   };
   const submitRef = useRef<HTMLFormElement>(null);
@@ -33,7 +32,7 @@ export default function PPDForm({ data, teeth, onSubmit, onCancel }: PPDFormProp
     <Card title={"Edit PPD Values"}>
       <form ref={submitRef} onSubmit={handleSubmit} className="space-y-4 overflow-x-auto">
         <div className="inline-block min-w-max">
-          <PerioInput data={values} zones={deriveZones(PPDMapping[0])} onUpdate={setValues} onNextFocus={handleFocusSubmit} />
+          <PerioInput data={values} zones={deriveZones()} onUpdate={setValues} onNextFocus={handleFocusSubmit} />
         </div>
         <div className="flex gap-3 justify-end pt-4">
           <Button variant="outline" onClick={onCancel} type="button">
