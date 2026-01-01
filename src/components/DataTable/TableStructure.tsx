@@ -13,15 +13,12 @@ type TableStructureProps<T> = {
   selectedRows: T[];
   columns: Column<T>[];
   data: T[];
-  sortKey: string | null;
-  sortDir: "asc" | "desc";
-  filters: Record<string, string>;
-  onFilterChange: (key: string, value: string) => void;
   onRowClick?: (row: T) => void;
   getRowId: (row: T) => string;
-  onSortToggle: (colKey: string) => void;
+  renderFilterRow: (columns: Column<T>[]) => React.ReactNode;
+  renderHeaderRow: (columns: Column<T>[]) => React.ReactNode;
 }
-export default function TableStructure<T>({ title, query, setQuery, bulkActions, selectedRows, columns, data, sortKey, sortDir, filters, onFilterChange, onRowClick, getRowId, onSortToggle }: TableStructureProps<T>) {
+export default function TableStructure<T>({ title, query, setQuery, bulkActions, selectedRows, columns, data, onRowClick, getRowId, renderFilterRow, renderHeaderRow }: TableStructureProps<T>) {
   return (
     <div style={styles.container}>
       <div style={styles.headerBar}>
@@ -37,18 +34,8 @@ export default function TableStructure<T>({ title, query, setQuery, bulkActions,
       <table style={styles.table}>
         <ColumnGroup columns={columns} />
         <thead>
-          <HeaderRow
-            columns={columns}
-            sortKey={sortKey}
-            sortDir={sortDir}
-            onSortToggle={onSortToggle}
-          />
-          {/* Filter row */}
-          <FilterRow
-            columns={columns}
-            onFilterChange={onFilterChange}
-            filters={filters}
-          />
+          {renderHeaderRow(columns)}
+          {renderFilterRow(columns)}
         </thead>
         <tbody>
           {data.map((row) => (

@@ -7,6 +7,8 @@ import TableStructure from "./TableStructure";
 import useFiltering from "./useFiltering";
 import useSorting from "./useSorting";
 import useSelection from "./useSelection";
+import FilterRow from "./FilterRow";
+import HeaderRow from "./HeaderRow";
 
 export default function DataTable<T>({ title, data, columns, getRowId, onRowClick, bulkActions, rowActions }: DataTableProps<T>) {
   const { predicate, filters, onFilterChange, query, setQuery } = useFiltering(columns);
@@ -27,6 +29,9 @@ export default function DataTable<T>({ title, data, columns, getRowId, onRowClic
     actionsColumn,
   ], [columns, selectionColumn, actionsColumn]);
 
+  const renderFilterRow = useFilterRow<T>(filters, onFilterChange);
+  const renderHeaderRow = useHeaderRow<T>(sortKey, sortDir, onSortToggle);
+
   return (
     <TableStructure
       title={title || "Results"}
@@ -36,13 +41,10 @@ export default function DataTable<T>({ title, data, columns, getRowId, onRowClic
       selectedRows={selectedRows}
       columns={extendedColumns}
       data={sortedData}
-      sortKey={sortKey}
-      sortDir={sortDir}
-      onSortToggle={onSortToggle}
-      filters={filters}
-      onFilterChange={onFilterChange}
       onRowClick={onRowClick}
       getRowId={getRowId}
+      renderFilterRow={renderFilterRow}
+      renderHeaderRow={renderHeaderRow}
     />
   );
 }
@@ -109,4 +111,27 @@ function useActionsColumn<T>(rowActions: RowAction<T>[]): Column<T> {
     }
   ), [renderRowActions]);
   return actionsColumn;
+}
+
+function useFilterRow<T>(filters: Record<string, string>, onFilterChange: (key: string, value: string) => void) {
+  const renderFilterRow = useCallback((columns: Column<T>[]) => (
+    <FilterRow
+      columns={columns}
+      onFilterChange={onFilterChange}
+      filters={filters}
+    />
+  ), [onFilterChange, filters]);
+  return renderFilterRow;
+}
+
+function useHeaderRow<T>(sortKey: string | null, sortDir: "asc" | "desc", onSortToggle: (colKey: string) => void) {
+  const renderHeaderRow = useCallback((columns: Column<T>[]) => (
+    <HeaderRow
+      columns={columns}
+      sortKey={sortKey}
+      sortDir={sortDir}
+      onSortToggle={onSortToggle}
+    />
+  ), [sortKey, sortDir, onSortToggle]);
+  return renderHeaderRow;
 }
