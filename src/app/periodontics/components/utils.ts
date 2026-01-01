@@ -33,15 +33,18 @@ const MAPPING = [
   LINGUAL_MAPPING[1],
   BUCCAL_MAPPING[1],
 ];
+
+const valueParser = (data: Quadrant<CommonMeasurement>) => ({ s, a, q, p } : { s: MeasurementSite; a: MeasurementArea; q: number; p: number; }) => {
+  const datum = data[q][p][a][s];
+  return datum ? datum.toString() : '';
+};
 export const deriveValues = (
   data: Quadrant<CommonMeasurement>,
   mapping = MAPPING,
+  valueParserFn = valueParser,
 ): string[][] => {
   // TODO: generalize by passing in parser function, then use it to produce 'state' pairs in custom hooks
-  const parser = ({ s, a, q, p } : { s: MeasurementSite; a: MeasurementArea; q: number; p: number; }) => {
-    const datum = data[q][p][a][s];
-    return datum ? datum.toString() : '';
-  };
+  const parser = valueParserFn(data);
   return mapping.map((group) => group.map(parser));
 }
 export const deriveDataFromValues = (values: string[][], mapping = MAPPING): Quadrant<CommonMeasurement> => {
