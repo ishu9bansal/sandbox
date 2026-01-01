@@ -14,7 +14,7 @@ export default function HeaderRow<T>({ columns, sortKey, sortDir, onSortToggle }
     <tr>
       {columns.map((col) => (col.renderHeader ?
         (
-          <th style={styles.cell}>
+          <th key={col.key} style={styles.cell}>
             {col.renderHeader()}
           </th>
         ) : (
