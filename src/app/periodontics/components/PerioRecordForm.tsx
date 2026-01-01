@@ -9,7 +9,7 @@ import { PerioRecord } from '@/models/perio';
 
 interface PerioRecordFormProps {
   record?: PerioRecord;
-  onSubmit: (patient: Omit<PerioRecord, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  onSubmit: (record: Omit<PerioRecord, 'id' | 'createdAt' | 'updatedAt'>) => void;
   onCancel: () => void;
 }
 
@@ -19,6 +19,7 @@ export default function PerioRecordForm({ record, onSubmit, onCancel }: PerioRec
     teeth: record?.teeth || generateDefaultTeeth(),
     ppd: record?.ppd || {},
     lgm: record?.lgm || {},
+    patientId: record?.patientId || null,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});

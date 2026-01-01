@@ -28,7 +28,7 @@ export default function PerioRecordDetails({ record, onEdit, onDelete, onBack }:
       minute: '2-digit',
     });
   };
-  const patient = useSelector(selectPatientById(record.patientId || null));
+  const patient = useSelector(selectPatientById(record.patientId));
 
   return (
     <div className="space-y-6">
