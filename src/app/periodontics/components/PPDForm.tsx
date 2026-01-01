@@ -3,15 +3,15 @@
 import { useRef, useState } from "react";
 import Card from "@/components/Card";
 import Button from "@/components/Button";
-import { PPD, Teeth } from "@/models/perio";
+import { PPDRecord, TeethSelection } from "@/models/perio";
 import { deriveDataFromValues, deriveValues, deriveZones } from "./utils";
 import PerioInput from "./PerioInput";
 import { PPDMapping } from "./constants";
 
 interface PPDFormProps {
-  teeth: Teeth;
-  data: PPD;
-  onSubmit: (data: PPD) => void;
+  teeth: TeethSelection;
+  data: PPDRecord;
+  onSubmit: (data: PPDRecord) => void;
   onCancel: () => void;
 }
 

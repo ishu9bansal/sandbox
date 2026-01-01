@@ -4,7 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import PerioRecordForm from "../../components/PerioRecordForm";
 import { selectPerioRecordById, updatePerioRecord } from "@/store/perioSlice";
-import { PerioRecord, LGM, PPD, Teeth } from '@/models/perio';
+import { PerioRecord, LGMRecord, PPDRecord, TeethSelection } from '@/models/perio';
 import { useState } from "react";
 import PPDForm from "../../components/PPDForm";
 import LGMForm from "../../components/LGMForm";
@@ -28,7 +28,7 @@ export default function EditPatientPage() {
     );
   }
 
-  const handleBasicUpdate = ({ label, note, teeth }: { label: string, note: string; teeth: Teeth; }) => {
+  const handleBasicUpdate = ({ label, note, teeth }: { label: string, note: string; teeth: TeethSelection; }) => {
     const updatedRecord: PerioRecord = {
       ...record,
       label,
@@ -39,7 +39,7 @@ export default function EditPatientPage() {
     setView('ppd');
   };
 
-  const handlePPDUpdate = (ppd: PPD) => {
+  const handlePPDUpdate = (ppd: PPDRecord) => {
     const updatedRecord: PerioRecord = {
       ...record,
       ppd,
@@ -48,7 +48,7 @@ export default function EditPatientPage() {
     setView('lgm');
   };
 
-  const handleLGMUpdate = (lgm: LGM) => {
+  const handleLGMUpdate = (lgm: LGMRecord) => {
     const updatedRecord: PerioRecord = {
       ...record,
       lgm,

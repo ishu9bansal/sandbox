@@ -1,12 +1,12 @@
 
-import { LGM, PPD } from "@/models/perio";
+import { LGMRecord, PPDRecord } from "@/models/perio";
 
 const deriveToothSiteFromPosition = (row: number, col: number, mapping: string[][]): [string, number] => {
   const key = mapping[row][col];
   const [tooth, site] = key.split("-");
   return [tooth, parseInt(site)];
 };
-export const deriveValues = (data: PPD | LGM, mapping: string[][]): string[][] => {
+export const deriveValues = (data: PPDRecord | LGMRecord, mapping: string[][]): string[][] => {
   const values: string[][] = [];
   mapping.forEach((group, rowIdx) => {
     values[rowIdx] = [];
@@ -20,8 +20,8 @@ export const deriveValues = (data: PPD | LGM, mapping: string[][]): string[][] =
   });
   return values;
 }
-export const deriveDataFromValues = (values: string[][], mapping: string[][]): PPD | LGM => {
-  const data: PPD | LGM = {};
+export const deriveDataFromValues = (values: string[][], mapping: string[][]): PPDRecord | LGMRecord => {
+  const data: PPDRecord | LGMRecord = {};
   values.forEach((group, rowIdx) => {
     group.forEach((val, colIdx) => {
       const [tooth, site] = deriveToothSiteFromPosition(rowIdx, colIdx, mapping);

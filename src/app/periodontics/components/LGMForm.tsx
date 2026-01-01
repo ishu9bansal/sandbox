@@ -3,15 +3,15 @@
 import { useRef, useState } from "react";
 import Card from "@/components/Card";
 import Button from "@/components/Button";
-import { LGM, Teeth } from "@/models/perio";
+import { LGMRecord, TeethSelection } from "@/models/perio";
 import PerioInput from "./PerioInput";
 import { deriveDataFromValues, deriveValues, deriveZones } from "./utils";
 import { LGMMapping } from "./constants";
 
 interface LGMFormProps {
-  teeth: Teeth;
-  data: LGM;
-  onSubmit: (data: LGM) => void;
+  teeth: TeethSelection;
+  data: LGMRecord;
+  onSubmit: (data: LGMRecord) => void;
   onCancel: () => void;
 }
 
