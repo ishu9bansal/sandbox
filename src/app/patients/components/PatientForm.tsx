@@ -109,9 +109,8 @@ export default function PatientForm({ patient, onSubmit, onCancel }: PatientForm
             label="Contact"
             value={formData.contact}
             onChange={(e) => handleChange('contact', e.target.value)}
-            placeholder="Enter contact number"
+            placeholder="Enter contact number (optional)"
             error={errors.contact}
-            required
           />
         </div>
 
