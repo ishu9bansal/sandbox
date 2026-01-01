@@ -43,6 +43,11 @@ export default function PerioRecordList({
       filterable: true,
     },
     {
+      key: 'note',
+      header: 'Note',
+      filterable: true,
+    },
+    {
       key: 'patient',
       header: 'Patient',
       filterable: true,

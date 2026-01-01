@@ -16,6 +16,7 @@ interface PerioRecordFormProps {
 export default function PerioRecordForm({ record, onSubmit, onCancel }: PerioRecordFormProps) {
   const [formData, setFormData] = useState({
     label: record?.label || '',
+    note: record?.note || '',
     teeth: record?.teeth || generateDefaultTeeth(),
     ppd: record?.ppd || {},
     lgm: record?.lgm || {},
@@ -54,6 +55,7 @@ export default function PerioRecordForm({ record, onSubmit, onCancel }: PerioRec
     }
   };
   const handleLabelChange = (value: string) => handleChange('label', value);
+  const handleNoteChange = (value: string) => handleChange('note', value);
   const labels = ['Baseline', 'Follow Up'];
 
   return (
@@ -69,6 +71,14 @@ export default function PerioRecordForm({ record, onSubmit, onCancel }: PerioRec
             required
           />
           <QuickLabels labels={labels} onSelect={handleLabelChange} />
+          <Input
+            label="Note"
+            value={formData.note}
+            onChange={(e) => handleNoteChange(e.target.value)}
+            placeholder="Enter any notes"
+            error={errors.note}
+            type="textarea"
+          />
         </div>
         <div className="flex gap-3 justify-end pt-4">
           <Button variant="outline" onClick={onCancel} type="button">

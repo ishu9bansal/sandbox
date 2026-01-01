@@ -28,10 +28,11 @@ export default function EditPatientPage() {
     );
   }
 
-  const handleBasicUpdate = ({ label, teeth }: { label: string; teeth: Teeth; }) => {
+  const handleBasicUpdate = ({ label, note, teeth }: { label: string, note: string; teeth: Teeth; }) => {
     const updatedRecord: PerioRecord = {
       ...record,
       label,
+      note,
       teeth,
     };
     dispatch(updatePerioRecord(updatedRecord));

@@ -9,6 +9,7 @@ export type PPD = { [toothNumber: string]: PPD_Tooth } // e.g., { "11": 3};
 export interface PerioRecord {
   id: string;
   label: string;
+  note: string;
   teeth: Teeth;
   ppd: PPD;
   lgm: LGM;
