@@ -1,4 +1,4 @@
-import { PerioRecord, Teeth, Tooth } from '@/models/perio';
+import { PerioRecord, SelectionMeasurement, TeethSelection } from '@/models/perio';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface PerioState {
@@ -12,20 +12,21 @@ const initialState: PerioState = {
 };
 
 const STUDY_LIMIT = 3;
-const defaltLabel = (position: number): Tooth => {
-    if (position>7) return 'X'; // generally missing wisdom teeth
-    if (position <= STUDY_LIMIT) return 'O'
+const defaltLabel = (position: number): SelectionMeasurement => {
+    if (position>=7) return 'X'; // generally missing wisdom teeth
+    if (position < STUDY_LIMIT) return 'O'
     return '-';
 }
 
-export const generateDefaultTeeth = (): Teeth => {
-    const teeth: Teeth = {};
-    for(let i=1; i<=4; i++) {   // Quadrants
-        for(let j=1; j<=8; j++) {
-            const toothNumber = `${i}${j}`;
-            teeth[toothNumber] = defaltLabel(j);
-        }
-    }
+export const generateDefaultTeeth = (): TeethSelection => {
+    const nums = Array.from({length: 8}, (_, i) => i);  // [0,1,2,3,4,5,6,7]
+    const quadrant = nums.map(pos => defaltLabel(pos));
+    const teeth = [
+        [...quadrant],  // Quadrant 1
+        [...quadrant],  // Quadrant 2
+        [...quadrant],  // Quadrant 3
+        [...quadrant],  // Quadrant 4
+    ] as TeethSelection;
     return teeth;
 };
 

@@ -13,7 +13,7 @@ export type CommonMeasurement = {
     Mid: number;
     Disto: number;
   };
-};
+} | null;
 export type PPDRecord = Quadrant<CommonMeasurement>;
 export type LGMRecord = Quadrant<CommonMeasurement>;
 
