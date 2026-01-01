@@ -1,4 +1,4 @@
-import ActionBar from "./ActionBar";
+import ActionBar, { BulkActionGroup, SearchInput } from "./ActionBar";
 import DataTableRow from "./DataTableRow";
 import FilterRow from "./FilterRow";
 import HeaderRow from "./HeaderRow";
@@ -7,28 +7,24 @@ import { BulkAction, Column } from "./types";
 
 type TableStructureProps<T> = {
   title: string;
-  query: string;
-  setQuery: (q: string) => void;
-  bulkActions?: BulkAction<T>[];
-  selectedRows: T[];
   columns: Column<T>[];
   data: T[];
   onRowClick?: (row: T) => void;
   getRowId: (row: T) => string;
   renderFilterRow: (columns: Column<T>[]) => React.ReactNode;
   renderHeaderRow: (columns: Column<T>[]) => React.ReactNode;
+  renderSearchInput: (columns: Column<T>[]) => React.ReactNode;
+  renderBulkActionGroup: (columns: Column<T>[]) => React.ReactNode;
 }
-export default function TableStructure<T>({ title, query, setQuery, bulkActions, selectedRows, columns, data, onRowClick, getRowId, renderFilterRow, renderHeaderRow }: TableStructureProps<T>) {
+export default function TableStructure<T>({ title, columns, data, onRowClick, getRowId, renderFilterRow, renderHeaderRow, renderSearchInput, renderBulkActionGroup }: TableStructureProps<T>) {
   return (
     <div style={styles.container}>
       <div style={styles.headerBar}>
         <h3 style={styles.title}>{title}</h3>
-        <ActionBar
-          searchValue={query}
-          onSearchValueChange={setQuery}
-          bulkActions={bulkActions}
-          selectedRows={selectedRows}
-        />
+        <div style={styles.actionsBar}>
+          {renderSearchInput(columns)}
+          {renderBulkActionGroup(columns)}
+        </div>
       </div>
 
       <table style={styles.table}>

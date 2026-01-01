@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo } from "react";
-import { Column, DataTableProps, RowAction } from "./types";
+import { BulkAction, Column, DataTableProps, RowAction } from "./types";
 import ActionGroup from "./ActionGroup";
 import TableStructure from "./TableStructure";
 import useFiltering from "./useFiltering";
@@ -9,6 +9,7 @@ import useSorting from "./useSorting";
 import useSelection from "./useSelection";
 import FilterRow from "./FilterRow";
 import HeaderRow from "./HeaderRow";
+import { BulkActionGroup, SearchInput } from "./ActionBar";
 
 export default function DataTable<T>({ title, data, columns, getRowId, onRowClick, bulkActions, rowActions }: DataTableProps<T>) {
   const { predicate, filters, onFilterChange, query, setQuery } = useFiltering(columns);
@@ -31,20 +32,20 @@ export default function DataTable<T>({ title, data, columns, getRowId, onRowClic
 
   const renderFilterRow = useFilterRow<T>(filters, onFilterChange);
   const renderHeaderRow = useHeaderRow<T>(sortKey, sortDir, onSortToggle);
+  const renderSearchInput = useSearchInput<T>(query, setQuery);
+  const renderBulkActionGroup = useBulkActionGroup<T>(bulkActions, selectedRows);
 
   return (
     <TableStructure
       title={title || "Results"}
-      query={query}
-      setQuery={setQuery}
-      bulkActions={bulkActions}
-      selectedRows={selectedRows}
       columns={extendedColumns}
       data={sortedData}
       onRowClick={onRowClick}
       getRowId={getRowId}
       renderFilterRow={renderFilterRow}
       renderHeaderRow={renderHeaderRow}
+      renderSearchInput={renderSearchInput}
+      renderBulkActionGroup={renderBulkActionGroup}
     />
   );
 }
@@ -134,4 +135,18 @@ function useHeaderRow<T>(sortKey: string | null, sortDir: "asc" | "desc", onSort
     />
   ), [sortKey, sortDir, onSortToggle]);
   return renderHeaderRow;
+}
+
+function useSearchInput<T>(query: string, setQuery: (q: string) => void) {
+  const renderSearchInput = useCallback((columns: Column<T>[]) => (
+    <SearchInput value={query} onChange={setQuery} />
+  ), [query, setQuery]);
+  return renderSearchInput;
+}
+
+function useBulkActionGroup<T>(bulkActions: BulkAction<T>[] | undefined, selectedRows: T[]) {
+  const renderBulkActionGroup = useCallback((columns: Column<T>[]) => (
+    <BulkActionGroup bulkActions={bulkActions} selectedRows={selectedRows} />
+  ), [bulkActions, selectedRows]);
+  return renderBulkActionGroup;
 }

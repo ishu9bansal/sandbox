@@ -11,13 +11,28 @@ type ActionBarProps<T> = {
 export default function ActionBar<T>({ searchValue, onSearchValueChange, bulkActions, selectedRows }: ActionBarProps<T>) {
   return (
     <div style={styles.actionsBar}>
-      <input
-        aria-label="Search"
-        placeholder="Search..."
-        value={searchValue}
-        onChange={(e) => onSearchValueChange(e.target.value)}
-        style={styles.searchInput}
-      />
+      <SearchInput value={searchValue} onChange={onSearchValueChange} />
+      <BulkActionGroup bulkActions={bulkActions} selectedRows={selectedRows} />
+    </div>
+  );
+}
+
+export function SearchInput({ value, onChange }: { value: string; onChange: (val: string) => void }) {
+  return (
+    <input
+      aria-label="Search"
+      placeholder="Search..."
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      style={styles.searchInput}
+    />
+  );
+}
+
+export function BulkActionGroup<T>({ bulkActions, selectedRows }: { bulkActions?: BulkAction<T>[]; selectedRows: T[] }) {
+  if (!bulkActions || bulkActions.length === 0) return null;
+  return (
+    <>
       {bulkActions?.map((action) => (
         <BulkActionButton
           key={action.key || action.label}
@@ -31,6 +46,6 @@ export default function ActionBar<T>({ searchValue, onSearchValueChange, bulkAct
           }}
         />
       ))}
-    </div>
+    </>
   );
 }
