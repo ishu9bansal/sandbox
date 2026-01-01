@@ -13,14 +13,17 @@ function generateAnnatomicalMapping(limit: number): {q: number, p: number}[][] {
   ];
 }
 const ANNATOMICAL_MAPPING = generateAnnatomicalMapping(STUDY_LIMIT);
-const siteOrder: MeasurementSite[] = ['Mesio', 'Mid', 'Disto'];
-const siteMapping = ANNATOMICAL_MAPPING.map(group => group.map(el => siteOrder.map(s => ({...el, s}))));
-function generateFlatMapping(siteMap: { s: MeasurementSite; q: number; p: number; }[][][], area: MeasurementArea) {
-  const arr = [
-    siteMap[0].flat().concat(siteMap[1].flat()),
-    siteMap[2].flat().concat(siteMap[3].flat()),
+function generateConcateMapping(mapping: {q: number, p: number}[][]) {
+  return [
+    mapping[0].concat(mapping[1]),
+    mapping[2].concat(mapping[3]),
   ];
-  return arr.map(group => group.map(({s, q, p}) => ({s, q, p, a: area})));
+}
+const CONCATENATED_MAPPING = generateConcateMapping(ANNATOMICAL_MAPPING);
+const siteOrder: MeasurementSite[] = ['Mesio', 'Mid', 'Disto'];
+const siteMapping = CONCATENATED_MAPPING.map(group => group.map(el => siteOrder.map(s => ({...el, s}))));
+function generateFlatMapping(siteMap: { s: MeasurementSite; q: number; p: number; }[][][], area: MeasurementArea) {
+  return siteMap.map(group => group.flat().map(({s, q, p}) => ({s, q, p, a: area})));
 }
 const BUCCAL_MAPPING = generateFlatMapping(siteMapping, 'Buccal');
 const LINGUAL_MAPPING = generateFlatMapping(siteMapping, 'Lingual');
@@ -59,10 +62,9 @@ export const deriveDataFromValues = (values: string[][], mapping = MAPPING): Qua
   return data;
 }
 
-export function deriveZones(mapping = MAPPING): { label: string; size: number }[] {
+export function deriveZones(mapping = CONCATENATED_MAPPING, siteCount = siteOrder.length): { label: string; size: number }[] {
   const labels = mapping[0].map(el => (el.p+1).toString());
-  const counts = countAndTell(labels);
-  return counts.map(({ value, count }) => ({ label: value, size: count }));
+  return labels.map(label => ({ label, size: siteCount }));
 }
 
 export function calculateColumnsFromZones(zones: { size: number }[]): number {
@@ -76,7 +78,7 @@ export function calculateZoneSeparators(zones: { size: number }[]): number[] {
     separators.push(cumulative);
     cumulative += z.size;
   }
-  separators.pop(); // remove last separator
+  // separators.pop(); // remove last separator
   return separators;
 }
 
