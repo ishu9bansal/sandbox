@@ -1,18 +1,29 @@
+import { Quadrant } from "./theeth";
 
-export type Tooth = 'X' | 'O' | '-';    // 'X' = missing, 'O' = Selected, 'S' = Skipped
-export type Teeth = { [toothNumber: string]: Tooth; } // e.g., { "11": "value"};
-export type PPD_Tooth = number[]; // e.g., [3,4,5,2,3,4]; for 6 sites
-export type LGM_Tooth = number[]; // e.g., [0,1,1,0,2,1]; for 6 sites
-export type LGM = { [toothNumber: string]: LGM_Tooth; } // e.g., { "11": [0,1,1,0,2,1]};
-export type PPD = { [toothNumber: string]: PPD_Tooth } // e.g., { "11": 3};
+export type SelectionMeasurement = 'X' | 'O' | '-'; // 'X' = missing, 'O' = Selected, 'S' = Skipped
+export type TeethSelection = Quadrant<SelectionMeasurement>;
+export type CommonMeasurement = {
+  B: {  // Buccal
+    Mesio: number;
+    Mid: number;
+    Disto: number;
+  };
+  L: {  // Lingual/Palatal
+    Mesio: number;
+    Mid: number;
+    Disto: number;
+  };
+};
+export type PPDRecord = Quadrant<CommonMeasurement>;
+export type LGMRecord = Quadrant<CommonMeasurement>;
 
 export interface PerioRecord {
   id: string;
   label: string;
   note: string;
-  teeth: Teeth;
-  ppd: PPD;
-  lgm: LGM;
+  teeth: TeethSelection;
+  ppd: PPDRecord;
+  lgm: LGMRecord;
   patientId: string | null;
   createdAt: string;
   updatedAt: string;
