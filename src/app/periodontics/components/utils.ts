@@ -36,9 +36,8 @@ export const deriveValues = (
 ): string[][] => {
   // TODO: generalize by passing in parser function, then use it to produce 'state' pairs in custom hooks
   const parser = ({ s, a, q, p } : { s: MeasurementSite; a: MeasurementArea; q: number; p: number; }) => {
-    const datum = data[q][p];
-    if (!datum) return '';
-    return datum[a][s].toString();
+    const datum = data[q][p][a][s];
+    return datum ? datum.toString() : '';
   };
   return mapping.map((group) => group.map(parser));
 }
@@ -47,7 +46,14 @@ export const deriveDataFromValues = (values: string[][], mapping = MAPPING): Qua
   for(let i=0; i<values.length; i++) {
     for(let j=0; j<values[i].length; j++) {
       const { s, a, q, p } = mapping[i][j];
-      data[q][p][a][s] = parseInt(values[i][j]);
+      const datum = data[q][p];
+      data[q][p] = { 
+        ...datum,
+        [a]: {
+          ...datum[a],
+          [s]: parseInt(values[i][j])
+        }
+      };
     }
   }
   return data;
