@@ -5,7 +5,7 @@ import Card from "@/components/Card";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
 import { generateDefaultTeeth } from "@/store/perioSlice";
-import { createDefaultMeasure, PerioRecord } from '@/models/perio';
+import { createDefaultMeasure, DEFAULT_COMMON_MEASUREMENT, PerioRecord } from '@/models/perio';
 
 interface PerioRecordFormProps {
   record?: PerioRecord;
@@ -18,8 +18,8 @@ export default function PerioRecordForm({ record, onSubmit, onCancel }: PerioRec
     label: record?.label || '',
     note: record?.note || '',
     teeth: record?.teeth || generateDefaultTeeth(),
-    ppd: record?.ppd || createDefaultMeasure(null),
-    lgm: record?.lgm || createDefaultMeasure(null),
+    ppd: record?.ppd || createDefaultMeasure(DEFAULT_COMMON_MEASUREMENT),
+    lgm: record?.lgm || createDefaultMeasure(DEFAULT_COMMON_MEASUREMENT),
     patientId: record?.patientId || null,
   });
 

@@ -37,13 +37,13 @@ export const deriveValues = (
   // TODO: generalize by passing in parser function, then use it to produce 'state' pairs in custom hooks
   const parser = ({ s, a, q, p } : { s: MeasurementSite; a: MeasurementArea; q: number; p: number; }) => {
     const datum = data[q][p];
-    if (!datum) return 'X'; // cross
+    if (!datum) return '';
     return datum[a][s].toString();
   };
   return mapping.map((group) => group.map(parser));
 }
 export const deriveDataFromValues = (values: string[][], mapping = MAPPING): Quadrant<CommonMeasurement> => {
-  const data = createDefaultMeasure(DEFAULT_COMMON_MEASUREMENT);
+  const data = createDefaultMeasure<CommonMeasurement>(DEFAULT_COMMON_MEASUREMENT);
   for(let i=0; i<values.length; i++) {
     for(let j=0; j<values[i].length; j++) {
       const { s, a, q, p } = mapping[i][j];
