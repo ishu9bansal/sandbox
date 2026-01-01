@@ -1,15 +1,8 @@
 "use client";
 
 import { SelectionMeasurement, TeethSelection } from "@/models/perio";
-import { COMMON_TOOTH_MAPPING, TeethGrid } from "@/models/theeth";
 
 // Component to visualize teeth data in anatomical layout
-// FDI dental notation: First digit = quadrant (1-4), second digit = tooth position (1-8)
-// Quadrant 1: Upper Right (11-18)
-// Quadrant 2: Upper Left (21-28)
-// Quadrant 3: Lower Left (31-38)
-// Quadrant 4: Lower Right (41-48)
-//
 // Color coding:
 // - Missing (X): gray with strikethrough
 // - Selected (O): green
@@ -44,19 +37,28 @@ const ToothCell = ({ tooth, status }: { tooth: string; status: string }) => {
   );
 };
 
+/**
+ * Mapping for TeethGrid to represent FDI notation in anatomical layout
+ * Each entry is an object with quadrant (q) and position (p)
+ * 18 17 16 15 14 13 12 11
+ * 21 22 23 24 25 26 27 28
+ * 48 47 46 45 44 43 42 41
+ * 31 32 33 34 35 36 37 38
+ */
 const MAPPING = [
-  COMMON_TOOTH_MAPPING[0].slice(0,8),
-  COMMON_TOOTH_MAPPING[0].slice(8),
-  COMMON_TOOTH_MAPPING[1].slice(0,8),
-  COMMON_TOOTH_MAPPING[1].slice(8),
+  Array.from({ length: 8 }, (_, i) => ({ q: 0, p: (7-i) })),
+  Array.from({ length: 8 }, (_, i) => ({ q: 1, p: i })),
+  Array.from({ length: 8 }, (_, i) => ({ q: 3, p: (7-i) })),
+  Array.from({ length: 8 }, (_, i) => ({ q: 2, p: i })),
 ];
 
 export default function TeethVisualization({ data }: { data: TeethSelection }) {
-  const teethGrid = new TeethGrid(data, MAPPING);
-  const serializedData = teethGrid.serialize((toothData, q, p) => {
-    const labelNum = 11 + q * 10 + p; // FDI notation
-    return { label: labelNum.toString(), status: toothData || '-' };
-  });
+  const serializedData = MAPPING.map((ids) => ids.map(
+    ({ q, p }) => ({
+      label: (11 + q * 10 + p).toString(),
+      status: data[q][p] || '-',
+    })
+  ));
   const renderQuadrant = (teeth: { label: string; status: SelectionMeasurement; }[]) => {
     return teeth.map((tooth) => (
       <ToothCell
