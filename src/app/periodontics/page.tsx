@@ -6,6 +6,8 @@ import { deletePerioRecord, deletePerioRecords } from "@/store/slices/perioSlice
 import { PerioRecord } from '@/models/perio';
 import Button from "@/components/Button";
 import PerioRecordList from "./components/PerioRecordList";
+import { generatePerioRecordsTable, transformPerioRecordToRep } from "@/models/representation";
+import { copyToClipboard, tableToTsvString } from "@/utils/helpers";
 
 export default function PatientsPage() {
   const router = useRouter();
@@ -23,6 +25,11 @@ export default function PatientsPage() {
     if (window.confirm(`Are you sure you want to delete ${count} record${count > 1 ? 's' : ''}?`)) {
       dispatch(deletePerioRecords(recordsToDelete.map(p => p.id)));
     }
+  };
+
+  const handleCopyRecords = (recordsToCopy: PerioRecord[]) => {
+    copyRecordsToClipboard(recordsToCopy);
+    alert(`${recordsToCopy.length} record${recordsToCopy.length > 1 ? 's' : ''} copied to clipboard in TSV format.`);
   };
 
   const handleViewRecord = (record: PerioRecord) => {
@@ -57,6 +64,7 @@ export default function PatientsPage() {
         onEdit={handleEditRecord}
         onDelete={handleDeleteRecord}
         onBulkDelete={handleBulkDelete}
+        onCopy={handleCopyRecords}
       />
 
       {records.length === 0 && (
@@ -71,4 +79,11 @@ export default function PatientsPage() {
       )}
     </div>
   );
+}
+
+function copyRecordsToClipboard(records: PerioRecord[]) {
+  const reps = records.map(record => transformPerioRecordToRep(record));
+  const table = generatePerioRecordsTable(reps);
+  const tsv = tableToTsvString(table);
+  copyToClipboard(tsv);
 }

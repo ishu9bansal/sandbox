@@ -7,7 +7,6 @@ import { Column } from "@/components/DataTable/types";
 import { PerioRecord } from '@/models/perio';
 import { useSelector } from "react-redux";
 import { selectAllPatients } from "@/store/slices/patientSlice";
-import { copyToClipboard } from "@/utils/helpers";
 
 interface PerioRecordListProps {
   records: PerioRecord[];
@@ -15,6 +14,7 @@ interface PerioRecordListProps {
   onEdit: (record: PerioRecord) => void;
   onDelete: (record: PerioRecord) => void;
   onBulkDelete: (records: PerioRecord[]) => void;
+  onCopy: (records: PerioRecord[]) => void;
 }
 
 export default function PerioRecordList({ 
@@ -22,7 +22,8 @@ export default function PerioRecordList({
   onView, 
   onEdit, 
   onDelete, 
-  onBulkDelete 
+  onBulkDelete,
+  onCopy,
 }: PerioRecordListProps) {
   const patients = useSelector(selectAllPatients);
   const patientLabelMap = useMemo(() => {
@@ -67,8 +68,6 @@ export default function PerioRecordList({
     },
   ), [patientAccessor]);
 
-  const copyAction = useCallback((records: PerioRecord[]) => copyCsv(records, columns), [columns]);
-
   const bulkActions = useMemo(() => [
     {
       key: 'delete',
@@ -81,13 +80,13 @@ export default function PerioRecordList({
     },
     {
       key: 'copy',
-      label: 'Copy Selected CSV',
-      action: copyAction,
+      label: 'Copy Selected',
+      action: onCopy,
       buttonStyles: {
         background: "#0066cc",
       },
     },
-  ], [onBulkDelete, copyAction]);
+  ], [onBulkDelete, onCopy]);
 
   const rowActions = useMemo(() => [
     {
@@ -114,30 +113,4 @@ export default function PerioRecordList({
       rowActions={rowActions}
     />
   );
-}
-
-function csvEscape(value: any): string {
-  let s = value == null ? "" : Array.isArray(value) ? value.join(" ") : String(value);
-  s = s.replace(/"/g, '""');
-  return `"${s}"`;
-}
-
-function copyCsv(records: PerioRecord[], visibleCols: Column<PerioRecord>[]) {
-  const header = visibleCols.map((c) => csvEscape(c.header)).join(",");
-  const body = records
-    .map((row) =>
-      visibleCols
-        .map((c) => csvEscape(
-            c.render?.(row)
-          )
-        )
-        .join(",")
-    )
-    .join("\n");
-  const csv = header + "\n" + body;
-  copyToClipboard(csv).then(() => {
-    console.log("CSV copied to clipboard");
-  }).catch((err) => {
-    console.error("Failed to copy CSV to clipboard:", err);
-  });
 }
