@@ -105,3 +105,31 @@ export function countAndTell<T>(arr: T[]): { value: T; count: number }[] {
 
   return result;
 }
+
+/** Convert a 2D array (table) to a CSV string
+ */
+export function tableToCsvString(table: string[][]): string {
+  return table.map(row => row.map(value => {
+    // Escape double quotes by doubling them
+    const escapedValue = value.replace(/"/g, '""');
+    // Wrap in double quotes if it contains a comma, newline, or double quote
+    if (/[",\n]/.test(escapedValue)) {
+      return `"${escapedValue}"`;
+    }
+    return escapedValue;
+  }).join(',')).join('\n');
+}
+
+/** Convert a 2D array (table) to a TSV string
+ */
+export function tableToTsvString(table: string[][]): string {
+  return table.map(row => row.map(value => {
+    // Escape double quotes by doubling them
+    const escapedValue = value.replace(/"/g, '""');
+    // Wrap in double quotes if it contains a tab, newline, or double quote
+    if (/[\t"\n]/.test(escapedValue)) {
+      return `"${escapedValue}"`;
+    }
+    return escapedValue;
+  }).join('\t')).join('\n');
+}
