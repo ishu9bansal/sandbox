@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import PerioRecordForm from "../components/PerioRecordForm";
-import { addPerioRecord, resetFreshId, selectFreshPerioRecordId } from "@/store/perioSlice";
+import { addPerioRecord, resetFreshId, selectFreshPerioRecordId } from "@/store/slices/perioSlice";
 import { PerioRecord } from '@/models/perio';
 import { useEffect } from "react";
 

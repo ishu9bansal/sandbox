@@ -5,7 +5,7 @@ import { store } from './store';
 import { ReactNode, useEffect } from 'react';
 import { setPatients } from './slices/patientSlice';
 import { loadStateFromLocalStorage } from './localStorage';
-import { setPerioRecords } from './perioSlice';
+import { setPerioRecords } from './slices/perioSlice';
 
 export default function ReduxProvider({ children }: { children: ReactNode }) {
   useEffect(() => {

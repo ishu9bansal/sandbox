@@ -4,7 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import Button from "@/components/Button";
 import PerioRecordDetails from "../components/PerioRecordDetails";
-import { deletePerioRecord, selectPerioRecordById } from "@/store/perioSlice";
+import { deletePerioRecord, selectPerioRecordById } from "@/store/slices/perioSlice";
 
 export default function PerioRecordPage() {
   const router = useRouter();
