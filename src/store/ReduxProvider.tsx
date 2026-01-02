@@ -3,7 +3,7 @@
 import { Provider } from 'react-redux';
 import { store } from './store';
 import { ReactNode, useEffect } from 'react';
-import { setPatients } from './patientSlice';
+import { setPatients } from './slices/patientSlice';
 import { loadStateFromLocalStorage } from './localStorage';
 import { setPerioRecords } from './perioSlice';
 

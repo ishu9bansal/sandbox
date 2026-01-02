@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { deletePatient } from "@/store/patientSlice";
+import { deletePatient } from "@/store/slices/patientSlice";
 import Button from "@/components/Button";
 import PatientDetails from "../components/PatientDetails";
 

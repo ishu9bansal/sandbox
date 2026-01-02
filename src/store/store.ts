@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import patientReducer from './patientSlice';
+import patientReducer from './slices/patientSlice';
 import perioReducer from './perioSlice';
 import { localStorageMiddleware } from './localStorage';
 

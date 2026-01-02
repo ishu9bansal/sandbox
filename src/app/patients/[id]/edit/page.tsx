@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { updatePatient } from "@/store/patientSlice";
+import { updatePatient } from "@/store/slices/patientSlice";
 import { Patient } from '@/models/patient';
 import PatientForm from "../../components/PatientForm";
 

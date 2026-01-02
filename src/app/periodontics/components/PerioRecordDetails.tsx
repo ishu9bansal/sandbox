@@ -8,7 +8,7 @@ import PerioInput from "./PerioInput";
 import { deriveValues, deriveZones } from "./utils";
 import PatientCard from "@/app/patients/components/PatientCard";
 import { useSelector } from "react-redux";
-import { selectPatientById } from "@/store/patientSlice";
+import { selectPatientById } from "@/store/slices/patientSlice";
 
 interface PerioRecordDetailsProps {
   record: PerioRecord;

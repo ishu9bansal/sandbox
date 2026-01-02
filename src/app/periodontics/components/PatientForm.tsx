@@ -4,7 +4,7 @@ import { JSX, useState } from "react";
 import Card from "@/components/Card";
 import Button from "@/components/Button";
 import { useSelector } from "react-redux";
-import { selectAllPatients, selectPatientById } from "@/store/patientSlice";
+import { selectAllPatients, selectPatientById } from "@/store/slices/patientSlice";
 import { Patient } from '@/models/patient';
 import DataSelector from "@/components/DataSelector";
 import PatientCard from "@/app/patients/components/PatientCard";

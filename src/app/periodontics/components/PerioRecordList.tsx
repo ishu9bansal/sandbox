@@ -6,7 +6,7 @@ import { columnsBuilder } from "@/components/DataTable/columns";
 import { Column } from "@/components/DataTable/types";
 import { PerioRecord } from '@/models/perio';
 import { useSelector } from "react-redux";
-import { selectAllPatients } from "@/store/patientSlice";
+import { selectAllPatients } from "@/store/slices/patientSlice";
 import { copyToClipboard } from "@/utils/helpers";
 
 interface PerioRecordListProps {
