@@ -1,25 +1,39 @@
-import { useCallback, useRef } from "react";
-import { calculateColumnsFromZones, calculateZoneSeparators, deriveZones } from "./utils";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { calculateColumnsFromZones, calculateZoneSeparators, dataUpdaterFromValues, deriveValues, deriveZones } from "./utils";
 import QuickInputRow, { QuickInputRowRef } from "./QuickInputRow";
 import { stylesGenerator } from "./style";
+import { Quadrant } from "@/models/theeth";
+import { CommonMeasurement } from "@/models/perio";
+
+
+const ZONES = deriveZones();
+const COLUMNS = calculateColumnsFromZones(ZONES);
+const ZONE_SEPARATORS = calculateZoneSeparators(ZONES);
+const labels = ['Buccal', 'Lingual', 'Lingual', 'Buccal'];
 
 interface PerioInputProps {
-  data: string[][]; // 4 rows of data
-  onUpdate?: (data: string[][]) => void;
+  data: Quadrant<CommonMeasurement>;
+  onUpdate?: (data: Quadrant<CommonMeasurement>) => void;
   onNextFocus?: () => void;
   onPrevFocus?: () => void;
   disabled?: boolean;
 }
 export default function PerioInput({ data, onUpdate, onNextFocus, onPrevFocus, disabled }: PerioInputProps) {
+  const [values, setValues] = useState<string[][]>(deriveValues(data));
   const handleChange = (row: number, vs: string[]) => {
-    const updatedData = [...data];
-    updatedData[row] = vs;
-    onUpdate?.(updatedData);
+    setValues((prev) => {
+      const updated = [...prev];
+      updated[row] = vs;
+      return updated;
+    })
   };
-  const zones = deriveZones();
-  const COLUMNS = calculateColumnsFromZones(zones);
-  const ZONE_SEPARATORS = calculateZoneSeparators(zones);
-  const labels = ['Buccal', 'Lingual', 'Lingual', 'Buccal'];
+  useEffect(() => {
+    if (onUpdate) {
+      const updateData = dataUpdaterFromValues(values);
+      const updated = updateData(data);
+      onUpdate(updated);
+    }
+  }, [values]);
   const inputRefs = useRef<(QuickInputRowRef | null)[]>(Array(labels.length).fill(null));
   const focus = (c: number, fromBehind: boolean = false): void => {
     if (c < 0) {
@@ -48,7 +62,7 @@ export default function PerioInput({ data, onUpdate, onNextFocus, onPrevFocus, d
 
   return (
     <div style={styles.grid}>
-      <ZoneMarkers zones={zones} style={styles.zoneLabel} />
+      <ZoneMarkers zones={ZONES} style={styles.zoneLabel} />
       {Array.from({ length: labels.length }).map((_, i) => (
         <QuickInputRow
           key={i}
@@ -56,7 +70,7 @@ export default function PerioInput({ data, onUpdate, onNextFocus, onPrevFocus, d
             if (el) inputRefs.current[i] = el;
           }}
           label={labels[i]}
-          values={data[i]}
+          values={values[i]}
           onRowChange={(vs) => handleChange(i, vs)}
           disabled={disabled}
           onNextFocus={() => next(i)}
