@@ -85,7 +85,6 @@ function useInternalState(initialValue: string, onChange: (value: string) => voi
   const handleKeyEvent = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     const key = e.key;
     switch(key) {
-      case "0":
       case "1":
       case "2":
       case "3":
@@ -97,13 +96,14 @@ function useInternalState(initialValue: string, onChange: (value: string) => voi
       case "9":
         const num = parseInt(key);
         return onDigit(num);
+      case "0":
       case "-":
+      case "a":
+        return onInc(-1);
       case "=":
       case "+":
-      case "a":
       case "s":
-        const inc = (key === "-" || key === "a") ? -1 : 1;
-        return onInc(inc);
+        return onInc(1);
       case "Tab":
         return e.shiftKey ? -1 : 1;
       case "ArrowRight":
