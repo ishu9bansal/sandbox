@@ -88,6 +88,14 @@ const QuickInputRow = forwardRef<QuickInputRowRef, QuickInputRowProps>(function 
     const key = e.key;
     const v = values[c];
 
+    if (key === "*" || key === "#") {
+      e.preventDefault();
+      const inc = key === "#" ? 10 : -10;
+      const updated = [...values];
+      updated[c] = parseInt(v || "0") + inc + "";
+      onRowChange(updated);
+      return;
+    }
     if (key === "Shift") {
       setShiftMode(c, true);
       return;
