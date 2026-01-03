@@ -73,8 +73,8 @@ const QuickInputRow = forwardRef<QuickInputRowRef, QuickInputRowProps>(function 
 
 interface QuickInputCellProps {
   value: string;  // TODO: change to number
-  focus: boolean;
   onChange: (value: string) => void;
+  focus: boolean;
   onNext: () => void;
   onPrev: () => void;
   disabled?: boolean;
@@ -83,21 +83,15 @@ interface QuickInputCellProps {
 
 export function QuickInputCell({
   value,
-  focus,
   onChange,
+  focus,
   onNext,
   onPrev,
   disabled,
   cellStyle,
 }: QuickInputCellProps) {
   const { displayValue, setPrefix, setSuffix, onBackspace } = useInternalState(value, onChange);
-  const inputRef = useRef<HTMLInputElement>(null);
-  useEffect(() => {
-    if (focus && inputRef.current) {
-      inputRef.current.focus();
-      inputRef.current.select();
-    }
-  }, [focus]); // Dependency on focus state
+  const inputRef = useFocusRef(focus);
   const handleKeyUp = useCallback((e: React.KeyboardEvent<HTMLInputElement>): void => {
     // if key is a digit, move to next
     const key = e.key;
@@ -207,4 +201,15 @@ function parseValue(v: string): [number, number] {
     }
   }
   return [0, NaN];
+}
+
+function useFocusRef(focus: boolean) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (focus && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [focus]); // Dependency on focus state
+  return inputRef;
 }
