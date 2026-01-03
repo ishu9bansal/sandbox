@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { calculateColumnsFromZones, calculateZoneSeparators } from "./utils";
 import QuickInputRow, { QuickInputRowRef } from "@/components/QuickInputRow";
-import { styles } from "./style";
+import { stylesGenerator } from "./style";
 
 interface PerioInputProps {
   data: string[][];
@@ -27,11 +27,11 @@ export default function PerioInput({ data, zones, onUpdate, onNextFocus, onPrevF
       focus();
     }
   };
-
+  const styles = stylesGenerator(COLUMNS, 28);
 
   return (
-    <div style={styles.grid(COLUMNS)}>
-      <ZoneMarkers zones={zones} />
+    <div style={styles.grid}>
+      <ZoneMarkers zones={zones} style={styles.zoneLabel} />
       <QuickInputRow
         ref={(el) => {
           if (el) inputRefs.current[0] = el;
@@ -100,7 +100,7 @@ export default function PerioInput({ data, zones, onUpdate, onNextFocus, onPrevF
   );
 }
 
-function ZoneMarkers({ zones }: { zones: { label: string; size: number }[] }) {
+function ZoneMarkers({ zones, style }: { zones: { label: string; size: number }[], style: React.CSSProperties; }) {
   return (
     <>
       <div /> {/* top-left empty */}
@@ -108,7 +108,7 @@ function ZoneMarkers({ zones }: { zones: { label: string; size: number }[] }) {
         <div
           key={i}
           style={{
-            ...styles.zoneLabel,
+            ...style,
             gridColumn: `span ${z.size}`
           }}
         >
