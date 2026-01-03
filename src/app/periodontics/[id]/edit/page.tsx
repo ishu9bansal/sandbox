@@ -71,7 +71,7 @@ export default function EditPatientPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-5xl mx-auto">
       { view === 'basic' &&
         <PerioRecordForm
           record={record}
