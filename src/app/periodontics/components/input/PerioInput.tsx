@@ -4,7 +4,7 @@ import QuickInputRow, { QuickInputRowRef } from "./QuickInputRow";
 import { stylesGenerator } from "./style";
 
 interface PerioInputProps {
-  data: string[][];
+  data: string[][]; // 4 rows of data
   zones: { label: string; size: number; }[];
   onUpdate?: (data: string[][]) => void;
   onNextFocus?: () => void;
@@ -73,17 +73,7 @@ function ZoneMarkers({ zones, style }: { zones: { label: string; size: number }[
   return (
     <>
       <div /> {/* top-left empty */}
-      {zones.map((z, i) => (
-        <div
-          key={i}
-          style={{
-            ...style,
-            gridColumn: `span ${z.size}`
-          }}
-        >
-          {z.label}
-        </div>
-      ))}
+      {zones.map((z, i) => (<div key={i} style={{ ...style, gridColumn: `span ${z.size}` }} >{z.label}</div>))}
     </>
   );
 }
