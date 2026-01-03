@@ -77,6 +77,21 @@ export default function ExamplePage() {
           <li>Your project will appear in the sidebar automatically!</li>
         </ul>
       </Card>
+
+      <Card title="Different Input Types">
+        {INPUT_MODES.map((mode) => (
+          <div key={mode} className="mb-4">
+            <Input
+              label={`Input type="${mode}"`}
+              type="text"
+              inputMode={mode as React.HTMLAttributes<HTMLInputElement>["inputMode"]}
+              placeholder={`This input has inputMode="${mode}"`}
+            />
+          </div>
+        ))}
+      </Card>
     </div>
   );
 }
+
+const INPUT_MODES = ["tel", "text", "email", "search", "decimal", "url", "none", "numeric"];
