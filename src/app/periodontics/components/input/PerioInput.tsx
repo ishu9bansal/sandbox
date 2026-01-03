@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { calculateColumnsFromZones, calculateZoneSeparators } from "./utils";
-import QuickInputRow, { QuickInputRowRef } from "@/components/QuickInputRow";
+import QuickInputRow, { QuickInputRowRef } from "./QuickInputRow";
 import { stylesGenerator } from "./style";
 
 interface PerioInputProps {

@@ -4,8 +4,8 @@ import { useRef, useState } from "react";
 import Card from "@/components/Card";
 import Button from "@/components/Button";
 import { PPDRecord, TeethSelection } from "@/models/perio";
-import { dataUpdaterFromValues, deriveValues, deriveZones } from "./utils";
-import PerioInput from "./PerioInput";
+import { dataUpdaterFromValues, deriveValues, deriveZones } from "./input/utils";
+import PerioInput from "./input/PerioInput";
 
 interface PPDFormProps {
   teeth: TeethSelection;

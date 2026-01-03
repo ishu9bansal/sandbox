@@ -4,8 +4,8 @@ import { useRef, useState } from "react";
 import Card from "@/components/Card";
 import Button from "@/components/Button";
 import { LGMRecord, TeethSelection } from "@/models/perio";
-import PerioInput from "./PerioInput";
-import { dataUpdaterFromValues, deriveValues, deriveZones } from "./utils";
+import PerioInput from "./input/PerioInput";
+import { dataUpdaterFromValues, deriveValues, deriveZones } from "./input/utils";
 
 interface LGMFormProps {
   teeth: TeethSelection;
