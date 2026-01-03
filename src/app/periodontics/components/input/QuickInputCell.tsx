@@ -1,3 +1,4 @@
+import { copyToClipboard } from "@/utils/helpers";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 interface QuickInputCellProps {
@@ -28,6 +29,7 @@ function QuickInputCell({
     } else if (move < 0) {
       onPrev();
     }
+    copyToClipboard(JSON.stringify(e)); // For debugging key events in mobile
   }, [onNext, onPrev, handleKeyEvent]);
   const inputRef = useFocusRef(focus);
   return (
