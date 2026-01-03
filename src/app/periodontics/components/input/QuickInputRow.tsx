@@ -125,27 +125,27 @@ export function QuickInputCell({
     onChange(displayValue);
   }, [displayValue]);
 
-  const onBackspace = (): void => {
+  const onBackspace = useCallback(() => {
     if (!isNaN(suffix)) {
       setSuffix(NaN);
-      return;
+      return false;
     }
     if (prefix !== 0) {
       setPrefix(0);
-      return;
+      return false;
     }
-    onPrev();
-  };
+    return true;
+  }, [prefix, suffix, setSuffix, setPrefix]);
 
-  const handleKeyUp = (e: React.KeyboardEvent<HTMLInputElement>): void => {
+  const handleKeyUp = useCallback((e: React.KeyboardEvent<HTMLInputElement>): void => {
     // if key is a digit, move to next
     const key = e.key;
     if (/^[0-9]$/.test(key)) {
       onNext();
     }
-  }
+  }, [onNext]);
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>): void => {
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>): void => {
     e.preventDefault();
     const key = e.key;
     switch(key) {
@@ -170,6 +170,10 @@ export function QuickInputCell({
         const inc = (key === "-" || key === "a") ? -1 : 1;
         setPrefix(prev => (prev + inc));
         break;
+      case "Tab":
+        const move = e.shiftKey ? onPrev : onNext;
+        move();
+        break;
       case "ArrowRight":
         onNext();
         break;
@@ -177,12 +181,14 @@ export function QuickInputCell({
         onPrev();
         break;
       case "Backspace":
-        onBackspace();
+        if (onBackspace()) {
+          onPrev();
+        }
         break;
       default:
         return;
     }
-  };
+  }, [onNext, onPrev, onBackspace]);
   return (
     <input
       ref={inputRef}
