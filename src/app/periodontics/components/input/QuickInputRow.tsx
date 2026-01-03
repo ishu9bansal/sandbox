@@ -1,13 +1,4 @@
-import React, { useRef, forwardRef, useImperativeHandle, useEffect, useState } from "react";
-import { ca } from "zod/locales";
-
-// partial: "", "-", "1", "12", "-1", "-12" (max 2 digits)
-const isValidPartial = (v: string): boolean => /^-?\d{0,2}$/.test(v) || v === "";
-const isPartial = (v: string, shiftMode: boolean): boolean => {
-  if (!/^-?\d{1,2}$/.test(v)) return true;
-  const num = v.slice(v.startsWith("-") ? 1 : 0);
-  return num.length < (shiftMode ? 2 : 1);
-}
+import React, { useRef, forwardRef, useEffect, useState } from "react";
 
 interface QuickInputRowProps {
   name: string;
@@ -41,10 +32,10 @@ const QuickInputRow = forwardRef<QuickInputRowRef, QuickInputRowProps>(function 
   onNextFocus,
   onPrevFocus,
 }, ref) {
-  const inputRefs = useRef<(HTMLInputElement | null)[]>(Array(columns).fill(null));
-  const shiftModeRef = useRef<boolean[]>(Array(columns).fill(false));
+  const [currentFocus, setCurrentFocus] = useState<number>(-1);
 
   const focus = (c: number): void => {
+    setCurrentFocus(c);
     if (c < 0) {
       onPrevFocus && onPrevFocus();
       return;
@@ -53,107 +44,34 @@ const QuickInputRow = forwardRef<QuickInputRowRef, QuickInputRowProps>(function 
       onNextFocus && onNextFocus();
       return;
     }
-    const el = inputRefs.current[c];
-    if (el) {
-      el.focus();
-      el.select();
-    }
   };
 
   const next = (c: number): void => focus(c + 1);
 
   const prev = (c: number): void => focus(c - 1);
 
-  const setShiftMode = (c: number, value: boolean): void => {
-    shiftModeRef.current[c] = value;
-  };
-
-  const getShiftMode = (c: number): boolean => shiftModeRef.current[c];
-
-  const handleChange = (c: number, raw: string): void => {
-    // TODO: handle negative input from mobile
-    const v = raw.trim();
-    if (!isValidPartial(v)) return;
-
+  const handleChange = (c: number, v: string): void => {
     const updated = [...values];
     updated[c] = v;
     onRowChange(updated);
-    
-    if (!isPartial(v, getShiftMode(c))) {
-      setShiftMode(c, false);
-      next(c);
-    }
   };
-
-  const handleKeyDown = (c: number, e: React.KeyboardEvent<HTMLInputElement>): void => {
-    const key = e.key;
-    const v = values[c];
-
-    if (key === "*" || key === "#") {
-      e.preventDefault();
-      const inc = key === "#" ? 10 : -10;
-      const updated = [...values];
-      updated[c] = parseInt(v || "0") + inc + "";
-      onRowChange(updated);
-      return;
-    }
-    if (key === "Shift") {
-      setShiftMode(c, true);
-      return;
-    }
-
-    if (key === "Backspace" && v === "") {
-      e.preventDefault();
-      prev(c);
-      return;
-    }
-
-    if (key === "ArrowRight") {
-      e.preventDefault();
-      next(c);
-      return;
-    }
-    if (key === "ArrowLeft") {
-      e.preventDefault();
-      prev(c);
-      return;
-    }
-    if (key === "ArrowUp" || key === "ArrowDown") {
-      // Let parent handle vertical navigation if needed; do nothing here.
-      return;
-    }
-  };
-
-  useImperativeHandle(ref, () => ({
-    focusFirst: () => {
-      focus(0);
-    },
-    focusLast: () => {
-      focus(columns - 1);
-    }
-  }));
-
   return (
     <>
       <div style={labelStyle}>{name}</div>
       {Array.from({ length: columns }).map((_, c) => {
         const needsSeparator = zoneSeparators.includes(c);
         return (
-          <input
+          <QuickInputCell
             key={c}
-            ref={(el) => {
-              if (el) inputRefs.current[c] = el;
-            }}
-            value={values[c] ?? ""}
-            onChange={(e) => handleChange(c, e.target.value)}
-            onKeyDown={(e) => handleKeyDown(c, e)}
-            style={{
+            value={values[c]}
+            focus={c === currentFocus}
+            onChange={(v) => handleChange(c, v)}
+            onNext={() => next(c)}
+            onPrev={() => prev(c)}
+            cellStyle={{
               ...cellStyle,
-              ...(needsSeparator ? separatorStyle : {})
+              ...(needsSeparator ? separatorStyle : {}),
             }}
-            inputMode="tel"
-            maxLength={3}
-            {...inputProps}
           />
         );
       })}
@@ -162,7 +80,7 @@ const QuickInputRow = forwardRef<QuickInputRowRef, QuickInputRowProps>(function 
 });
 
 interface QuickInputCellProps {
-  value: string;
+  value: string;  // TODO: change to number
   focus: boolean;
   onChange: (value: string) => void;
   onNext: () => void;
