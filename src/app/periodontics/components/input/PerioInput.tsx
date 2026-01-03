@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useCallback, useRef } from "react";
 import { calculateColumnsFromZones, calculateZoneSeparators } from "./utils";
 import QuickInputRow, { QuickInputRowRef } from "./QuickInputRow";
 import { stylesGenerator } from "./style";
@@ -28,6 +28,12 @@ export default function PerioInput({ data, zones, onUpdate, onNextFocus, onPrevF
     }
   };
   const styles = stylesGenerator(COLUMNS, 28);
+  const cellStyleGenerator = useCallback((index: number): React.CSSProperties => {
+    return {
+      ...styles.cell,
+      ...(ZONE_SEPARATORS.includes(index) ? styles.zoneSeparatorLeft : {}),
+    }
+  }, [ZONE_SEPARATORS, styles.cell, styles.zoneSeparatorLeft]);
 
   return (
     <div style={styles.grid}>
@@ -40,10 +46,11 @@ export default function PerioInput({ data, zones, onUpdate, onNextFocus, onPrevF
         columns={COLUMNS}
         values={data[0]}
         onRowChange={(vs) => handleChange(0, vs)}
-        zoneSeparators={ZONE_SEPARATORS}
         disabled={disabled}
         onNextFocus={() => focus(1)}
         onPrevFocus={onPrevFocus}
+        labelStyle={styles.label}
+        cellStyleGenerator={cellStyleGenerator}
       />
       <QuickInputRow
         ref={(el) => {
@@ -53,10 +60,11 @@ export default function PerioInput({ data, zones, onUpdate, onNextFocus, onPrevF
         columns={COLUMNS}
         values={data[1]}
         onRowChange={(vs) => handleChange(1, vs)}
-        zoneSeparators={ZONE_SEPARATORS}
         disabled={disabled}
         onNextFocus={() => focus(2)}
         onPrevFocus={() => focus(0, true)}
+        labelStyle={styles.label}
+        cellStyleGenerator={cellStyleGenerator}
       />
       <QuickInputRow
         ref={(el) => {
@@ -66,10 +74,11 @@ export default function PerioInput({ data, zones, onUpdate, onNextFocus, onPrevF
         columns={COLUMNS}
         values={data[2]}
         onRowChange={(vs) => handleChange(2, vs)}
-        zoneSeparators={ZONE_SEPARATORS}
         disabled={disabled}
         onNextFocus={() => focus(3)}
         onPrevFocus={() => focus(1, true)}
+        labelStyle={styles.label}
+        cellStyleGenerator={cellStyleGenerator}
       />
       <QuickInputRow
         ref={(el) => {
@@ -79,10 +88,11 @@ export default function PerioInput({ data, zones, onUpdate, onNextFocus, onPrevF
         columns={COLUMNS}
         values={data[3]}
         onRowChange={(vs) => handleChange(3, vs)}
-        zoneSeparators={ZONE_SEPARATORS}
         disabled={disabled}
         onNextFocus={onNextFocus}
         onPrevFocus={() => focus(2, true)}
+        labelStyle={styles.label}
+        cellStyleGenerator={cellStyleGenerator}
       />
     </div>
   );

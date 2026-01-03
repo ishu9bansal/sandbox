@@ -1,4 +1,3 @@
-import { styles } from "@/components/DataTable/styles";
 import React, { useRef, forwardRef, useEffect, useState, useImperativeHandle } from "react";
 
 interface QuickInputRowProps {
@@ -6,10 +5,11 @@ interface QuickInputRowProps {
   columns: number;
   values: string[];
   onRowChange: (values: string[]) => void;
-  zoneSeparators?: number[]; // indices where a left border is drawn for grouping
   disabled?: boolean;
   onNextFocus?: () => void;
   onPrevFocus?: () => void;
+  cellStyleGenerator: (index: number) => React.CSSProperties;
+  labelStyle: React.CSSProperties;
 }
 
 export type QuickInputRowRef = {
@@ -22,10 +22,11 @@ const QuickInputRow = forwardRef<QuickInputRowRef, QuickInputRowProps>(function 
   columns,
   values,
   onRowChange,
-  zoneSeparators = [0, 3, 6, 9, 12, 15],
   disabled,
   onNextFocus,
   onPrevFocus,
+  cellStyleGenerator,
+  labelStyle,
 }, ref) {
   const [currentFocus, setCurrentFocus] = useState<number>(-1);
 
@@ -57,25 +58,19 @@ const QuickInputRow = forwardRef<QuickInputRowRef, QuickInputRowProps>(function 
 
   return (
     <>
-      <div style={styles.labelStyle}>{name}</div>
-      {Array.from({ length: columns }).map((_, c) => {
-        const needsSeparator = zoneSeparators.includes(c);
-        return (
-          <QuickInputCell
-            key={c}
-            value={values[c]}
-            focus={c === currentFocus}
-            onChange={(v) => handleChange(c, v)}
-            onNext={() => next(c)}
-            onPrev={() => prev(c)}
-            disabled={disabled}
-            cellStyle={{
-              ...styles.cellStyle,
-              ...(needsSeparator ? styles.separatorStyle : {}),
-            }}
-          />
-        );
-      })}
+      <div style={labelStyle}>{name}</div>
+      {Array.from({ length: columns }).map((_, c) => (
+        <QuickInputCell
+          key={c}
+          value={values[c]}
+          focus={c === currentFocus}
+          onChange={(v) => handleChange(c, v)}
+          onNext={() => next(c)}
+          onPrev={() => prev(c)}
+          disabled={disabled}
+          cellStyle={cellStyleGenerator(c)}
+        />
+      ))}
     </>
   );
 });
