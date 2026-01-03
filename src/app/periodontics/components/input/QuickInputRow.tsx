@@ -90,6 +90,7 @@ export function QuickInputCell({
   disabled,
   cellStyle,
 }: QuickInputCellProps) {
+  const { displayValue, setPrefix, setSuffix, onBackspace } = useInternalState(value, onChange);
   const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     if (focus && inputRef.current) {
@@ -97,46 +98,6 @@ export function QuickInputCell({
       inputRef.current.select();
     }
   }, [focus]); // Dependency on focus state
-
-  function parseValue(v: string): [number, number] {
-    if (v === "") return [0, NaN];
-    if (v === "-") return [-1, NaN];
-    const match = v.match(/^(-?)(\d{1,2})$/);
-    if (match) {
-      const prefix = match[1] === "-" ? -1 : 1;
-      const num = parseInt(match[2]);
-      if (num >= 0 && num <= 99) {
-        return [prefix * Math.floor(num / 10), num % 10];
-      }
-    }
-    return [0, NaN];
-  }
-  const [initPrefix, initSuffix] = parseValue(value);
-  const [prefix, setPrefix] = useState<number>(initPrefix);
-  const [suffix, setSuffix] = useState<number>(initSuffix);
-  const displayPrefix = 
-      prefix < -1 ? `${prefix + 1}`
-    : prefix === -1 ? "-"
-    : prefix === 0 ? ""
-    : prefix;
-  const displaySuffix = isNaN(suffix) ? (prefix === 0 ? "" : "0") : suffix;
-  const displayValue = `${displayPrefix}${displaySuffix}`;
-  useEffect(() => {
-    onChange(displayValue);
-  }, [displayValue]);
-
-  const onBackspace = useCallback(() => {
-    if (!isNaN(suffix)) {
-      setSuffix(NaN);
-      return false;
-    }
-    if (prefix !== 0) {
-      setPrefix(0);
-      return false;
-    }
-    return true;
-  }, [prefix, suffix, setSuffix, setPrefix]);
-
   const handleKeyUp = useCallback((e: React.KeyboardEvent<HTMLInputElement>): void => {
     // if key is a digit, move to next
     const key = e.key;
@@ -188,7 +149,7 @@ export function QuickInputCell({
       default:
         return;
     }
-  }, [onNext, onPrev, onBackspace]);
+  }, [onNext, onPrev, onBackspace, setPrefix, setSuffix]);
   return (
     <input
       ref={inputRef}
@@ -203,3 +164,47 @@ export function QuickInputCell({
   );
 }
 export default QuickInputRow;
+
+function useInternalState(initialValue: string, onChange: (value: string) => void) {
+  const [initPrefix, initSuffix] = parseValue(initialValue);
+  const [prefix, setPrefix] = useState<number>(initPrefix);
+  const [suffix, setSuffix] = useState<number>(initSuffix);
+  const displayPrefix = 
+      prefix < -1 ? `${prefix + 1}`
+    : prefix === -1 ? "-"
+    : prefix === 0 ? ""
+    : prefix;
+  const displaySuffix = isNaN(suffix) ? (prefix === 0 ? "" : "0") : suffix;
+  const displayValue = `${displayPrefix}${displaySuffix}`;
+  useEffect(() => {
+    onChange(displayValue);
+  }, [displayValue]);
+
+  const onBackspace = useCallback(() => {
+    if (!isNaN(suffix)) {
+      setSuffix(NaN);
+      return false;
+    }
+    if (prefix !== 0) {
+      setPrefix(0);
+      return false;
+    }
+    return true;
+  }, [prefix, suffix, setSuffix, setPrefix]);
+
+  return { prefix, setPrefix, suffix, setSuffix, displayValue, onBackspace };
+}
+
+function parseValue(v: string): [number, number] {
+  if (v === "") return [0, NaN];
+  if (v === "-") return [-1, NaN];
+  const match = v.match(/^(-?)(\d{1,2})$/);
+  if (match) {
+    const prefix = match[1] === "-" ? -1 : 1;
+    const num = parseInt(match[2]);
+    if (num >= 0 && num <= 99) {
+      return [prefix * Math.floor(num / 10), num % 10];
+    }
+  }
+  return [0, NaN];
+}
