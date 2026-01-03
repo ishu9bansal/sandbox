@@ -41,10 +41,7 @@ export default function PerioInput({ data, zones, onUpdate, onNextFocus, onPrevF
         values={data[0]}
         onRowChange={(vs) => handleChange(0, vs)}
         zoneSeparators={ZONE_SEPARATORS}
-        labelStyle={styles.label}
-        cellStyle={styles.cell}
-        separatorStyle={styles.zoneSeparatorLeft}
-        inputProps={{ inputMode: "tel", maxLength: 3, disabled }}
+        disabled={disabled}
         onNextFocus={() => focus(1)}
         onPrevFocus={onPrevFocus}
       />
@@ -57,10 +54,7 @@ export default function PerioInput({ data, zones, onUpdate, onNextFocus, onPrevF
         values={data[1]}
         onRowChange={(vs) => handleChange(1, vs)}
         zoneSeparators={ZONE_SEPARATORS}
-        labelStyle={styles.label}
-        cellStyle={styles.cell}
-        separatorStyle={styles.zoneSeparatorLeft}
-        inputProps={{ inputMode: "tel", maxLength: 3, disabled }}
+        disabled={disabled}
         onNextFocus={() => focus(2)}
         onPrevFocus={() => focus(0, true)}
       />
@@ -73,10 +67,7 @@ export default function PerioInput({ data, zones, onUpdate, onNextFocus, onPrevF
         values={data[2]}
         onRowChange={(vs) => handleChange(2, vs)}
         zoneSeparators={ZONE_SEPARATORS}
-        labelStyle={styles.label}
-        cellStyle={styles.cell}
-        separatorStyle={styles.zoneSeparatorLeft}
-        inputProps={{ inputMode: "tel", maxLength: 3, disabled }}
+        disabled={disabled}
         onNextFocus={() => focus(3)}
         onPrevFocus={() => focus(1, true)}
       />
@@ -89,10 +80,7 @@ export default function PerioInput({ data, zones, onUpdate, onNextFocus, onPrevF
         values={data[3]}
         onRowChange={(vs) => handleChange(3, vs)}
         zoneSeparators={ZONE_SEPARATORS}
-        labelStyle={styles.label}
-        cellStyle={styles.cell}
-        separatorStyle={styles.zoneSeparatorLeft}
-        inputProps={{ inputMode: "tel", maxLength: 3, disabled }}
+        disabled={disabled}
         onNextFocus={onNextFocus}
         onPrevFocus={() => focus(2, true)}
       />

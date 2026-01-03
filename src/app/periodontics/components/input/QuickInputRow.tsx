@@ -1,4 +1,5 @@
-import React, { useRef, forwardRef, useEffect, useState } from "react";
+import { styles } from "@/components/DataTable/styles";
+import React, { useRef, forwardRef, useEffect, useState, useImperativeHandle } from "react";
 
 interface QuickInputRowProps {
   name: string;
@@ -6,10 +7,7 @@ interface QuickInputRowProps {
   values: string[];
   onRowChange: (values: string[]) => void;
   zoneSeparators?: number[]; // indices where a left border is drawn for grouping
-  labelStyle?: React.CSSProperties;
-  cellStyle?: React.CSSProperties;
-  separatorStyle?: React.CSSProperties;
-  inputProps?: Partial<React.InputHTMLAttributes<HTMLInputElement>>;
+  disabled?: boolean;
   onNextFocus?: () => void;
   onPrevFocus?: () => void;
 }
@@ -25,10 +23,7 @@ const QuickInputRow = forwardRef<QuickInputRowRef, QuickInputRowProps>(function 
   values,
   onRowChange,
   zoneSeparators = [0, 3, 6, 9, 12, 15],
-  labelStyle,
-  cellStyle,
-  separatorStyle,
-  inputProps,
+  disabled,
   onNextFocus,
   onPrevFocus,
 }, ref) {
@@ -55,9 +50,14 @@ const QuickInputRow = forwardRef<QuickInputRowRef, QuickInputRowProps>(function 
     updated[c] = v;
     onRowChange(updated);
   };
+  useImperativeHandle(ref, () => ({
+    focusFirst: () => focus(0),
+    focusLast: () => focus(columns - 1),
+  }), [columns]);
+
   return (
     <>
-      <div style={labelStyle}>{name}</div>
+      <div style={styles.labelStyle}>{name}</div>
       {Array.from({ length: columns }).map((_, c) => {
         const needsSeparator = zoneSeparators.includes(c);
         return (
@@ -68,9 +68,10 @@ const QuickInputRow = forwardRef<QuickInputRowRef, QuickInputRowProps>(function 
             onChange={(v) => handleChange(c, v)}
             onNext={() => next(c)}
             onPrev={() => prev(c)}
+            disabled={disabled}
             cellStyle={{
-              ...cellStyle,
-              ...(needsSeparator ? separatorStyle : {}),
+              ...styles.cellStyle,
+              ...(needsSeparator ? styles.separatorStyle : {}),
             }}
           />
         );
