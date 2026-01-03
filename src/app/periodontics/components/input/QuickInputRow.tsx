@@ -90,67 +90,23 @@ export function QuickInputCell({
   disabled,
   cellStyle,
 }: QuickInputCellProps) {
-  const { displayValue, setPrefix, setSuffix, onBackspace } = useInternalState(value, onChange);
-  const inputRef = useFocusRef(focus);
-  const handleKeyUp = useCallback((e: React.KeyboardEvent<HTMLInputElement>): void => {
-    // if key is a digit, move to next
-    const key = e.key;
-    if (/^[0-9]$/.test(key)) {
-      onNext();
-    }
-  }, [onNext]);
-
+  const { displayValue, handleKeyEvent } = useInternalState(value, onChange);
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>): void => {
     e.preventDefault();
-    const key = e.key;
-    switch(key) {
-      case "0":
-      case "1":
-      case "2":
-      case "3":
-      case "4":
-      case "5":
-      case "6":
-      case "7":
-      case "8":
-      case "9":
-        const num = parseInt(key);
-        setSuffix(num);
-        break;
-      case "-":
-      case "=":
-      case "+":
-      case "a":
-      case "s":
-        const inc = (key === "-" || key === "a") ? -1 : 1;
-        setPrefix(prev => (prev + inc));
-        break;
-      case "Tab":
-        const move = e.shiftKey ? onPrev : onNext;
-        move();
-        break;
-      case "ArrowRight":
-        onNext();
-        break;
-      case "ArrowLeft":
-        onPrev();
-        break;
-      case "Backspace":
-        if (onBackspace()) {
-          onPrev();
-        }
-        break;
-      default:
-        return;
+    const move = handleKeyEvent(e);
+    if (move > 0) {
+      onNext();
+    } else if (move < 0) {
+      onPrev();
     }
-  }, [onNext, onPrev, onBackspace, setPrefix, setSuffix]);
+  }, [onNext, onPrev, handleKeyEvent]);
+  const inputRef = useFocusRef(focus);
   return (
     <input
       ref={inputRef}
       value={displayValue}
       onChange={() => {}}
       onKeyDown={handleKeyDown}
-      onKeyUp={handleKeyUp}
       style={cellStyle}
       disabled={disabled}
       inputMode="tel"
@@ -177,16 +133,60 @@ function useInternalState(initialValue: string, onChange: (value: string) => voi
   const onBackspace = useCallback(() => {
     if (!isNaN(suffix)) {
       setSuffix(NaN);
-      return false;
+      return 0;
     }
     if (prefix !== 0) {
       setPrefix(0);
-      return false;
+      return 0;
     }
-    return true;
+    return -1;
   }, [prefix, suffix, setSuffix, setPrefix]);
 
-  return { prefix, setPrefix, suffix, setSuffix, displayValue, onBackspace };
+  const onDigit = useCallback((digit: number) => {
+    setSuffix(digit);
+    return 1;
+  }, [setSuffix]);
+
+  const onInc = useCallback((inc: number) => {
+    setPrefix((prev) => prev + inc);
+    return 0;
+  }, [setPrefix]);
+
+  const handleKeyEvent = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    const key = e.key;
+    switch(key) {
+      case "0":
+      case "1":
+      case "2":
+      case "3":
+      case "4":
+      case "5":
+      case "6":
+      case "7":
+      case "8":
+      case "9":
+        const num = parseInt(key);
+        return onDigit(num);
+      case "-":
+      case "=":
+      case "+":
+      case "a":
+      case "s":
+        const inc = (key === "-" || key === "a") ? -1 : 1;
+        return onInc(inc);
+      case "Tab":
+        return e.shiftKey ? -1 : 1;
+      case "ArrowRight":
+        return 1;
+      case "ArrowLeft":
+        return -1;
+      case "Backspace":
+        return onBackspace();
+      default:
+        return 0;
+    }
+  }, [onBackspace, onDigit, onInc]);
+  return { displayValue, handleKeyEvent };
 }
 
 function parseValue(v: string): [number, number] {
