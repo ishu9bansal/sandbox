@@ -8,6 +8,7 @@ import Button from "@/components/Button";
 import PerioRecordList from "./components/PerioRecordList";
 import { generatePerioRecordsTable, transformPerioRecordToRep } from "@/models/representation";
 import { copyToClipboard, tableToTsvString } from "@/utils/helpers";
+import { QuickInputCell } from "./components/input/QuickInputRow";
 
 export default function PatientsPage() {
   const router = useRouter();
@@ -53,6 +54,25 @@ export default function PatientsPage() {
             View and manage perio chart for patients with an intuitive interface.
           </p>
         </div>
+
+        <QuickInputCell
+          value={"5"}
+          focus={false}
+          onChange={(val) => console.log("QuickInputCell changed:", val)}
+          onNext={() => console.log("Next cell")}
+          onPrev={() => console.log("Previous cell")}
+          disabled={false}
+          cellStyle={{
+            height: 32,
+            textAlign: "center" as const,
+            borderRadius: 6,
+            border: "1px solid #3a4050",
+            fontSize: 10,
+            outline: "none",
+            background: "#2a2a2a",
+            color: "#e0e0e0"
+          }}
+        />
         <Button variant="primary" onClick={handleAddRecord}>
           + Add New Record
         </Button>

@@ -1,4 +1,5 @@
-import React, { useRef, forwardRef, useImperativeHandle } from "react";
+import React, { useRef, forwardRef, useImperativeHandle, useEffect, useState } from "react";
+import { ca } from "zod/locales";
 
 // partial: "", "-", "1", "12", "-1", "-12" (max 2 digits)
 const isValidPartial = (v: string): boolean => /^-?\d{0,2}$/.test(v) || v === "";
@@ -160,4 +161,129 @@ const QuickInputRow = forwardRef<QuickInputRowRef, QuickInputRowProps>(function 
   );
 });
 
+interface QuickInputCellProps {
+  value: string;
+  focus: boolean;
+  onChange: (value: string) => void;
+  onNext: () => void;
+  onPrev: () => void;
+  disabled?: boolean;
+  cellStyle?: React.CSSProperties;
+}
+
+export function QuickInputCell({
+  value,
+  focus,
+  onChange,
+  onNext,
+  onPrev,
+  disabled,
+  cellStyle,
+}: QuickInputCellProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (focus && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [focus]); // Dependency on focus state
+
+  function parseValue(v: string): [number, number] {
+    if (v === "") return [0, NaN];
+    if (v === "-") return [-1, NaN];
+    const match = v.match(/^(-?)(\d{1,2})$/);
+    if (match) {
+      const prefix = match[1] === "-" ? -1 : 1;
+      const num = parseInt(match[2]);
+      if (num >= 0 && num <= 99) {
+        return [prefix * Math.floor(num / 10), num % 10];
+      }
+    }
+    return [0, NaN];
+  }
+  const [initPrefix, initSuffix] = parseValue(value);
+  const [prefix, setPrefix] = useState<number>(initPrefix);
+  const [suffix, setSuffix] = useState<number>(initSuffix);
+  const displayPrefix = 
+      prefix < -1 ? `${prefix + 1}`
+    : prefix === -1 ? "-"
+    : prefix === 0 ? ""
+    : prefix;
+  const displaySuffix = isNaN(suffix) ? (prefix === 0 ? "" : "0") : suffix;
+  const displayValue = `${displayPrefix}${displaySuffix}`;
+  useEffect(() => {
+    onChange(displayValue);
+  }, [displayValue]);
+
+  const onBackspace = (): void => {
+    if (!isNaN(suffix)) {
+      setSuffix(NaN);
+      return;
+    }
+    if (prefix !== 0) {
+      setPrefix(0);
+      return;
+    }
+    onPrev();
+  };
+
+  const handleKeyUp = (e: React.KeyboardEvent<HTMLInputElement>): void => {
+    // if key is a digit, move to next
+    const key = e.key;
+    if (/^[0-9]$/.test(key)) {
+      onNext();
+    }
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>): void => {
+    e.preventDefault();
+    const key = e.key;
+    switch(key) {
+      case "0":
+      case "1":
+      case "2":
+      case "3":
+      case "4":
+      case "5":
+      case "6":
+      case "7":
+      case "8":
+      case "9":
+        const num = parseInt(key);
+        setSuffix(num);
+        break;
+      case "-":
+      case "=":
+      case "+":
+      case "a":
+      case "s":
+        const inc = (key === "-" || key === "a") ? -1 : 1;
+        setPrefix(prev => (prev + inc));
+        break;
+      case "ArrowRight":
+        onNext();
+        break;
+      case "ArrowLeft":
+        onPrev();
+        break;
+      case "Backspace":
+        onBackspace();
+        break;
+      default:
+        return;
+    }
+  };
+  return (
+    <input
+      ref={inputRef}
+      value={displayValue}
+      onChange={() => {}}
+      onKeyDown={handleKeyDown}
+      onKeyUp={handleKeyUp}
+      style={cellStyle}
+      disabled={disabled}
+      inputMode="tel"
+    />
+  );
+}
 export default QuickInputRow;
