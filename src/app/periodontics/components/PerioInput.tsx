@@ -30,7 +30,7 @@ export default function PerioInput({ data, zones, onUpdate, onNextFocus, onPrevF
 
 
   return (
-    <div style={styles.grid}>
+    <div style={styles.grid(COLUMNS)}>
       <ZoneMarkers zones={zones} />
       <QuickInputRow
         ref={(el) => {

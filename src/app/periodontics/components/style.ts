@@ -1,12 +1,14 @@
 
 export const styles = {
-  grid: {
+  grid: (columnsNum: number) => ({
     display: "grid",
-    gridTemplateColumns: "80px repeat(18, 36px)",
-    gap: 6,
+    gridTemplateColumns: `50px repeat(${columnsNum}, 18px)`,
+    gap: 3,
     alignItems: "center",
+    overflowX: "auto" as const,
+    paddingBottom: 12,
     marginTop: 12
-  },
+  }),
   zoneLabel: {
     textAlign: "center" as const,
     fontSize: 11,
@@ -25,11 +27,11 @@ export const styles = {
     color: "#b0b8d4"
   },
   cell: {
-    height: 32,
+    height: 18,
     textAlign: "center" as const,
     borderRadius: 6,
     border: "1px solid #3a4050",
-    fontSize: 14,
+    fontSize: 10,
     outline: "none",
     background: "#2a2a2a",
     color: "#e0e0e0"
