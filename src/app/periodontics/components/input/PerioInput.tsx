@@ -1,22 +1,22 @@
 import { useCallback, useRef } from "react";
-import { calculateColumnsFromZones, calculateZoneSeparators } from "./utils";
+import { calculateColumnsFromZones, calculateZoneSeparators, deriveZones } from "./utils";
 import QuickInputRow, { QuickInputRowRef } from "./QuickInputRow";
 import { stylesGenerator } from "./style";
 
 interface PerioInputProps {
   data: string[][]; // 4 rows of data
-  zones: { label: string; size: number; }[];
   onUpdate?: (data: string[][]) => void;
   onNextFocus?: () => void;
   onPrevFocus?: () => void;
   disabled?: boolean;
 }
-export default function PerioInput({ data, zones, onUpdate, onNextFocus, onPrevFocus, disabled }: PerioInputProps) {
+export default function PerioInput({ data, onUpdate, onNextFocus, onPrevFocus, disabled }: PerioInputProps) {
   const handleChange = (row: number, vs: string[]) => {
     const updatedData = [...data];
     updatedData[row] = vs;
     onUpdate?.(updatedData);
   };
+  const zones = deriveZones();
   const COLUMNS = calculateColumnsFromZones(zones);
   const ZONE_SEPARATORS = calculateZoneSeparators(zones);
   const labels = ['Buccal', 'Lingual', 'Lingual', 'Buccal'];

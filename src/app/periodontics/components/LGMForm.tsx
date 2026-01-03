@@ -32,7 +32,7 @@ export default function LGMForm({ data, teeth, onSubmit, onCancel }: LGMFormProp
   return (
     <Card title={"Edit LGM Values" }>
       <form ref={submitRef} onSubmit={handleSubmit} className="space-y-4 overflow-x-auto">
-        <PerioInput data={values} zones={deriveZones()} onUpdate={setValues} onNextFocus={handleFocusSubmit} />
+        <PerioInput data={values} onUpdate={setValues} onNextFocus={handleFocusSubmit} />
         <div className="flex gap-3 justify-end pt-4">
           <Button variant="outline" onClick={onCancel} type="button">
             Back

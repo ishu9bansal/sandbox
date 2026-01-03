@@ -31,7 +31,7 @@ export default function PPDForm({ data, teeth, onSubmit, onCancel }: PPDFormProp
   return (
     <Card title={"Edit PPD Values"}>
       <form ref={submitRef} onSubmit={handleSubmit} className="space-y-8">
-        <PerioInput data={values} zones={deriveZones()} onUpdate={setValues} onNextFocus={handleFocusSubmit} />
+        <PerioInput data={values} onUpdate={setValues} onNextFocus={handleFocusSubmit} />
         <div className="flex gap-3 justify-end pt-4">
           <Button variant="outline" onClick={onCancel} type="button">
             Back
