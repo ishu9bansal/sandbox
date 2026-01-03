@@ -1,8 +1,7 @@
-import React, { useRef, forwardRef, useEffect, useState, useImperativeHandle } from "react";
+import React, { useRef, forwardRef, useEffect, useState, useImperativeHandle, useCallback } from "react";
 
 interface QuickInputRowProps {
-  name: string;
-  columns: number;
+  label: string;
   values: string[];
   onRowChange: (values: string[]) => void;
   disabled?: boolean;
@@ -18,8 +17,7 @@ export type QuickInputRowRef = {
 };
 
 const QuickInputRow = forwardRef<QuickInputRowRef, QuickInputRowProps>(function QuickInputRow({
-  name,
-  columns,
+  label,
   values,
   onRowChange,
   disabled,
@@ -28,37 +26,35 @@ const QuickInputRow = forwardRef<QuickInputRowRef, QuickInputRowProps>(function 
   cellStyleGenerator,
   labelStyle,
 }, ref) {
+  const columns = values.length;
   const [currentFocus, setCurrentFocus] = useState<number>(-1);
-
-  const focus = (c: number): void => {
+  const focus = useCallback((c: number): void => {
     setCurrentFocus(c);
     if (c < 0) {
-      onPrevFocus && onPrevFocus();
+      onPrevFocus?.();
       return;
     }
     if (c >= columns) {
-      onNextFocus && onNextFocus();
+      onNextFocus?.();
       return;
     }
-  };
-
-  const next = (c: number): void => focus(c + 1);
-
-  const prev = (c: number): void => focus(c - 1);
-
-  const handleChange = (c: number, v: string): void => {
-    const updated = [...values];
-    updated[c] = v;
-    onRowChange(updated);
-  };
+  }, [columns, onNextFocus, onPrevFocus]);
+  const next = useCallback((c: number): void => focus(c + 1), [focus]);
+  const prev = useCallback((c: number): void => focus(c - 1), [focus]);
   useImperativeHandle(ref, () => ({
     focusFirst: () => focus(0),
     focusLast: () => focus(columns - 1),
-  }), [columns]);
+  }), [columns, focus]);
+
+  const handleChange = useCallback((c: number, v: string): void => {
+    const updated = [...values];
+    updated[c] = v;
+    onRowChange(updated);
+  }, [values, onRowChange]);
 
   return (
     <>
-      <div style={labelStyle}>{name}</div>
+      <div style={labelStyle}>{label}</div>
       {Array.from({ length: columns }).map((_, c) => (
         <QuickInputCell
           key={c}

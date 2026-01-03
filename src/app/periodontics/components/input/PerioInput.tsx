@@ -19,14 +19,25 @@ export default function PerioInput({ data, zones, onUpdate, onNextFocus, onPrevF
   };
   const COLUMNS = calculateColumnsFromZones(zones);
   const ZONE_SEPARATORS = calculateZoneSeparators(zones);
-  const inputRefs = useRef<(QuickInputRowRef | null)[]>(Array(4).fill(null));
+  const labels = ['Buccal', 'Lingual', 'Lingual', 'Buccal'];
+  const inputRefs = useRef<(QuickInputRowRef | null)[]>(Array(labels.length).fill(null));
   const focus = (c: number, fromBehind: boolean = false): void => {
+    if (c < 0) {
+      onPrevFocus?.();
+      return;
+    }
+    if (c >= labels.length) {
+      onNextFocus?.();
+      return;
+    }
     const el = inputRefs.current[c];
     if (el) {
       const focus = fromBehind ? el.focusLast : el.focusFirst;
       focus();
     }
   };
+  const next = useCallback((c: number): void => focus(c + 1), [focus]);
+  const prev = useCallback((c: number): void => focus(c - 1, true), [focus]);
   const styles = stylesGenerator(COLUMNS, 28);
   const cellStyleGenerator = useCallback((index: number): React.CSSProperties => {
     return {
@@ -38,62 +49,22 @@ export default function PerioInput({ data, zones, onUpdate, onNextFocus, onPrevF
   return (
     <div style={styles.grid}>
       <ZoneMarkers zones={zones} style={styles.zoneLabel} />
-      <QuickInputRow
-        ref={(el) => {
-          if (el) inputRefs.current[0] = el;
-        }}
-        name={'Buccal'}
-        columns={COLUMNS}
-        values={data[0]}
-        onRowChange={(vs) => handleChange(0, vs)}
-        disabled={disabled}
-        onNextFocus={() => focus(1)}
-        onPrevFocus={onPrevFocus}
-        labelStyle={styles.label}
-        cellStyleGenerator={cellStyleGenerator}
-      />
-      <QuickInputRow
-        ref={(el) => {
-          if (el) inputRefs.current[1] = el;
-        }}
-        name={'Lingual'}
-        columns={COLUMNS}
-        values={data[1]}
-        onRowChange={(vs) => handleChange(1, vs)}
-        disabled={disabled}
-        onNextFocus={() => focus(2)}
-        onPrevFocus={() => focus(0, true)}
-        labelStyle={styles.label}
-        cellStyleGenerator={cellStyleGenerator}
-      />
-      <QuickInputRow
-        ref={(el) => {
-          if (el) inputRefs.current[2] = el;
-        }}
-        name={'Lingual'}
-        columns={COLUMNS}
-        values={data[2]}
-        onRowChange={(vs) => handleChange(2, vs)}
-        disabled={disabled}
-        onNextFocus={() => focus(3)}
-        onPrevFocus={() => focus(1, true)}
-        labelStyle={styles.label}
-        cellStyleGenerator={cellStyleGenerator}
-      />
-      <QuickInputRow
-        ref={(el) => {
-          if (el) inputRefs.current[3] = el;
-        }}
-        name={'Buccal'}
-        columns={COLUMNS}
-        values={data[3]}
-        onRowChange={(vs) => handleChange(3, vs)}
-        disabled={disabled}
-        onNextFocus={onNextFocus}
-        onPrevFocus={() => focus(2, true)}
-        labelStyle={styles.label}
-        cellStyleGenerator={cellStyleGenerator}
-      />
+      {Array.from({ length: labels.length }).map((_, i) => (
+        <QuickInputRow
+          key={i}
+          ref={(el) => {
+            if (el) inputRefs.current[i] = el;
+          }}
+          label={labels[i]}
+          values={data[i]}
+          onRowChange={(vs) => handleChange(i, vs)}
+          disabled={disabled}
+          onNextFocus={() => next(i)}
+          onPrevFocus={() => prev(i)}
+          labelStyle={styles.label}
+          cellStyleGenerator={cellStyleGenerator}
+        />
+      ))}
     </div>
   );
 }
