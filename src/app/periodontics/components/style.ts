@@ -8,6 +8,7 @@ export const stylesGenerator = (columnsNum: number, cellSize: number = 18) => {
       gap: 3,
       alignItems: "center",
       overflowX: "auto" as const,
+      justifyContent: "space-around" as const,
       paddingBottom: 12,
       marginTop: 12
     },
