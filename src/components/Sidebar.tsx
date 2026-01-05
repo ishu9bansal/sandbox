@@ -7,12 +7,18 @@ import { useSidebar } from "@/contexts/SidebarContext";
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const { isOpen, closeSidebar } = useSidebar();
+  const { isOpen, isMobile, closeSidebar } = useSidebar();
+
+  const handleLinkClick = () => {
+    if (isMobile) {
+      closeSidebar();
+    }
+  };
 
   return (
     <>
       {/* Mobile overlay */}
-      {isOpen && (
+      {isOpen && isMobile && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"
           onClick={closeSidebar}
@@ -31,9 +37,7 @@ export default function Sidebar() {
         `}
       >
         <div className="p-6">
-          <Link href="/" className="block" onClick={() => {
-            if (window.innerWidth < 768) closeSidebar();
-          }}>
+          <Link href="/" className="block" onClick={handleLinkClick}>
             <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
               Sandbox
             </h1>
@@ -47,9 +51,7 @@ export default function Sidebar() {
           <div className="mb-6">
             <Link
               href="/"
-              onClick={() => {
-                if (window.innerWidth < 768) closeSidebar();
-              }}
+              onClick={handleLinkClick}
               className={`block px-4 py-2 rounded-lg transition-colors ${
                 pathname === "/"
                   ? "bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-300"
@@ -69,9 +71,7 @@ export default function Sidebar() {
                 <li key={project.id}>
                   <Link
                     href={project.path}
-                    onClick={() => {
-                      if (window.innerWidth < 768) closeSidebar();
-                    }}
+                    onClick={handleLinkClick}
                     className={`block px-4 py-2 rounded-lg transition-colors ${
                       pathname === project.path
                         ? "bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-300"

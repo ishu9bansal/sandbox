@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 
 interface SidebarContextType {
   isOpen: boolean;
+  isMobile: boolean;
   toggleSidebar: () => void;
   closeSidebar: () => void;
 }
@@ -12,11 +13,14 @@ const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 
 export function SidebarProvider({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Auto-close sidebar on mobile, keep open on desktop
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 768) {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (mobile) {
         setIsOpen(false);
       } else {
         setIsOpen(true);
@@ -34,7 +38,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
   const closeSidebar = () => setIsOpen(false);
 
   return (
-    <SidebarContext.Provider value={{ isOpen, toggleSidebar, closeSidebar }}>
+    <SidebarContext.Provider value={{ isOpen, isMobile, toggleSidebar, closeSidebar }}>
       {children}
     </SidebarContext.Provider>
   );
