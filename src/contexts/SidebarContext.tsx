@@ -17,14 +17,13 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 
   // Auto-close sidebar on mobile, keep open on desktop
   useEffect(() => {
+    // Only run on client side
+    if (typeof window === "undefined") return;
+
     const handleResize = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
-      if (mobile) {
-        setIsOpen(false);
-      } else {
-        setIsOpen(true);
-      }
+      setIsOpen(!mobile);
     };
 
     // Set initial state
