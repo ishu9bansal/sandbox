@@ -2,19 +2,43 @@
 
 import { usePathname } from "next/navigation";
 import { projects } from "@/lib/projects";
+import { useSidebar } from "@/contexts/SidebarContext";
 
 export default function Navbar() {
   const pathname = usePathname();
+  const { toggleSidebar } = useSidebar();
 
   const currentProject = projects.find((p) => p.path === pathname);
   const pageTitle = pathname === "/" ? "Home" : currentProject?.name || "Page";
 
   return (
-    <nav className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+    <nav className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 md:px-6 py-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
-          {pageTitle}
-        </h2>
+        <div className="flex items-center gap-3">
+          {/* Hamburger Menu Button */}
+          <button
+            onClick={toggleSidebar}
+            className="p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            aria-label="Toggle sidebar"
+          >
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          </button>
+          <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
+            {pageTitle}
+          </h2>
+        </div>
         <div className="flex items-center gap-4">
           <a
             href="https://github.com/ishu9bansal/sandbox"
