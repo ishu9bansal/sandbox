@@ -4,8 +4,7 @@ import Card from "@/components/Card";
 import Button from "@/components/Button";
 import { PerioRecord } from '@/models/perio';
 import TeethVisualization from "@/components/TeethVisualization";
-import PerioInput from "./PerioInput";
-import { deriveValues, deriveZones } from "./utils";
+import PerioInput from "./input/PerioInput";
 import PatientCard from "@/app/patients/components/PatientCard";
 import { useSelector } from "react-redux";
 import { selectPatientById } from "@/store/slices/patientSlice";
@@ -85,13 +84,13 @@ export default function PerioRecordDetails({ record, onEdit, onDelete, onBack }:
           <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
             PPD Values
           </label>
-          <PerioInput data={deriveValues(record.ppd)} zones={deriveZones()} disabled={true} />
+          <PerioInput data={record.ppd} disabled={true} />
         </div>
         <div className="my-6 pt-4 border-t border-gray-300 dark:border-gray-600">
           <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
             LGM Values
           </label>
-          <PerioInput data={deriveValues(record.lgm)} zones={deriveZones()} disabled={true} />
+          <PerioInput data={record.lgm} disabled={true} />
         </div>
         <div className="my-6 pt-4 border-t border-gray-300 dark:border-gray-600">
           <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
