@@ -139,6 +139,12 @@ function useFocusRef(focus: boolean) {
     if (focus && inputRef.current) {
       inputRef.current.focus();
       inputRef.current.select();
+      // Scroll the input into view with smooth behavior
+      inputRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'center'
+      });
     }
   }, [focus]); // Dependency on focus state
   return inputRef;

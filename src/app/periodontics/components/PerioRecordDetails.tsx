@@ -30,18 +30,18 @@ export default function PerioRecordDetails({ record, onEdit, onDelete, onBack }:
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <h2 className="text-2xl font-bold">Record Details</h2>
-        <div className="flex gap-3 justify-end">
-          <Button variant="outline" onClick={onBack}>
+        <div className="flex flex-wrap gap-2 justify-end">
+          <Button variant="outline" onClick={onBack} size="sm" className="text-xs sm:text-sm">
             ← Back to List
           </Button>
-          <Button variant="outline" onClick={onEdit}>
+          <Button variant="outline" onClick={onEdit} size="sm" className="text-xs sm:text-sm">
             Edit Record
           </Button>
           <button
             onClick={onDelete}
-            className="px-4 py-2 text-base font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 bg-red-600 text-white hover:bg-red-700 focus:ring-red-500"
+            className="px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 bg-red-600 text-white hover:bg-red-700 focus:ring-red-500"
           >
             Delete Record
           </button>

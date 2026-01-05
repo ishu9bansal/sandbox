@@ -70,32 +70,34 @@ export default function TeethVisualization({ data }: { data: TeethSelection }) {
   };
 
   return (
-    <div className="inline-block border-2 border-gray-400 rounded-lg p-4 bg-gray-700">
-      {/* Upper teeth */}
-      <div className="flex gap-1 mb-6">
-        {/* Upper Left (21-28) - reversed */}
-        <div className="flex gap-1">{renderQuadrant(serializedData[0])}</div>
+    <div className="overflow-x-auto">
+      <div className="inline-block border-2 border-gray-400 rounded-lg p-4 bg-gray-700">
+        {/* Upper teeth */}
+        <div className="flex gap-1 mb-6">
+          {/* Upper Left (21-28) - reversed */}
+          <div className="flex gap-1">{renderQuadrant(serializedData[0])}</div>
 
-        {/* Midline divider */}
-        <div className="w-1 bg-gray-600 mx-2"></div>
+          {/* Midline divider */}
+          <div className="w-1 bg-gray-600 mx-2"></div>
 
-        {/* Upper Right (11-18) */}
-        <div className="flex gap-1">{renderQuadrant(serializedData[1])}</div>
-      </div>
+          {/* Upper Right (11-18) */}
+          <div className="flex gap-1">{renderQuadrant(serializedData[1])}</div>
+        </div>
 
-      {/* Midline separator */}
-      <div className="h-1 bg-gray-600 mb-6"></div>
+        {/* Midline separator */}
+        <div className="h-1 bg-gray-600 mb-6"></div>
 
-      {/* Lower teeth */}
-      <div className="flex gap-1">
-        {/* Lower Left (31-38) - reversed */}
-        <div className="flex gap-1">{renderQuadrant(serializedData[2])}</div>
+        {/* Lower teeth */}
+        <div className="flex gap-1">
+          {/* Lower Left (31-38) - reversed */}
+          <div className="flex gap-1">{renderQuadrant(serializedData[2])}</div>
 
-        {/* Midline divider */}
-        <div className="w-1 bg-gray-600 mx-2"></div>
+          {/* Midline divider */}
+          <div className="w-1 bg-gray-600 mx-2"></div>
 
-        {/* Lower Right (41-48) */}
-        <div className="flex gap-1">{renderQuadrant(serializedData[3])}</div>
+          {/* Lower Right (41-48) */}
+          <div className="flex gap-1">{renderQuadrant(serializedData[3])}</div>
+        </div>
       </div>
     </div>
   );

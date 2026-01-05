@@ -22,17 +22,19 @@ export default function TableStructure<T>({ title, columns, data, renderFilterRo
         </div>
       </div>
 
-      <table style={styles.table}>
-        <ColumnGroup columns={columns} />
-        <thead>
-          {renderHeaderRow(columns)}
-          {renderFilterRow(columns)}
-        </thead>
-        <tbody>
-          {renderDataRows(columns, data)}
-          <EmptyView colSpan={columns.length} visible={data.length === 0} />
-        </tbody>
-      </table>
+      <div style={styles.tableWrapper}>
+        <table style={styles.table}>
+          <ColumnGroup columns={columns} />
+          <thead>
+            {renderHeaderRow(columns)}
+            {renderFilterRow(columns)}
+          </thead>
+          <tbody>
+            {renderDataRows(columns, data)}
+            <EmptyView colSpan={columns.length} visible={data.length === 0} />
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
