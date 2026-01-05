@@ -35,10 +35,11 @@ export const styles: Record<string, React.CSSProperties> = {
     background: "#2a2a2a",
     color: "#e0e0e0",
     fontSize: 12,
+    minWidth: 120,
   },
   button: {
-    padding: "8px 12px",
-    fontSize: 12,
+    padding: "6px 10px",
+    fontSize: 11,
     fontWeight: 600,
     background: "#0066cc",
     color: "#ffffff",
@@ -46,6 +47,7 @@ export const styles: Record<string, React.CSSProperties> = {
     borderRadius: 6,
     cursor: "pointer",
     transition: "background 0.2s ease",
+    whiteSpace: "nowrap",
   },
   tableWrapper: {
     overflowX: "auto",
