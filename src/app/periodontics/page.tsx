@@ -46,14 +46,14 @@ export default function PatientsPage() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
-      <div className="flex justify-between items-start">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
         <div>
           <h1 className="text-3xl font-bold mb-4">Record Management</h1>
           <p className="text-gray-600 dark:text-gray-300">
             View and manage perio chart for patients with an intuitive interface.
           </p>
         </div>
-        <Button variant="primary" onClick={handleAddRecord}>
+        <Button variant="primary" onClick={handleAddRecord} size="sm" className="text-xs sm:text-sm whitespace-nowrap self-start sm:self-auto">
           + Add New Record
         </Button>
       </div>
