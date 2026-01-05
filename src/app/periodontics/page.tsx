@@ -53,7 +53,7 @@ export default function PatientsPage() {
             View and manage perio chart for patients with an intuitive interface.
           </p>
         </div>
-        <Button variant="primary" onClick={handleAddRecord} size="sm" className="text-xs sm:text-sm whitespace-nowrap self-start sm:self-auto">
+        <Button variant="primary" onClick={handleAddRecord} size="sm" className="whitespace-nowrap self-start sm:self-auto">
           + Add New Record
         </Button>
       </div>
