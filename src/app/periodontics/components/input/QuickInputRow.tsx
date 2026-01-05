@@ -31,14 +31,8 @@ const QuickInputRow = forwardRef<QuickInputRowRef, QuickInputRowProps>(function 
   const [currentFocus, setCurrentFocus] = useState<number>(-1);
   const focus = useCallback((c: number): void => {
     setCurrentFocus(c);
-    if (c < 0) {
-      onPrevFocus?.();
-      return;
-    }
-    if (c >= columns) {
-      onNextFocus?.();
-      return;
-    }
+    if (c < 0)  onPrevFocus?.();
+    if (c >= columns) onNextFocus?.();
   }, [columns, onNextFocus, onPrevFocus]);
   const next = useCallback((c: number): void => focus(c + 1), [focus]);
   const prev = useCallback((c: number): void => focus(c - 1), [focus]);
