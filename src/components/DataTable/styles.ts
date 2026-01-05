@@ -13,11 +13,13 @@ export const styles: Record<string, React.CSSProperties> = {
     alignItems: "center",
     marginBottom: 12,
     gap: 12,
+    flexWrap: "wrap",
   },
   actionsBar: {
     display: "flex",
     gap: 8,
     alignItems: "center",
+    flexWrap: "wrap",
   },
   title: {
     fontSize: 14,
@@ -45,10 +47,15 @@ export const styles: Record<string, React.CSSProperties> = {
     cursor: "pointer",
     transition: "background 0.2s ease",
   },
+  tableWrapper: {
+    overflowX: "auto",
+    width: "100%",
+  },
   table: {
     width: "100%",
     borderCollapse: "collapse",
     fontSize: 12,
+    minWidth: "600px",
   },
   row: {
     borderBottom: "1px solid #3a4050",
