@@ -24,10 +24,7 @@ export default function PatientForm({ patient_id, onSubmit, onCancel }: PatientF
     const patientId = selected?.id || null;
     onSubmit(patientId);
   };
-  const toString = (patient: Patient | null) => {
-    if (!patient) {
-      return "null";
-    }
+  const toString = (patient: Patient) => {
     return `${patient.name} ${patient.age}${patient.sex[0]}`;
   };
 
@@ -35,7 +32,8 @@ export default function PatientForm({ patient_id, onSubmit, onCancel }: PatientF
     <Card title={"Assign to Patient" }>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <DataSelector data={patients} selected={selected} onSelect={setSelected} renderer={renderPatient} toString={toString} />
+          <DataSelector data={patients} selected={selected} onSelect={setSelected} renderer={toString} />
+          <PatientView patient={selected} />
         </div>
         <div className="flex gap-3 justify-end pt-4">
           <Button variant="outline" onClick={onCancel} type="button">
@@ -50,11 +48,14 @@ export default function PatientForm({ patient_id, onSubmit, onCancel }: PatientF
   );
 }
 
-function renderPatient(patient: Patient | null): JSX.Element {
-  if (!patient) {
-    return <span>No Patient Selected</span>;
-  }
+function PatientView({ patient }: { patient: Patient | null; }): JSX.Element {
   return (
-    <PatientCard patient={patient} />
+    <div className="mt-2">
+      {
+        patient
+        ? (<PatientCard patient={patient} />)
+        : (<span>No Patient Selected</span>)
+      }
+    </div>
   );
 }
