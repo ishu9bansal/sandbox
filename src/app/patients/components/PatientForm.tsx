@@ -35,10 +35,6 @@ export default function PatientForm({ patient, onSubmit, onCancel }: PatientForm
       newErrors.age = 'Age must be between 0 and 150';
     }
 
-    if (!formData.contact.trim()) {
-      newErrors.contact = 'Contact is required';
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
