@@ -2,7 +2,7 @@
 import { CommonMeasurement, copy, MeasurementArea, MeasurementSite } from "@/models/perio";
 import { Quadrant } from "@/models/theeth";
 
-const STUDY_LIMIT = 3;
+const STUDY_LIMIT = 7;
 function generateAnnatomicalMapping(limit: number): {q: number, p: number}[][] {
   return [
     Array.from({ length: limit }, (_, i) => ({ q: 0, p: (limit-1-i) })),
