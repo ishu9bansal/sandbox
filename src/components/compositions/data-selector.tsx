@@ -27,9 +27,23 @@ type DataSelectorProps<T> = {
   toString: (datum: T) => string;
   renderer?: (datum: T) => React.JSX.Element;
   searchValue?: (datum: T) => string;
-  uniqueKey?: (datum: T) => string
+  uniqueKey?: (datum: T) => string;
+  selectPlaceholder?: string;
+  searchPlaceholder?: string;
+  emptyView?: (search: string, setSearch: (s: string) => void) => React.JSX.Element;
 };
-export default function DataSelector<T>({ data, typeLabel, isSelected, onSelect, toString, renderer, searchValue, uniqueKey }: DataSelectorProps<T>) {
+export default function DataSelector<T>({
+  data,
+  isSelected,
+  onSelect,
+  toString,
+  renderer,
+  searchValue,
+  uniqueKey,
+  selectPlaceholder,
+  searchPlaceholder,
+  emptyView,
+}: DataSelectorProps<T>) {
   const [open, setOpen] = React.useState(false);
   const selected = data.find(isSelected) || null;
   const [searchTerm, setSearchTerm] = React.useState("");
@@ -43,17 +57,21 @@ export default function DataSelector<T>({ data, typeLabel, isSelected, onSelect,
           aria-expanded={open}
           className="w-[400px] justify-between"
         >
-          {selected ? toString(selected) : `Select ${typeLabel}...`}
+          {selected ? toString(selected) : (selectPlaceholder || "Select...")}
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[400px] p-0">
         <Command>
-          <CommandInput value={searchTerm} onValueChange={setSearchTerm} placeholder={`Search ${typeLabel}...`} className="h-9" />
+          <CommandInput
+            value={searchTerm}
+            onValueChange={setSearchTerm}
+            placeholder={searchPlaceholder || "Search..."}
+            className="h-9"
+          />
           <CommandList>
             <CommandEmpty>
-                <span>No {typeLabel} found.</span>
-
+              {emptyView?.(searchTerm, setSearchTerm) || "No results found."}
             </CommandEmpty>
             <CommandGroup>
               {data.map((datum) => (

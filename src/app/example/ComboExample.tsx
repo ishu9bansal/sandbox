@@ -1,7 +1,8 @@
 "use client";
 
 import DataSelector from "@/components/compositions/data-selector";
-import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { useCallback, useState } from "react";
 
 export default function ComboboxDemo() {
   const [value, setValue] = useState<string | null>(null);
@@ -12,7 +13,23 @@ export default function ComboboxDemo() {
       isSelected={(datum) => datum.value === value}
       onSelect={(datum) => setValue(datum ? datum.value : null)}
       toString={(datum) => datum.label}
+      emptyView={(search, setSearch) => <EmptyView search={search} setSearch={setSearch} />}
     />
+  );
+}
+
+function EmptyView({ search, setSearch }: { search: string; setSearch: (s: string) => void; }) {
+  const onCreate = useCallback(() => {
+    COMBO_INPUTS.push({ value: search.toLowerCase(), label: search });
+    setSearch("");
+  }, [search, setSearch]);
+  return (
+    <>
+      <div>No results for "{search}"</div>
+      <Button size="sm" className="mt-2" onClick={onCreate}>
+        Create "{search}" +
+      </Button>
+    </>
   );
 }
 
