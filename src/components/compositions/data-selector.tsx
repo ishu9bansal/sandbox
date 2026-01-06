@@ -32,6 +32,7 @@ type DataSelectorProps<T> = {
 export default function DataSelector<T>({ data, typeLabel, isSelected, onSelect, toString, renderer, searchValue, uniqueKey }: DataSelectorProps<T>) {
   const [open, setOpen] = React.useState(false);
   const selected = data.find(isSelected) || null;
+  const [searchTerm, setSearchTerm] = React.useState("");
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -40,22 +41,25 @@ export default function DataSelector<T>({ data, typeLabel, isSelected, onSelect,
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-[200px] justify-between"
+          className="w-[400px] justify-between"
         >
           {selected ? toString(selected) : `Select ${typeLabel}...`}
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0">
+      <PopoverContent className="w-[400px] p-0">
         <Command>
-          <CommandInput placeholder={`Search ${typeLabel}...`} className="h-9" />
+          <CommandInput value={searchTerm} onValueChange={setSearchTerm} placeholder={`Search ${typeLabel}...`} className="h-9" />
           <CommandList>
-            <CommandEmpty>No {typeLabel} found.</CommandEmpty>
+            <CommandEmpty>
+                <span>No {typeLabel} found.</span>
+
+            </CommandEmpty>
             <CommandGroup>
               {data.map((datum) => (
                 <CommandItem
                   key={uniqueKey?.(datum) || toString(datum)}
-                  value={searchValue?.(datum) || toString(datum)}
+                  value={searchValue?.(datum)}
                   onSelect={(_) => {
                     onSelect(isSelected(datum) ? null : datum)
                     setOpen(false)
