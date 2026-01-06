@@ -6,8 +6,8 @@ import Button from "@/components/Button";
 import { useSelector } from "react-redux";
 import { selectAllPatients, selectPatientById } from "@/store/slices/patientSlice";
 import { Patient } from '@/models/patient';
-import DataSelector from "@/components/DataSelector";
 import PatientCard from "@/app/patients/components/PatientCard";
+import DataSelector from "@/components/compositions/data-selector";
 
 interface PatientFormProps {
   patient_id: string | null;
@@ -28,11 +28,23 @@ export default function PatientForm({ patient_id, onSubmit, onCancel }: PatientF
     return `${patient.name} ${patient.age}${patient.sex[0]}`;
   };
 
+  const searchValue = (patient: Patient) => {
+    return `${patient.name} ${patient.age} ${patient.contact} ${patient.email}`;
+  };
+
   return (
     <Card title={"Assign to Patient" }>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <DataSelector data={patients} selected={selected} onSelect={setSelected} renderer={toString} />
+          <DataSelector
+            data={patients}
+            typeLabel="patient"
+            isSelected={(p) => selected ? p.id === selected.id : false}
+            onSelect={setSelected}
+            toString={toString}
+            uniqueKey={(p) => p.id}
+            searchValue={searchValue}
+          />
           <PatientView patient={selected} />
         </div>
         <div className="flex gap-3 justify-end pt-4">
