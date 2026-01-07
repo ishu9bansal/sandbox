@@ -4,10 +4,9 @@ interface DataSelectorProps<T> {
   data: T[];
   selected: T | null;
   onSelect: (datum: T | null) => void;
-  renderer: (datum: T | null) => JSX.Element;
-  toString: (datum: T | null) => string;
+  renderer: (datum: T) => JSX.Element | string;
 }
-export default function DataSelector<T>({ data, selected, onSelect, renderer, toString }: DataSelectorProps<T>) {
+export default function DataSelector<T>({ data, selected, onSelect, renderer }: DataSelectorProps<T>) {
   // TODO: Implement search/filtering
   return (
     <div>
@@ -26,13 +25,10 @@ export default function DataSelector<T>({ data, selected, onSelect, renderer, to
         <option value={-1}>-- Select Patient --</option>
         {data.map((datum, index) => (
           <option key={index} value={index}>
-            {toString(datum)}
+            {renderer(datum)}
           </option>
         ))}
       </select>
-      <div className="mt-2">
-        Selected: {renderer(selected)}
-      </div>
     </div>
   );
 }
