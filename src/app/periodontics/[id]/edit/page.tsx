@@ -37,7 +37,10 @@ export default function EditPatientPage() {
       </div>
     );
   }
-
+  // TODO: move the submit/cancel buttons out of each form and into this page
+  // TODO: refactor the button names to be Next/Back instead of Submit/Cancel
+  // TODO: show progress indicator of which step we are on
+  // TODO: is there a better way to manage multi-step forms, instead of conditional rendering?
   return (
     <div className="max-w-3xl mx-auto">
       { view === 'basic' &&
