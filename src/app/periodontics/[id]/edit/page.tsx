@@ -4,7 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import PerioRecordForm from "../../components/PerioRecordForm";
 import { selectPerioRecordById, updatePerioRecord } from "@/store/slices/perioSlice";
-import { PerioRecord, LGMRecord, PPDRecord, TeethSelection } from '@/models/perio';
+import { PerioRecord } from '@/models/perio';
 import { useCallback, useState } from "react";
 import PPDForm from "../../components/PPDForm";
 import LGMForm from "../../components/LGMForm";
@@ -18,9 +18,14 @@ export default function EditPatientPage() {
   const { id: record_id } = useParams();
   const dispatch = useAppDispatch();
   const record = useAppSelector(selectPerioRecordById(record_id));
+  const id = record?.id || '';
   const onCancel = useCallback(() => router.back(), [router]);
-  const onSubmit = useCallback(() => router.push(`/periodontics/${record?.id}`), [router, record]);
+  const onSubmit = useCallback(() => router.push(`/periodontics/${id}`), [router, id]);
   const { view, handleBack, handleNext } = useViewsNavigation(onCancel, onSubmit);
+  const handleUpdate = useCallback((updatedRecord: Partial<PerioRecord>) => {
+    dispatch(updatePerioRecord({ ...updatedRecord, id }));
+    handleNext();
+  }, [dispatch, id, handleNext]);
 
   if (!record) {
     return ( 
@@ -33,51 +38,12 @@ export default function EditPatientPage() {
     );
   }
 
-  const handleBasicUpdate = ({ label, note, teeth }: { label: string, note: string; teeth: TeethSelection; }) => {
-    const updatedRecord: PerioRecord = {
-      ...record,
-      label,
-      note,
-      teeth,
-    };
-    dispatch(updatePerioRecord(updatedRecord));
-    handleNext();
-  };
-
-  const handlePPDUpdate = (ppd: PPDRecord) => {
-    const updatedRecord: PerioRecord = {
-      ...record,
-      ppd,
-    };
-    dispatch(updatePerioRecord(updatedRecord));
-    handleNext();
-  };
-
-  const handleLGMUpdate = (lgm: LGMRecord) => {
-    const updatedRecord: PerioRecord = {
-      ...record,
-      lgm,
-    };
-    dispatch(updatePerioRecord(updatedRecord));
-    handleNext();
-  };
-  
-  const handlePatientUpdate = (patientId: string | null) => {
-    const updatedRecord: PerioRecord = {
-      ...record,
-      patientId,
-    };
-    dispatch(updatePerioRecord(updatedRecord));
-    handleNext();
-  };
-
-
   return (
     <div className="max-w-3xl mx-auto">
       { view === 'basic' &&
         <PerioRecordForm
           record={record}
-          onSubmit={handleBasicUpdate}
+          onSubmit={handleUpdate}
           onCancel={handleBack}
         />
       }
@@ -85,7 +51,7 @@ export default function EditPatientPage() {
         <PPDForm
           teeth={record.teeth}
           data={record.ppd}
-          onSubmit={handlePPDUpdate}
+          onSubmit={(ppd) => handleUpdate({ ppd })}
           onCancel={handleBack}
         />
       }
@@ -93,14 +59,14 @@ export default function EditPatientPage() {
         <LGMForm
           teeth={record.teeth}
           data={record.lgm}
-          onSubmit={handleLGMUpdate}
+          onSubmit={(lgm) => handleUpdate({ lgm })}
           onCancel={handleBack}
         />
       }
       { view === 'patient' &&
         <PatientForm
           patient_id={record.patientId}
-          onSubmit={handlePatientUpdate}
+          onSubmit={(patientId) => handleUpdate({ patientId })}
           onCancel={handleBack}
         />
       }

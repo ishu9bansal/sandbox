@@ -1,4 +1,5 @@
 import { PerioRecord, SelectionMeasurement, TeethSelection } from '@/models/perio';
+import { ModelInput, ModelUpdate } from '@/models/type';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface PerioState {
@@ -39,7 +40,7 @@ const perioSlice = createSlice({
   name: 'perio',
   initialState,
   reducers: {
-    addPerioRecord: (state, action: PayloadAction<Omit<PerioRecord, 'id' | 'createdAt' | 'updatedAt'>>) => {
+    addPerioRecord: (state, action: PayloadAction<ModelInput<PerioRecord>>) => {
       const now = new Date().toISOString();
       const newRecord: PerioRecord = {
         ...action.payload,
@@ -50,11 +51,11 @@ const perioSlice = createSlice({
       state.records.push(newRecord);
       state.freshId = newRecord.id;
     },
-    updatePerioRecord: (state, action: PayloadAction<PerioRecord>) => {
-      // TODO: can be optimized by using only partial update
+    updatePerioRecord: (state, action: PayloadAction<ModelUpdate<PerioRecord>>) => {
       const index = state.records.findIndex(r => r.id === action.payload.id);
       if (index !== -1) {
         state.records[index] = {
+          ...state.records[index],
           ...action.payload,
           updatedAt: new Date().toISOString(),
         };
