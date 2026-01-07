@@ -51,6 +51,7 @@ const perioSlice = createSlice({
       state.freshId = newRecord.id;
     },
     updatePerioRecord: (state, action: PayloadAction<PerioRecord>) => {
+      // TODO: can be optimized by using only partial update
       const index = state.records.findIndex(r => r.id === action.payload.id);
       if (index !== -1) {
         state.records[index] = {
