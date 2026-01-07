@@ -1,6 +1,6 @@
 "use client";
 
-import DataSelector from "@/components/compositions/data-selector";
+import DataSelector, { useDataSelectorContext } from "@/components/compositions/data-selector";
 import { Button } from "@/components/ui/button";
 import { useCallback, useState } from "react";
 
@@ -13,12 +13,17 @@ export default function ComboboxDemo() {
       isSelected={(datum) => datum.value === value}
       onSelect={(datum) => setValue(datum ? datum.value : null)}
       toString={(datum) => datum.label}
-      emptyView={(search, setSearch) => <EmptyView search={search} setSearch={setSearch} />}
-    />
+    >
+      <EmptyView />
+    </DataSelector>
   );
 }
 
-function EmptyView({ search, setSearch }: { search: string; setSearch: (s: string) => void; }) {
+function EmptyView() {
+  const {
+    searchTerm: search,
+    setSearchTerm: setSearch,
+  } = useDataSelectorContext();
   const onCreate = useCallback(() => {
     COMBO_INPUTS.push({ value: search.toLowerCase(), label: search });
     setSearch("");

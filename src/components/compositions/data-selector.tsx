@@ -30,7 +30,7 @@ type DataSelectorProps<T> = {
   uniqueKey?: (datum: T) => string;
   selectPlaceholder?: string;
   searchPlaceholder?: string;
-  emptyView?: (search: string, setSearch: (s: string) => void) => React.JSX.Element;
+  children?: React.JSX.Element;
 };
 export default function DataSelector<T>({
   data,
@@ -42,7 +42,7 @@ export default function DataSelector<T>({
   uniqueKey,
   selectPlaceholder,
   searchPlaceholder,
-  emptyView,
+  children,
 }: DataSelectorProps<T>) {
   const [open, setOpen] = React.useState(false);
   const selected = data.find(isSelected) || null;
@@ -71,7 +71,9 @@ export default function DataSelector<T>({
           />
           <CommandList>
             <CommandEmpty>
-              {emptyView?.(searchTerm, setSearchTerm) || "No results found."}
+              <DataSelectorContext value={{ searchTerm, setSearchTerm }}>
+                {children || "No results found."}
+              </DataSelectorContext>
             </CommandEmpty>
             <CommandGroup>
               {data.map((datum) => (
@@ -98,4 +100,10 @@ export default function DataSelector<T>({
       </PopoverContent>
     </Popover>
   )
+}
+
+const DataSelectorContext = React.createContext({ searchTerm: "", setSearchTerm: (term: string) => {} });
+
+export function useDataSelectorContext() {
+  return React.useContext(DataSelectorContext);
 }
