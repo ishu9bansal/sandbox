@@ -1,3 +1,4 @@
+import { ModelInput, ModelUpdate } from "./type";
 
 export interface Patient {
   id: string;
@@ -11,4 +12,5 @@ export interface Patient {
   updatedAt: string;
 }
 
-export type PatientInput = Omit<Patient, 'id' | 'createdAt' | 'updatedAt'>;
+export type PatientInput = ModelInput<Patient>;
+export type PatientUpdate = ModelUpdate<Patient>;

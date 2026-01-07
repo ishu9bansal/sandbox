@@ -18,13 +18,8 @@ export default function EditPatientPage() {
   const { id: record_id } = useParams();
   const dispatch = useAppDispatch();
   const record = useAppSelector(selectPerioRecordById(record_id));
-  const onCancel = useCallback(() => {
-    router.back();
-  }, [router]);
-  const onSubmit = useCallback(() => {
-    router.push(`/periodontics/${record?.id}`);
-  }, [router, record]);
-
+  const onCancel = useCallback(() => router.back(), [router]);
+  const onSubmit = useCallback(() => router.push(`/periodontics/${record?.id}`), [router, record]);
   const { view, handleBack, handleNext } = useViewsNavigation(onCancel, onSubmit);
 
   if (!record) {
