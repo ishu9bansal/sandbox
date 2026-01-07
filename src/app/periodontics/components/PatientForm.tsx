@@ -12,6 +12,7 @@ import { DialogBox } from "@/components/compositions/dialog-box";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useAppDispatch } from "@/store/hooks";
+import { SelectInput } from "@/components/compositions/select-input";
 
 interface PatientSelectProps {
   patient_id: string | null;
@@ -122,23 +123,22 @@ function CreatePatientDialog({ patientName, onCreate }: { patientName: string; o
 
 function PatientForm({ patient, onChange }: { patient: PatientInput; onChange: (data: PatientInput) => void }) {
   const { name, age, sex } = patient;
-  const onFieldChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    // Note: make sure to use the name attribute on Input components
-    onChange({ ...patient, [e.target.name]: e.target.value });
+  const onFieldChange = useCallback((key: string, val: string | number) => {
+    onChange({ ...patient, [key]: val });
   }, [patient, onChange]);
   return (
     <div className="grid gap-4">
       <div className="grid gap-3">
         <Label htmlFor="name-1">Name</Label>
-        <Input id="name-1" name="name" value={name} onChange={onFieldChange} />
+        <Input id="name-1" value={name} onChange={e => onFieldChange('name', e.target.value)} />
       </div>
       <div className="grid gap-3">
         <Label htmlFor="age-1">Age</Label>
-        <Input id="age-1" name="age" value={age} onChange={onFieldChange} type='number' />
+        <Input id="age-1" value={age} onChange={e => onFieldChange('age', e.target.value)} type='number' />
       </div>
       <div className="grid gap-3">
-        <Label htmlFor="sex-1">Sex</Label>
-        <Input id="sex-1" name="sex" value={sex} onChange={onFieldChange} />
+        <Label>Sex</Label>
+        <SelectInput value={sex} onChange={val => onFieldChange('sex', val)} options={['Male', 'Female', 'Other']} />
       </div>
     </div>
   );
