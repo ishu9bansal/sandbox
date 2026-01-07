@@ -10,3 +10,5 @@ export interface Patient {
   createdAt: string;
   updatedAt: string;
 }
+
+export type PatientInput = Omit<Patient, 'id' | 'createdAt' | 'updatedAt'>;
