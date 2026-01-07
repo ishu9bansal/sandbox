@@ -43,7 +43,7 @@ export default function PatientForm({ patient_id, onSubmit, onCancel }: PatientF
             onSelect={setSelected}
             toString={toString}
             uniqueKey={(p) => p.id}
-            // searchValue={searchValue}
+            searchValue={searchValue}
           />
           <PatientView patient={selected} />
         </div>
