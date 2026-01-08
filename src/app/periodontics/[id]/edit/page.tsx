@@ -32,13 +32,16 @@ function RecordView({ record }: { record: PerioRecord }) {
   }, [dispatch, id]);
   const {
     value: ppd, onChange: setPpd, handleUpdate: commitPpdUpdate
-  } = useFormField(record.ppd, (ppd) => handleUpdate({ ppd }));
+  } = useFormField(record.ppd, useCallback((ppd) => handleUpdate({ ppd }), [handleUpdate]));
   const {
     value: lgm, onChange: setLgm, handleUpdate: commitLgmUpdate
-  } = useFormField(record.lgm, (lgm) => handleUpdate({ lgm }));  
+  } = useFormField(record.lgm, useCallback((lgm) => handleUpdate({ lgm }), [handleUpdate]));
   const {
     value: patientId, onChange: setPatientId, handleUpdate: commitPatientIdUpdate
-  } = useFormField(record.patientId, (patientId) => handleUpdate({ patientId }));
+  } = useFormField(record.patientId, useCallback((patientId) => handleUpdate({ patientId }), [handleUpdate]));
+  const {
+    value: basicInfo, onChange: setBasicInfo, handleUpdate: commitBasicInfoUpdate
+  } = useFormField({ label: record.label, note: record.note }, useCallback(({ label, note }) => handleUpdate({ label, note }), [handleUpdate]));
 
   // TODO: move the submit/cancel buttons out of each form and into this page
   // TODO: refactor the button names to be Next/Back instead of Submit/Cancel
@@ -48,9 +51,11 @@ function RecordView({ record }: { record: PerioRecord }) {
     <div className="max-w-3xl mx-auto">
       { view === 'basic' &&
         <PerioRecordForm
-          record={record}
-          onSubmit={(r) => {
-            handleUpdate(r);
+          title="Edit record"
+          info={basicInfo}
+          onChange={setBasicInfo}
+          onSubmit={() => {
+            commitBasicInfoUpdate();
             handleNext();
           }}
           onCancel={handleBack}

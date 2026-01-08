@@ -1,5 +1,6 @@
-import { PerioRecord, SelectionMeasurement, TeethSelection } from '@/models/perio';
+import { PerioRecord } from '@/models/perio';
 import { ModelInput, ModelUpdate } from '@/models/type';
+import { generateRecordId } from '@/utils/perio';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface PerioState {
@@ -10,30 +11,6 @@ export interface PerioState {
 const initialState: PerioState = {
   records: [],
   freshId: null,
-};
-
-const STUDY_LIMIT = 3;
-const defaltLabel = (position: number): SelectionMeasurement => {
-    if (position>=7) return 'X'; // generally missing wisdom teeth
-    if (position < STUDY_LIMIT) return 'O'
-    return '-';
-}
-
-export const generateDefaultTeeth = (): TeethSelection => {
-    const nums = Array.from({length: 8}, (_, i) => i);  // [0,1,2,3,4,5,6,7]
-    const quadrant = nums.map(pos => defaltLabel(pos));
-    const teeth = [
-        [...quadrant],  // Quadrant 1
-        [...quadrant],  // Quadrant 2
-        [...quadrant],  // Quadrant 3
-        [...quadrant],  // Quadrant 4
-    ] as TeethSelection;
-    return teeth;
-};
-
-// Helper function to generate unique record IDs
-const generateRecordId = (): string => {
-  return `perio-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
 };
 
 const perioSlice = createSlice({

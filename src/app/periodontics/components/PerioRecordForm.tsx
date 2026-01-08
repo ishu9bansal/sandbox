@@ -1,82 +1,48 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback } from "react";
 import Card from "@/components/Card";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
-import { generateDefaultTeeth } from "@/store/slices/perioSlice";
-import { createDefaultMeasure, DEFAULT_COMMON_MEASUREMENT, PerioRecord } from '@/models/perio';
 
 interface PerioRecordFormProps {
-  record?: PerioRecord;
-  onSubmit: (record: Omit<PerioRecord, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  title: string;
+  info: { label: string; note: string };
+  onChange: (info: { label: string; note: string }) => void;
+  onSubmit: () => void;
   onCancel: () => void;
 }
 
-export default function PerioRecordForm({ record, onSubmit, onCancel }: PerioRecordFormProps) {
-  const [formData, setFormData] = useState({
-    label: record?.label || '',
-    note: record?.note || '',
-    teeth: record?.teeth || generateDefaultTeeth(),
-    ppd: record?.ppd || createDefaultMeasure(DEFAULT_COMMON_MEASUREMENT),
-    lgm: record?.lgm || createDefaultMeasure(DEFAULT_COMMON_MEASUREMENT),
-    patientId: record?.patientId || null,
-  });
-
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.label.trim()) {
-      newErrors.name = 'Label is required';
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
+export default function PerioRecordForm({ title, info, onChange, onSubmit, onCancel }: PerioRecordFormProps) {
+  const onFieldChange = useCallback((field: string, value: string) => {
+    onChange({ ...info, [field]: value });
+  }, [info, onChange]);
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (validateForm()) {
-      onSubmit(formData);
-    }
+    onSubmit();
   };
 
-  const handleChange = (field: string, value: string | number) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    // Clear error for this field
-    if (errors[field]) {
-      setErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[field];
-        return newErrors;
-      });
-    }
-  };
-  const handleLabelChange = (value: string) => handleChange('label', value);
-  const handleNoteChange = (value: string) => handleChange('note', value);
+  const handleLabelChange = (value: string) => onFieldChange('label', value);
+  const handleNoteChange = (value: string) => onFieldChange('note', value);
   const labels = ['Baseline', 'Follow Up'];
 
   return (
-    <Card title={record ? "Edit Record" : "Add New Record"}>
+    <Card title={title}>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <Input
             label="Label"
-            value={formData.label}
+            value={info.label}
             onChange={(e) => handleLabelChange(e.target.value)}
             placeholder="Enter record label"
-            error={errors.label}
             required
           />
           <QuickLabels labels={labels} onSelect={handleLabelChange} />
           <Input
             label="Note"
-            value={formData.note}
+            value={info.note}
             onChange={(e) => handleNoteChange(e.target.value)}
             placeholder="Enter any notes"
-            error={errors.note}
             type="textarea"
           />
         </div>

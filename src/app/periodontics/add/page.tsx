@@ -5,15 +5,24 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import PerioRecordForm from "../components/PerioRecordForm";
 import { addPerioRecord, resetFreshId, selectFreshPerioRecordId } from "@/store/slices/perioSlice";
 import { PerioRecord } from '@/models/perio';
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
+import { generateNewRecord } from "@/utils/perio";
+import useFormField from "@/hooks/useFormField";
+import { ModelInput } from "@/models/type";
 
 export default function AddRecordPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const freshId = useAppSelector(selectFreshPerioRecordId);
-
-  const handleAddRecord = (record: Omit<PerioRecord, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const handleAddRecord = useCallback((record: ModelInput<PerioRecord>) => {
     dispatch(addPerioRecord(record));
+  }, [dispatch]);
+  const {
+    value: record, onChange: setRecord, handleUpdate: commitRecordUpdate
+  } = useFormField(generateNewRecord(), handleAddRecord);
+
+  const onChange = (updatedInfo: { label: string; note: string }) => {
+    setRecord(prev => ({ ...prev, ...updatedInfo }));
   };
 
   const handleCancel = () => {
@@ -30,7 +39,10 @@ export default function AddRecordPage() {
   return (
     <div className="max-w-2xl mx-auto">
       <PerioRecordForm
-        onSubmit={handleAddRecord}
+        title="Add new record"
+        info={{ label: record.label, note: record.note }}
+        onChange={onChange}
+        onSubmit={commitRecordUpdate}
         onCancel={handleCancel}
       />
     </div>
