@@ -28,17 +28,17 @@ function RecordView({ record }: { record: PerioRecord }) {
   const viewTitle = viewTitleMap[view];
   
   const {
-    ppd, setPpd, commitPpdUpdate,
-    lgm, setLgm, commitLgmUpdate,
-    patientId, setPatientId, commitPatientIdUpdate,
-    basicInfo, setBasicInfo, commitBasicInfoUpdate,
+    ppd, setPpd, commitPpd,
+    lgm, setLgm, commitLgm,
+    patientId, setPatientId, commitPatientId,
+    basicInfo, setBasicInfo, commitBasicInfo,
   } = useFormFieldGroups(record);
 
   const commitFunctions: Record<ViewType, () => void> = {
-    basic: commitBasicInfoUpdate,
-    ppd: commitPpdUpdate,
-    lgm: commitLgmUpdate,
-    patient: commitPatientIdUpdate,
+    basic: commitBasicInfo,
+    ppd: commitPpd,
+    lgm: commitLgm,
+    patient: commitPatientId,
   };
   const commit = commitFunctions[view];
   const handleSubmit = useCallback(() => {
@@ -119,21 +119,21 @@ function useFormFieldGroups(record: PerioRecord) {
     dispatch(updatePerioRecord({ ...updatedRecord, id }));
   }, [dispatch, id]);
   const {
-    value: ppd, onChange: setPpd, handleUpdate: commitPpdUpdate
+    value: ppd, onChange: setPpd, handleUpdate: commitPpd
   } = useFormField(record.ppd, useCallback((ppd) => handleUpdate({ ppd }), [handleUpdate]));
   const {
-    value: lgm, onChange: setLgm, handleUpdate: commitLgmUpdate
+    value: lgm, onChange: setLgm, handleUpdate: commitLgm
   } = useFormField(record.lgm, useCallback((lgm) => handleUpdate({ lgm }), [handleUpdate]));
   const {
-    value: patientId, onChange: setPatientId, handleUpdate: commitPatientIdUpdate
+    value: patientId, onChange: setPatientId, handleUpdate: commitPatientId
   } = useFormField(record.patientId, useCallback((patientId) => handleUpdate({ patientId }), [handleUpdate]));
   const {
-    value: basicInfo, onChange: setBasicInfo, handleUpdate: commitBasicInfoUpdate
+    value: basicInfo, onChange: setBasicInfo, handleUpdate: commitBasicInfo
   } = useFormField({ label: record.label, note: record.note }, useCallback(({ label, note }) => handleUpdate({ label, note }), [handleUpdate]));
   return {
-    ppd, setPpd, commitPpdUpdate,
-    lgm, setLgm, commitLgmUpdate,
-    patientId, setPatientId, commitPatientIdUpdate,
-    basicInfo, setBasicInfo, commitBasicInfoUpdate,
+    ppd, setPpd, commitPpd,
+    lgm, setLgm, commitLgm,
+    patientId, setPatientId, commitPatientId,
+    basicInfo, setBasicInfo, commitBasicInfo,
   };
 }
