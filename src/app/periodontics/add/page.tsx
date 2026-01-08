@@ -9,6 +9,7 @@ import { useCallback, useEffect } from "react";
 import { generateNewRecord } from "@/utils/perio";
 import useFormField from "@/hooks/useFormField";
 import { ModelInput } from "@/models/type";
+import EditLayout from "../components/EditLayout";
 
 export default function AddRecordPage() {
   const router = useRouter();
@@ -41,20 +42,23 @@ export default function AddRecordPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <PerioRecordForm
+      <EditLayout
         title="Add new record"
-        errors={errors}
-        label={record.label}
-        note={record.note}
-        onLabelChange={(label) => setRecord(prev => ({ ...prev, label }))}
-        onNoteChange={(note) => setRecord(prev => ({ ...prev, note }))}
         onSubmit={() => {
           if (!commitRecordUpdate()) {
             console.log("Validation failed, cannot submit.");
           }
         }}
         onCancel={handleCancel}
-      />
+      >
+        <PerioRecordForm
+          errors={errors}
+          label={record.label}
+          note={record.note}
+          onLabelChange={(label) => setRecord(prev => ({ ...prev, label }))}
+          onNoteChange={(note) => setRecord(prev => ({ ...prev, note }))}
+        />
+      </EditLayout>
     </div>
   );
 }

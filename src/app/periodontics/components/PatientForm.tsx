@@ -1,8 +1,6 @@
 "use client";
 
 import { JSX, useCallback, useState } from "react";
-import Card from "@/components/Card";
-import Button from "@/components/Button";
 import { useSelector } from "react-redux";
 import { addPatient, selectAllPatients, selectPatientById } from "@/store/slices/patientSlice";
 import { Patient, PatientInput } from '@/models/patient';
@@ -17,16 +15,10 @@ import { SelectInput } from "@/components/compositions/select-input";
 interface PatientSelectProps {
   patient_id: string | null;
   onChange: (patient_id: string | null) => void;
-  onSubmit: () => void;
-  onCancel: () => void;
 }
 
-export default function PatientSelect({ patient_id, onChange, onSubmit, onCancel }: PatientSelectProps) {
+export default function PatientSelect({ patient_id, onChange }: PatientSelectProps) {
   const dispatch = useAppDispatch();
-  const handleSubmit = useCallback((e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit();
-  }, [onSubmit]);
   const createPatient = useCallback((data: PatientInput) => {
     dispatch(addPatient(data));
   }, []);
@@ -41,32 +33,20 @@ export default function PatientSelect({ patient_id, onChange, onSubmit, onCancel
   };
 
   return (
-    <Card title={"Assign to Patient" }>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <DataSelector
-            data={patients}
-            typeLabel="patient"
-            isSelected={(p) => patient ? p.id === patient.id : false}
-            onSelect={(p) => onChange(p?.id || null)}
-            toString={toString}
-            uniqueKey={(p) => p.id}
-            searchValue={searchValue}
-          >
-            <EmptySearchView onCreatePatient={createPatient} />
-          </DataSelector>
-          <PatientView patient={patient} />
-        </div>
-        <div className="flex gap-3 justify-end pt-4">
-          <Button variant="outline" onClick={onCancel} type="button">
-            Back
-          </Button>
-          <Button variant="primary" type="submit">
-            Submit
-          </Button>
-        </div>
-      </form>
-    </Card>
+    <div>
+      <DataSelector
+        data={patients}
+        typeLabel="patient"
+        isSelected={(p) => patient ? p.id === patient.id : false}
+        onSelect={(p) => onChange(p?.id || null)}
+        toString={toString}
+        uniqueKey={(p) => p.id}
+        searchValue={searchValue}
+      >
+        <EmptySearchView onCreatePatient={createPatient} />
+      </DataSelector>
+      <PatientView patient={patient} />
+    </div>
   );
 }
 
