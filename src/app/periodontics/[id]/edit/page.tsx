@@ -9,34 +9,40 @@ import { useCallback, useState } from "react";
 import PPDForm from "../../components/PPDForm";
 import LGMForm from "../../components/LGMForm";
 import PatientForm from "../../components/PatientForm";
+import useFormField from "@/hooks/useFormField";
 
 type ViewType = 'basic' | 'ppd' | 'lgm' | 'patient';
 const VIEW_ORDER: ViewType[] = ['basic', 'ppd', 'lgm', 'patient'];
 
 export default function EditPatientPage() {
-  const router = useRouter();
   const { id: record_id } = useParams();
-  const dispatch = useAppDispatch();
   const record = useAppSelector(selectPerioRecordById(record_id));
-  const id = record?.id || '';
+  return record ? <RecordView record={record} /> : <EmptyRecordView />;
+}
+
+function RecordView({ record }: { record: PerioRecord }) {
+  const { id } = record;
+  const router = useRouter();
   const onCancel = useCallback(() => router.back(), [router]);
   const onSubmit = useCallback(() => router.push(`/periodontics/${id}`), [router, id]);
   const { view, handleBack, handleNext } = useViewsNavigation(onCancel, onSubmit);
+  const dispatch = useAppDispatch();
   const handleUpdate = useCallback((updatedRecord: Partial<PerioRecord>) => {
     dispatch(updatePerioRecord({ ...updatedRecord, id }));
-    handleNext();
-  }, [dispatch, id, handleNext]);
+  }, [dispatch, id]);
+  const {
+    value: ppd, onChange: setPpd, handleUpdate: commitPpdUpdate
+  } = useFormField(record.ppd, useCallback((ppd) => handleUpdate({ ppd }), [handleUpdate]));
+  const {
+    value: lgm, onChange: setLgm, handleUpdate: commitLgmUpdate
+  } = useFormField(record.lgm, useCallback((lgm) => handleUpdate({ lgm }), [handleUpdate]));
+  const {
+    value: patientId, onChange: setPatientId, handleUpdate: commitPatientIdUpdate
+  } = useFormField(record.patientId, useCallback((patientId) => handleUpdate({ patientId }), [handleUpdate]));
+  const {
+    value: basicInfo, onChange: setBasicInfo, handleUpdate: commitBasicInfoUpdate
+  } = useFormField({ label: record.label, note: record.note }, useCallback(({ label, note }) => handleUpdate({ label, note }), [handleUpdate]));
 
-  if (!record) {
-    return ( 
-      <div className="max-w-2xl mx-auto text-center py-12">
-        <h2 className="text-2xl font-bold mb-4">Record Not Found</h2>
-        <p className="text-gray-600 dark:text-gray-300 mb-4">
-          The record you're trying to edit doesn't exist.
-        </p>
-      </div>
-    );
-  }
   // TODO: move the submit/cancel buttons out of each form and into this page
   // TODO: refactor the button names to be Next/Back instead of Submit/Cancel
   // TODO: show progress indicator of which step we are on
@@ -45,34 +51,63 @@ export default function EditPatientPage() {
     <div className="max-w-3xl mx-auto">
       { view === 'basic' &&
         <PerioRecordForm
-          record={record}
-          onSubmit={handleUpdate}
+          title="Edit record"
+          errors={null}
+          label={basicInfo.label}
+          note={basicInfo.note}
+          onLabelChange={(label) => setBasicInfo(prev => ({ ...prev, label }))}
+          onNoteChange={(note) => setBasicInfo(prev => ({ ...prev, note }))}
+          onSubmit={() => {
+            commitBasicInfoUpdate();
+            handleNext();
+          }}
           onCancel={handleBack}
         />
       }
       { view === 'ppd' &&
         <PPDForm
-          teeth={record.teeth}
-          data={record.ppd}
-          onSubmit={(ppd) => handleUpdate({ ppd })}
+          data={ppd}
+          onChange={setPpd}
+          onSubmit={() => {
+            commitPpdUpdate();
+            handleNext();
+          }}
           onCancel={handleBack}
         />
       }
       { view === 'lgm' &&
         <LGMForm
-          teeth={record.teeth}
-          data={record.lgm}
-          onSubmit={(lgm) => handleUpdate({ lgm })}
+          data={lgm}
+          onChange={setLgm}
+          onSubmit={() => {
+            commitLgmUpdate();
+            handleNext();
+          }}
           onCancel={handleBack}
         />
       }
       { view === 'patient' &&
         <PatientForm
-          patient_id={record.patientId}
-          onSubmit={(patientId) => handleUpdate({ patientId })}
+          patient_id={patientId}
+          onChange={setPatientId}
+          onSubmit={() => {
+            commitPatientIdUpdate();
+            handleNext();
+          }}
           onCancel={handleBack}
         />
       }
+    </div>
+  );
+}
+
+function EmptyRecordView() {
+  return ( 
+    <div className="max-w-2xl mx-auto text-center py-12">
+      <h2 className="text-2xl font-bold mb-4">Record Not Found</h2>
+      <p className="text-gray-600 dark:text-gray-300 mb-4">
+        The record you're trying to edit doesn't exist.
+      </p>
     </div>
   );
 }

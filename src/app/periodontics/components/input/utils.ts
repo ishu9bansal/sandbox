@@ -1,6 +1,7 @@
 
-import { CommonMeasurement, copy, MeasurementArea, MeasurementSite } from "@/models/perio";
+import { CommonMeasurement, MeasurementArea, MeasurementSite } from "@/models/perio";
 import { Quadrant } from "@/models/theeth";
+import { copy } from "@/utils/perio";
 
 const STUDY_LIMIT = 7;
 function generateAnnatomicalMapping(limit: number): {q: number, p: number}[][] {

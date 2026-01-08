@@ -19,19 +19,3 @@ export interface PerioRecord {
   createdAt: string;
   updatedAt: string;
 }
-
-export function createDefaultMeasure<T>(emptyValue: T): Quadrant<T> {
-  return Array.from({ length: 4 }, () => Array.from({ length: 8 }, () => emptyValue)) as Quadrant<T>;
-}
-
-export const DEFAULT_COMMON_MEASUREMENT: CommonMeasurement = {
-  Buccal: { Mesio: NaN, Mid: NaN, Disto: NaN },
-  Lingual: { Mesio: NaN, Mid: NaN, Disto: NaN },
-};
-
-export function copy(data: Quadrant<CommonMeasurement>): Quadrant<CommonMeasurement> {
-  return data.map(quadrant => quadrant.map(tooth => ({
-    Buccal: { ...tooth.Buccal },
-    Lingual: { ...tooth.Lingual },
-  }))) as Quadrant<CommonMeasurement>;
-}

@@ -1,24 +1,23 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useCallback, useRef } from "react";
 import Card from "@/components/Card";
 import Button from "@/components/Button";
-import { PPDRecord, TeethSelection } from "@/models/perio";
+import { PPDRecord } from "@/models/perio";
 import PerioInput from "./input/PerioInput";
 
 interface PPDFormProps {
-  teeth: TeethSelection;
   data: PPDRecord;
-  onSubmit: (data: PPDRecord) => void;
+  onChange: (data: PPDRecord) => void;
+  onSubmit: () => void;
   onCancel: () => void;
 }
 
-export default function PPDForm({ data, teeth, onSubmit, onCancel }: PPDFormProps) {
-  const [state, setState] = useState(data);
-  const handleSubmit = (e: React.FormEvent) => {
+export default function PPDForm({ data, onChange, onSubmit, onCancel }: PPDFormProps) {
+  const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(state);
-  };
+    onSubmit();
+  }, [onSubmit]);
   const submitRef = useRef<HTMLFormElement>(null);
   const handleFocusSubmit = () => {
     const el = submitRef.current;
@@ -29,7 +28,7 @@ export default function PPDForm({ data, teeth, onSubmit, onCancel }: PPDFormProp
   return (
     <Card title={"Edit PPD Values"}>
       <form ref={submitRef} onSubmit={handleSubmit} className="space-y-8">
-        <PerioInput data={state} onUpdate={setState} onNextFocus={handleFocusSubmit} />
+        <PerioInput data={data} onUpdate={onChange} onNextFocus={handleFocusSubmit} />
         <div className="flex gap-3 justify-end pt-4">
           <Button variant="outline" onClick={onCancel} type="button">
             Back
