@@ -20,10 +20,13 @@ export default function EditPatientPage() {
 function RecordView({ record }: { record: PerioRecord }) {
   const { id } = record;
   const router = useRouter();
+  
   const onCancel = useCallback(() => router.back(), [router]);
   const onSubmit = useCallback(() => router.push(`/periodontics/${id}`), [router, id]);
+  
   const { view, handleBack, handleNext, backLabel, nextLabel } = useViewsNavigation(onCancel, onSubmit);
   const viewTitle = viewTitleMap[view];
+  
   const dispatch = useAppDispatch();
   const handleUpdate = useCallback((updatedRecord: Partial<PerioRecord>) => {
     dispatch(updatePerioRecord({ ...updatedRecord, id }));
