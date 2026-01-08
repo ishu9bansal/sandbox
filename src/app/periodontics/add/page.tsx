@@ -21,10 +21,6 @@ export default function AddRecordPage() {
     value: record, onChange: setRecord, handleUpdate: commitRecordUpdate
   } = useFormField(generateNewRecord(), handleAddRecord);
 
-  const onChange = (updatedInfo: { label: string; note: string }) => {
-    setRecord(prev => ({ ...prev, ...updatedInfo }));
-  };
-
   const handleCancel = () => {
     router.back();
   };
@@ -40,8 +36,10 @@ export default function AddRecordPage() {
     <div className="max-w-2xl mx-auto">
       <PerioRecordForm
         title="Add new record"
-        info={{ label: record.label, note: record.note }}
-        onChange={onChange}
+        label={record.label}
+        note={record.note}
+        onLabelChange={(label) => setRecord(prev => ({ ...prev, label }))}
+        onNoteChange={(note) => setRecord(prev => ({ ...prev, note }))}
         onSubmit={commitRecordUpdate}
         onCancel={handleCancel}
       />

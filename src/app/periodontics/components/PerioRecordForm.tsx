@@ -1,29 +1,32 @@
 "use client";
 
-import { useCallback } from "react";
 import Card from "@/components/Card";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
 
 interface PerioRecordFormProps {
   title: string;
-  info: { label: string; note: string };
-  onChange: (info: { label: string; note: string }) => void;
+  label: string;
+  note: string;
+  onLabelChange: (label: string) => void;
+  onNoteChange: (note: string) => void;
   onSubmit: () => void;
   onCancel: () => void;
 }
 
-export default function PerioRecordForm({ title, info, onChange, onSubmit, onCancel }: PerioRecordFormProps) {
-  const onFieldChange = useCallback((field: string, value: string) => {
-    onChange({ ...info, [field]: value });
-  }, [info, onChange]);
+export default function PerioRecordForm({
+  title,
+  label,
+  note,
+  onLabelChange,
+  onNoteChange,
+  onSubmit,
+  onCancel,
+}: PerioRecordFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit();
   };
-
-  const handleLabelChange = (value: string) => onFieldChange('label', value);
-  const handleNoteChange = (value: string) => onFieldChange('note', value);
   const labels = ['Baseline', 'Follow Up'];
 
   return (
@@ -32,16 +35,16 @@ export default function PerioRecordForm({ title, info, onChange, onSubmit, onCan
         <div>
           <Input
             label="Label"
-            value={info.label}
-            onChange={(e) => handleLabelChange(e.target.value)}
+            value={label}
+            onChange={(e) => onLabelChange(e.target.value)}
             placeholder="Enter record label"
             required
           />
-          <QuickLabels labels={labels} onSelect={handleLabelChange} />
+          <QuickLabels labels={labels} onSelect={onLabelChange} />
           <Input
             label="Note"
-            value={info.note}
-            onChange={(e) => handleNoteChange(e.target.value)}
+            value={note}
+            onChange={(e) => onNoteChange(e.target.value)}
             placeholder="Enter any notes"
             type="textarea"
           />

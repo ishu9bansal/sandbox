@@ -52,8 +52,10 @@ function RecordView({ record }: { record: PerioRecord }) {
       { view === 'basic' &&
         <PerioRecordForm
           title="Edit record"
-          info={basicInfo}
-          onChange={setBasicInfo}
+          label={basicInfo.label}
+          note={basicInfo.note}
+          onLabelChange={(label) => setBasicInfo(prev => ({ ...prev, label }))}
+          onNoteChange={(note) => setBasicInfo(prev => ({ ...prev, note }))}
           onSubmit={() => {
             commitBasicInfoUpdate();
             handleNext();
