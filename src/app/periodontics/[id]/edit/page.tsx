@@ -11,19 +11,6 @@ import useFormField from "@/hooks/useFormField";
 import PerioInput from "../../components/input/PerioInput";
 import EditLayout from "../../components/EditLayout";
 
-type ViewType = 'basic' | 'ppd' | 'lgm' | 'patient';
-const VIEW_ORDER: ViewType[] = ['basic', 'ppd', 'lgm', 'patient'];
-const viewTitleMap: Record<ViewType, string> = {
-  basic: 'Edit Record',
-  ppd: 'Edit Pocket Probing Depth (PPD)',
-  lgm: 'Edit Level of Gingival Margin (LGM)',
-  patient: 'Assign to Patient',
-};
-const BACK = "Back";
-const NEXT = "Next";
-const CANCEL = "Cancel";
-const SUBMIT = "Submit";
-
 export default function EditPatientPage() {
   const { id: record_id } = useParams();
   const record = useAppSelector(selectPerioRecordById(record_id));
@@ -95,7 +82,6 @@ function RecordView({ record }: { record: PerioRecord }) {
   );
 }
 
-
 function EmptyRecordView() {
   return ( 
     <div className="max-w-2xl mx-auto text-center py-12">
@@ -107,32 +93,27 @@ function EmptyRecordView() {
   );
 }
 
+type ViewType = 'basic' | 'ppd' | 'lgm' | 'patient';
+const VIEW_ORDER: ViewType[] = ['basic', 'ppd', 'lgm', 'patient'];
+const viewTitleMap: Record<ViewType, string> = {
+  basic: 'Edit Record',
+  ppd: 'Edit Pocket Probing Depth (PPD)',
+  lgm: 'Edit Level of Gingival Margin (LGM)',
+  patient: 'Assign to Patient',
+};
+const BACK = "Back";
+const NEXT = "Next";
+const CANCEL = "Cancel";
+const SUBMIT = "Submit";
 
 function useViewsNavigation(onCancel: () => void, onSubmit: () => void) {
   const [view, setView] = useState<ViewType>('ppd');
-  const [backLabel, setBackLabel] = useState(BACK);
-  const [nextLabel, setNextLabel] = useState(NEXT);
   const currentIndex = VIEW_ORDER.indexOf(view);
-  const handleBack = useCallback(() => {
-    if (currentIndex > 0) {
-      setView(VIEW_ORDER[currentIndex - 1]);
-      setBackLabel(BACK);
-    } else {
-      onCancel();
-      setBackLabel(CANCEL);
-    }
-
-  }, [onCancel, currentIndex]);
-
-  const handleNext = useCallback(() => {
-    if (currentIndex < VIEW_ORDER.length - 1) {
-      setView(VIEW_ORDER[currentIndex + 1]);
-      setNextLabel(NEXT);
-    } else {
-      onSubmit();
-      setNextLabel(SUBMIT);
-    }
-  }, [onSubmit, currentIndex]);
-
+  const prevView = currentIndex > 0 ? VIEW_ORDER[currentIndex - 1] : null;
+  const nextView = currentIndex < VIEW_ORDER.length - 1 ? VIEW_ORDER[currentIndex + 1] : null;
+  const handleBack = prevView ? () => setView(prevView) : onCancel;
+  const handleNext = nextView ? () => setView(nextView) : onSubmit;
+  const backLabel = prevView ? BACK : CANCEL;
+  const nextLabel = nextView ? NEXT : SUBMIT;
   return { view, handleBack, handleNext, backLabel, nextLabel };
 }
