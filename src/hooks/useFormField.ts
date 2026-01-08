@@ -12,3 +12,5 @@ export default function useFormField<T>(fieldValue: T, onFieldUpdate: (val: T) =
   const handleUpdate = useCallback(() => onFieldUpdate(value), [onFieldUpdate, value]);
   return { value, onChange, handleUpdate };
 }
+
+// TODO: add validation handling, error state, reset functionality, etc. as needed

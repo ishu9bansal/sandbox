@@ -16,23 +16,18 @@ import { SelectInput } from "@/components/compositions/select-input";
 
 interface PatientSelectProps {
   patient_id: string | null;
-  onSubmit: (patient_id: string | null) => void;
+  onChange: (patient_id: string | null) => void;
+  onSubmit: () => void;
   onCancel: () => void;
 }
 
-export default function PatientSelect({ patient_id, onSubmit, onCancel }: PatientSelectProps) {
+export default function PatientSelect({ patient_id, onChange, onSubmit, onCancel }: PatientSelectProps) {
   const dispatch = useAppDispatch();
   const createPatient = useCallback((data: PatientInput) => {
     dispatch(addPatient(data));
   }, []);
   const patients = useSelector(selectAllPatients);
   const patient = useSelector(selectPatientById(patient_id)) || null;
-  const [selected, setSelected] = useState<Patient | null>(patient);
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const patientId = selected?.id || null;
-    onSubmit(patientId);
-  };
   const toString = (patient: Patient) => {
     return `${patient.name} ${patient.age}${patient.sex[0]}`;
   };
@@ -43,20 +38,20 @@ export default function PatientSelect({ patient_id, onSubmit, onCancel }: Patien
 
   return (
     <Card title={"Assign to Patient" }>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={onSubmit} className="space-y-4">
         <div>
           <DataSelector
             data={patients}
             typeLabel="patient"
-            isSelected={(p) => selected ? p.id === selected.id : false}
-            onSelect={setSelected}
+            isSelected={(p) => patient ? p.id === patient.id : false}
+            onSelect={(p) => onChange(p?.id || null)}
             toString={toString}
             uniqueKey={(p) => p.id}
             searchValue={searchValue}
           >
             <EmptySearchView onCreatePatient={createPatient} />
           </DataSelector>
-          <PatientView patient={selected} />
+          <PatientView patient={patient} />
         </div>
         <div className="flex gap-3 justify-end pt-4">
           <Button variant="outline" onClick={onCancel} type="button">
