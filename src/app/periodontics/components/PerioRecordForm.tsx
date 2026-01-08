@@ -6,6 +6,7 @@ import Button from "@/components/Button";
 
 interface PerioRecordFormProps {
   title: string;
+  errors: Record<string, string> | null;
   label: string;
   note: string;
   onLabelChange: (label: string) => void;
@@ -16,6 +17,7 @@ interface PerioRecordFormProps {
 
 export default function PerioRecordForm({
   title,
+  errors,
   label,
   note,
   onLabelChange,
@@ -38,7 +40,7 @@ export default function PerioRecordForm({
             value={label}
             onChange={(e) => onLabelChange(e.target.value)}
             placeholder="Enter record label"
-            required
+            error={errors?.label}
           />
           <QuickLabels labels={labels} onSelect={onLabelChange} />
           <Input

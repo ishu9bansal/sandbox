@@ -52,6 +52,7 @@ function RecordView({ record }: { record: PerioRecord }) {
       { view === 'basic' &&
         <PerioRecordForm
           title="Edit record"
+          errors={null}
           label={basicInfo.label}
           note={basicInfo.note}
           onLabelChange={(label) => setBasicInfo(prev => ({ ...prev, label }))}
