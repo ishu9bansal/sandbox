@@ -6,13 +6,10 @@ import PerioRecordForm from "../../components/PerioRecordForm";
 import { selectPerioRecordById, updatePerioRecord } from "@/store/slices/perioSlice";
 import { PerioRecord } from '@/models/perio';
 import { useCallback, useState } from "react";
-import PPDForm from "../../components/PPDForm";
-import LGMForm from "../../components/LGMForm";
 import PatientForm from "../../components/PatientForm";
 import useFormField from "@/hooks/useFormField";
-
-type ViewType = 'basic' | 'ppd' | 'lgm' | 'patient';
-const VIEW_ORDER: ViewType[] = ['basic', 'ppd', 'lgm', 'patient'];
+import PerioInput from "../../components/input/PerioInput";
+import EditLayout from "../../components/EditLayout";
 
 export default function EditPatientPage() {
   const { id: record_id } = useParams();
@@ -23,80 +20,58 @@ export default function EditPatientPage() {
 function RecordView({ record }: { record: PerioRecord }) {
   const { id } = record;
   const router = useRouter();
+  
   const onCancel = useCallback(() => router.back(), [router]);
   const onSubmit = useCallback(() => router.push(`/periodontics/${id}`), [router, id]);
-  const { view, handleBack, handleNext } = useViewsNavigation(onCancel, onSubmit);
-  const dispatch = useAppDispatch();
-  const handleUpdate = useCallback((updatedRecord: Partial<PerioRecord>) => {
-    dispatch(updatePerioRecord({ ...updatedRecord, id }));
-  }, [dispatch, id]);
+  
+  const { view, handleBack, handleNext, backLabel, nextLabel } = useViewsNavigation(onCancel, onSubmit);
+  const viewTitle = viewTitleMap[view];
+  
   const {
-    value: ppd, onChange: setPpd, handleUpdate: commitPpdUpdate
-  } = useFormField(record.ppd, useCallback((ppd) => handleUpdate({ ppd }), [handleUpdate]));
-  const {
-    value: lgm, onChange: setLgm, handleUpdate: commitLgmUpdate
-  } = useFormField(record.lgm, useCallback((lgm) => handleUpdate({ lgm }), [handleUpdate]));
-  const {
-    value: patientId, onChange: setPatientId, handleUpdate: commitPatientIdUpdate
-  } = useFormField(record.patientId, useCallback((patientId) => handleUpdate({ patientId }), [handleUpdate]));
-  const {
-    value: basicInfo, onChange: setBasicInfo, handleUpdate: commitBasicInfoUpdate
-  } = useFormField({ label: record.label, note: record.note }, useCallback(({ label, note }) => handleUpdate({ label, note }), [handleUpdate]));
+    ppd, setPpd, commitPpd,
+    lgm, setLgm, commitLgm,
+    patientId, setPatientId, commitPatientId,
+    basicInfo, setBasicInfo, commitBasicInfo,
+  } = useFormFieldGroups(record);
 
-  // TODO: move the submit/cancel buttons out of each form and into this page
-  // TODO: refactor the button names to be Next/Back instead of Submit/Cancel
+  const commitFunctions: Record<ViewType, () => void> = {
+    basic: commitBasicInfo,
+    ppd: commitPpd,
+    lgm: commitLgm,
+    patient: commitPatientId,
+  };
+  const commit = commitFunctions[view];
+  const handleSubmit = useCallback(() => {
+    commit();
+    handleNext();
+  }, [handleNext, commit]);
+
   // TODO: show progress indicator of which step we are on
   // TODO: is there a better way to manage multi-step forms, instead of conditional rendering?
   return (
     <div className="max-w-3xl mx-auto">
+      <EditLayout
+        title={viewTitle}
+        onSubmit={handleSubmit}
+        onCancel={handleBack}
+        backLabel={backLabel}
+        nextLabel={nextLabel}
+      >
       { view === 'basic' &&
         <PerioRecordForm
-          title="Edit record"
           errors={null}
           label={basicInfo.label}
           note={basicInfo.note}
           onLabelChange={(label) => setBasicInfo(prev => ({ ...prev, label }))}
           onNoteChange={(note) => setBasicInfo(prev => ({ ...prev, note }))}
-          onSubmit={() => {
-            commitBasicInfoUpdate();
-            handleNext();
-          }}
-          onCancel={handleBack}
         />
       }
-      { view === 'ppd' &&
-        <PPDForm
-          data={ppd}
-          onChange={setPpd}
-          onSubmit={() => {
-            commitPpdUpdate();
-            handleNext();
-          }}
-          onCancel={handleBack}
-        />
-      }
-      { view === 'lgm' &&
-        <LGMForm
-          data={lgm}
-          onChange={setLgm}
-          onSubmit={() => {
-            commitLgmUpdate();
-            handleNext();
-          }}
-          onCancel={handleBack}
-        />
-      }
+      { view === 'ppd' && <PerioInput data={ppd} onUpdate={setPpd} /> }
+      { view === 'lgm' && <PerioInput data={lgm} onUpdate={setLgm} /> }
       { view === 'patient' &&
-        <PatientForm
-          patient_id={patientId}
-          onChange={setPatientId}
-          onSubmit={() => {
-            commitPatientIdUpdate();
-            handleNext();
-          }}
-          onCancel={handleBack}
-        />
+        <PatientForm patient_id={patientId} onChange={setPatientId} />
       }
+      </EditLayout>
     </div>
   );
 }
@@ -112,25 +87,53 @@ function EmptyRecordView() {
   );
 }
 
+type ViewType = 'basic' | 'ppd' | 'lgm' | 'patient';
+const VIEW_ORDER: ViewType[] = ['basic', 'ppd', 'lgm', 'patient'];
+const viewTitleMap: Record<ViewType, string> = {
+  basic: 'Edit Record',
+  ppd: 'Edit Pocket Probing Depth (PPD)',
+  lgm: 'Edit Level of Gingival Margin (LGM)',
+  patient: 'Assign to Patient',
+};
+const BACK = "Back";
+const NEXT = "Next";
+const CANCEL = "Cancel";
+const SUBMIT = "Submit";
 
 function useViewsNavigation(onCancel: () => void, onSubmit: () => void) {
   const [view, setView] = useState<ViewType>('ppd');
   const currentIndex = VIEW_ORDER.indexOf(view);
-  const handleBack = useCallback(() => {
-    if (currentIndex > 0) {
-      setView(VIEW_ORDER[currentIndex - 1]);
-    } else {
-      onCancel();
-    }
-  }, [onCancel, currentIndex]);
+  const prevView = currentIndex > 0 ? VIEW_ORDER[currentIndex - 1] : null;
+  const nextView = currentIndex < VIEW_ORDER.length - 1 ? VIEW_ORDER[currentIndex + 1] : null;
+  const handleBack = prevView ? () => setView(prevView) : onCancel;
+  const handleNext = nextView ? () => setView(nextView) : onSubmit;
+  const backLabel = prevView ? BACK : CANCEL;
+  const nextLabel = nextView ? NEXT : SUBMIT;
+  return { view, handleBack, handleNext, backLabel, nextLabel };
+}
 
-  const handleNext = useCallback(() => {
-    if (currentIndex < VIEW_ORDER.length - 1) {
-      setView(VIEW_ORDER[currentIndex + 1]);
-    } else {
-      onSubmit();
-    }
-  }, [onSubmit, currentIndex]);
-
-  return { view, handleBack, handleNext };
+function useFormFieldGroups(record: PerioRecord) {
+  const { id } = record;
+  const dispatch = useAppDispatch();
+  const handleUpdate = useCallback((updatedRecord: Partial<PerioRecord>) => {
+    dispatch(updatePerioRecord({ ...updatedRecord, id }));
+  }, [dispatch, id]);
+  const {
+    value: ppd, onChange: setPpd, handleUpdate: commitPpd
+  } = useFormField(record.ppd, useCallback((ppd) => handleUpdate({ ppd }), [handleUpdate]));
+  const {
+    value: lgm, onChange: setLgm, handleUpdate: commitLgm
+  } = useFormField(record.lgm, useCallback((lgm) => handleUpdate({ lgm }), [handleUpdate]));
+  const {
+    value: patientId, onChange: setPatientId, handleUpdate: commitPatientId
+  } = useFormField(record.patientId, useCallback((patientId) => handleUpdate({ patientId }), [handleUpdate]));
+  const {
+    value: basicInfo, onChange: setBasicInfo, handleUpdate: commitBasicInfo
+  } = useFormField({ label: record.label, note: record.note }, useCallback(({ label, note }) => handleUpdate({ label, note }), [handleUpdate]));
+  return {
+    ppd, setPpd, commitPpd,
+    lgm, setLgm, commitLgm,
+    patientId, setPatientId, commitPatientId,
+    basicInfo, setBasicInfo, commitBasicInfo,
+  };
 }
