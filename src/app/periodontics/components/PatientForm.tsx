@@ -23,6 +23,10 @@ interface PatientSelectProps {
 
 export default function PatientSelect({ patient_id, onChange, onSubmit, onCancel }: PatientSelectProps) {
   const dispatch = useAppDispatch();
+  const handleSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit();
+  }, [onSubmit]);
   const createPatient = useCallback((data: PatientInput) => {
     dispatch(addPatient(data));
   }, []);
@@ -38,7 +42,7 @@ export default function PatientSelect({ patient_id, onChange, onSubmit, onCancel
 
   return (
     <Card title={"Assign to Patient" }>
-      <form onSubmit={onSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <DataSelector
             data={patients}
