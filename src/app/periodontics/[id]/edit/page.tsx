@@ -27,22 +27,13 @@ function RecordView({ record }: { record: PerioRecord }) {
   const { view, handleBack, handleNext, backLabel, nextLabel } = useViewsNavigation(onCancel, onSubmit);
   const viewTitle = viewTitleMap[view];
   
-  const dispatch = useAppDispatch();
-  const handleUpdate = useCallback((updatedRecord: Partial<PerioRecord>) => {
-    dispatch(updatePerioRecord({ ...updatedRecord, id }));
-  }, [dispatch, id]);
   const {
-    value: ppd, onChange: setPpd, handleUpdate: commitPpdUpdate
-  } = useFormField(record.ppd, useCallback((ppd) => handleUpdate({ ppd }), [handleUpdate]));
-  const {
-    value: lgm, onChange: setLgm, handleUpdate: commitLgmUpdate
-  } = useFormField(record.lgm, useCallback((lgm) => handleUpdate({ lgm }), [handleUpdate]));
-  const {
-    value: patientId, onChange: setPatientId, handleUpdate: commitPatientIdUpdate
-  } = useFormField(record.patientId, useCallback((patientId) => handleUpdate({ patientId }), [handleUpdate]));
-  const {
-    value: basicInfo, onChange: setBasicInfo, handleUpdate: commitBasicInfoUpdate
-  } = useFormField({ label: record.label, note: record.note }, useCallback(({ label, note }) => handleUpdate({ label, note }), [handleUpdate]));
+    ppd, setPpd, commitPpdUpdate,
+    lgm, setLgm, commitLgmUpdate,
+    patientId, setPatientId, commitPatientIdUpdate,
+    basicInfo, setBasicInfo, commitBasicInfoUpdate,
+  } = useFormFieldGroups(record);
+
   const commitFunctions: Record<ViewType, () => void> = {
     basic: commitBasicInfoUpdate,
     ppd: commitPpdUpdate,
@@ -119,4 +110,30 @@ function useViewsNavigation(onCancel: () => void, onSubmit: () => void) {
   const backLabel = prevView ? BACK : CANCEL;
   const nextLabel = nextView ? NEXT : SUBMIT;
   return { view, handleBack, handleNext, backLabel, nextLabel };
+}
+
+function useFormFieldGroups(record: PerioRecord) {
+  const { id } = record;
+  const dispatch = useAppDispatch();
+  const handleUpdate = useCallback((updatedRecord: Partial<PerioRecord>) => {
+    dispatch(updatePerioRecord({ ...updatedRecord, id }));
+  }, [dispatch, id]);
+  const {
+    value: ppd, onChange: setPpd, handleUpdate: commitPpdUpdate
+  } = useFormField(record.ppd, useCallback((ppd) => handleUpdate({ ppd }), [handleUpdate]));
+  const {
+    value: lgm, onChange: setLgm, handleUpdate: commitLgmUpdate
+  } = useFormField(record.lgm, useCallback((lgm) => handleUpdate({ lgm }), [handleUpdate]));
+  const {
+    value: patientId, onChange: setPatientId, handleUpdate: commitPatientIdUpdate
+  } = useFormField(record.patientId, useCallback((patientId) => handleUpdate({ patientId }), [handleUpdate]));
+  const {
+    value: basicInfo, onChange: setBasicInfo, handleUpdate: commitBasicInfoUpdate
+  } = useFormField({ label: record.label, note: record.note }, useCallback(({ label, note }) => handleUpdate({ label, note }), [handleUpdate]));
+  return {
+    ppd, setPpd, commitPpdUpdate,
+    lgm, setLgm, commitLgmUpdate,
+    patientId, setPatientId, commitPatientIdUpdate,
+    basicInfo, setBasicInfo, commitBasicInfoUpdate,
+  };
 }
