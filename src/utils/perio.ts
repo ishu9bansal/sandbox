@@ -1,8 +1,8 @@
 import { PerioRecord } from "@/models/perio";
 import { PerioMappingType, PerioSerializer } from "@/models/perioInput";
-import { generateDefaultTeeth } from "@/models/theeth";
 import { ModelInput } from "@/models/type";
 import { INPUT_MAPPING } from "./perioMappings";
+import { defaultTeethRecord } from "./theeth";
 
 // Helper function to generate unique record IDs
 export const generateRecordId = (): string => {
@@ -13,7 +13,7 @@ export function generateNewRecord(): ModelInput<PerioRecord> {
   return {
     label: '',
     note: '',
-    teeth: generateDefaultTeeth(),
+    teeth: defaultTeethRecord(),
     ppd: {},
     lgm: {},
     patientId: null,

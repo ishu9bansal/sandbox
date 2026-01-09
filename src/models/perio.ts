@@ -1,5 +1,5 @@
 import { PerioInputRecord } from "./perioInput";
-import { TeethSelection } from "./theeth";
+import { TeethInputRecord, TVal } from "./teethInput";
 
 export type PPDRecord = PerioInputRecord;
 export type LGMRecord = PerioInputRecord;
@@ -8,7 +8,7 @@ export interface PerioRecord {
   id: string;
   label: string;
   note: string;
-  teeth: TeethSelection;
+  teeth: TeethInputRecord<TVal>;
   ppd: PPDRecord;
   lgm: LGMRecord;
   patientId: string | null;
