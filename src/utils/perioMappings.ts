@@ -1,7 +1,7 @@
-import { PerioMappingType } from "@/models/perioInput";
-import { TeethMappingType } from "@/models/teethInput";
+import { Area, MKey, PerioMappingType, Site } from "@/models/perioInput";
+import { TeethMappingType, TKey } from "@/models/teethInput";
 
-export const INPUT_MAPPING: PerioMappingType = [
+export const DETAILED_INPUT_MAPPING: PerioMappingType = [
   [
     '18BMe', '18BMi', '18BDi',
     '17BMe', '17BMi', '17BDi',
@@ -84,3 +84,27 @@ export const COMMON_TEETH_MAPPING: TeethMappingType = [
   ['18', '17', '16', '15', '14', '13', '12', '11', '21', '22', '23', '24', '25', '26', '27', '28'],
   ['48', '47', '46', '45', '44', '43', '42', '41', '31', '32', '33', '34', '35', '36', '37', '38'],
 ];
+
+
+function mkey(tooth: TKey, area: Area, site: Site): MKey {
+  return `${tooth}${area}${site}`;
+}
+function perioGroup(tooth: TKey, area: Area): MKey[] {
+  const sites: Site[] = ['Me', 'Mi', 'Di'];
+  return sites.map(site => mkey(tooth, area, site));
+}
+
+function perioRow(teethRow: TKey[], area: Area): MKey[] {
+  return teethRow.flatMap(tooth => perioGroup(tooth, area));
+}
+
+export function generatePerioMappingFromTeethMapping(teethMapping: TeethMappingType): PerioMappingType {
+  return [
+    perioRow(teethMapping[0], 'B'),
+    perioRow(teethMapping[0], 'L'),
+    perioRow(teethMapping[1], 'L'),
+    perioRow(teethMapping[1], 'B'),
+  ];
+}
+
+export const INPUT_MAPPING = generatePerioMappingFromTeethMapping(COMMON_TEETH_MAPPING);
