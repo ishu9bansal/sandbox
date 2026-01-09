@@ -1,3 +1,4 @@
+"use client";
 import { Children, createContext, isValidElement, ReactNode, useCallback, useContext, useState, useMemo } from "react";
 
 /**
@@ -275,9 +276,9 @@ export function SurveyProgress({
  */
 type SurveyLayoutProps = {
   /** Custom navigation controls component (uses default if not provided) */
-  navigationControls?: ReactNode | React.ComponentType<any>;
+  NavigationControls?: ReactNode | React.ComponentType<any>;
   /** Custom header/progress component (uses default if not provided) */
-  headerContent?: ReactNode | React.ComponentType<any>;
+  HeaderContent?: ReactNode | React.ComponentType<any>;
   /** Container CSS class */
   containerClassName?: string;
   /** Header section CSS class */
@@ -307,37 +308,37 @@ type SurveyLayoutProps = {
  * 
  * @example
  * // Custom navigation component
- * <SurveyLayout navigationControls={<CustomNavigation />} />
+ * <SurveyLayout NavigationControls={<CustomNavigation />} />
  * 
  * @example
  * // No header
- * <SurveyLayout headerContent={null} />
+ * <SurveyLayout HeaderContent={null} />
  */
 export function SurveyLayout({
-  navigationControls,
-  headerContent,
+  NavigationControls,
+  HeaderContent,
   containerClassName = "flex flex-col gap-6 w-full max-w-2xl mx-auto p-6",
   headerClassName = "border-b pb-4",
   contentClassName = "flex-1",
   footerClassName = "border-t pt-4",
 }: SurveyLayoutProps) {
   // Resolve navigation controls - if it's a component type, render it, otherwise use as-is
-  const resolvedNavigation = navigationControls === undefined 
+  const resolvedNavigation = NavigationControls === undefined 
     ? <SurveyNavigationControls />
-    : typeof navigationControls === "function"
-    ? <navigationControls />
-    : navigationControls;
+    : typeof NavigationControls === "function"
+    ? <NavigationControls />
+    : NavigationControls;
 
   // Resolve header content - if it's a component type, render it, otherwise use as-is
-  const resolvedHeader = headerContent === undefined 
+  const resolvedHeader = HeaderContent === undefined 
     ? <SurveyProgress />
-    : typeof headerContent === "function"
-    ? <headerContent />
-    : headerContent;
+    : typeof HeaderContent === "function"
+    ? <HeaderContent />
+    : HeaderContent;
 
   return (
     <div className={containerClassName}>
-      {headerContent !== null && <div className={headerClassName}>{resolvedHeader}</div>}
+      {HeaderContent !== null && <div className={headerClassName}>{resolvedHeader}</div>}
       
       <div className={contentClassName}>
         <SurveyViewProxy />

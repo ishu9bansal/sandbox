@@ -1,8 +1,18 @@
+"use client";
+
 import Card from "@/components/Card";
 import Button from "@/components/Button";
 import Input from "@/components/Input";
 import ComboboxDemo from "./ComboExample";
 import DialogDemo from "./DialogExample";
+import { 
+  BasicSurveyExample,
+  CustomNavLabelsExample,
+  CustomProgressExample,
+  CustomNavigationExample,
+  FullyCustomExample,
+  MinimalLayoutExample,
+} from "@/components/Survey/SurveyView.examples";
 
 export default function ExamplePage() {
   return (
@@ -99,6 +109,23 @@ export default function ExamplePage() {
 
       <Card title="Dialog Example">
         <DialogDemo />
+      </Card>
+
+      <Card title="Survey View Examples">
+        <p className="text-gray-600 dark:text-gray-300 mb-4">
+          Below are some examples of how to use the Survey and SurveyView components to create multi-step forms with customizable navigation and progress indicators.
+        </p>
+        <BasicSurveyExample />
+        <br />
+        <MinimalLayoutExample />
+        <br />
+        <CustomProgressExample />
+        <br />
+        <CustomNavLabelsExample />
+        <br />
+        <CustomNavigationExample />
+        <br />
+        <FullyCustomExample />
       </Card>
     </div>
   );
