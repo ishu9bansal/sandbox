@@ -5,7 +5,7 @@
  * levels of customization.
  */
 
-import { Survey, SurveyView, SurveyLayout, SurveyNavigationControls, SurveyProgress, useSurveyContext } from "./SurveyView";
+import { Survey, SurveyView, SurveyLayout, SurveyNavigationControls, SurveyProgress, useSurveyContext } from "../../app/periodontics/components/SurveyView";
 
 // ============================================================================
 // Example 1: Basic Usage - Everything Default

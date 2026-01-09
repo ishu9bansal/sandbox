@@ -10,7 +10,7 @@ import PatientForm from "../../components/PatientForm";
 import useFormField from "@/hooks/useFormField";
 import PerioInput from "../../components/input/PerioInput";
 import EditLayout from "../../components/EditLayout";
-import { Survey, SurveyView, SurveyViewProxy, useSurveyContext } from "../../components/SurveyView";
+import { Survey, SurveyView, SurveyViewProxy, useSurveyContext } from "../../../../components/Survey/SurveyView";
 
 export default function EditPatientPage() {
   const { id: record_id } = useParams();
