@@ -117,7 +117,8 @@ export function Survey({ children, defaultViewIndex = 0, onCancel, onSubmit }: S
  */
 const surveyChildId = (child: ReactNode): string | null => {
   if (isValidElement(child)) {
-    return (child.props?.id as string) || null;
+    const props = (child.props || {}) as { id?: string };
+    return props.id || null;
   }
   return null;
 };

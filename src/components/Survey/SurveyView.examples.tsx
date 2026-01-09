@@ -61,7 +61,7 @@ export function CustomNavLabelsExample() {
 
       {/* Customize navigation button labels */}
       <SurveyLayout
-        navigationControls={
+        NavigationControls={
           <SurveyNavigationControls
             backLabel="← Previous"
             nextLabel="Continue →"
@@ -93,7 +93,7 @@ export function CustomProgressExample() {
 
       {/* Show step IDs instead of numbers */}
       <SurveyLayout
-        headerContent={<SurveyProgress showIds className="text-lg font-semibold" />}
+        HeaderContent={<SurveyProgress showIds className="text-lg font-semibold" />}
       />
     </Survey>
   );
@@ -152,7 +152,7 @@ export function CustomNavigationExample() {
       </SurveyView>
 
       {/* Custom navigation with dot indicators */}
-      <SurveyLayout navigationControls={<CustomNavigationButtons />} />
+      <SurveyLayout NavigationControls={<CustomNavigationButtons />} />
     </Survey>
   );
 }
@@ -191,8 +191,8 @@ export function FullyCustomExample() {
 
       {/* Fully customized header and layout */}
       <SurveyLayout
-        headerContent={<CustomHeader />}
-        navigationControls={
+        HeaderContent={<CustomHeader />}
+        NavigationControls={
           <div className="flex gap-4">
             <button className="flex-1 px-4 py-2 border border-gray-300 rounded">Back</button>
             <button className="flex-1 px-4 py-2 bg-blue-500 text-white rounded">Next</button>
@@ -222,7 +222,7 @@ export function MinimalLayoutExample() {
       </SurveyView>
 
       {/* Remove header by passing null */}
-      <SurveyLayout headerContent={null} />
+      <SurveyLayout HeaderContent={null} />
     </Survey>
   );
 }
