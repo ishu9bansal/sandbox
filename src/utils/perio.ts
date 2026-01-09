@@ -40,6 +40,25 @@ export const INPUT_MAPPING: MappingType = [
     '28BMe', '28BMi', '28BDi',
   ],
   [
+    '18LMe', '18LMi', '18LDi',
+    '17LMe', '17LMi', '17LDi',
+    '16LMe', '16LMi', '16LDi',
+    '15LMe', '15LMi', '15LDi',
+    '14LMe', '14LMi', '14LDi',
+    '13LMe', '13LMi', '13LDi',
+    '12LMe', '12LMi', '12LDi',
+    '11LMe', '11LMi', '11LDi',
+
+    '21LMe', '21LMi', '21LDi',
+    '22LMe', '22LMi', '22LDi',
+    '23LMe', '23LMi', '23LDi',
+    '24LMe', '24LMi', '24LDi',
+    '25LMe', '25LMi', '25LDi',
+    '26LMe', '26LMi', '26LDi',
+    '27LMe', '27LMi', '27LDi',
+    '28LMe', '28LMi', '28LDi',
+  ],
+  [
     '48LMe', '48LMi', '48LDi',
     '47LMe', '47LMi', '47LDi',
     '46LMe', '46LMi', '46LDi',
@@ -90,7 +109,7 @@ export function generatePartialInputMapping(limit: number): MappingType {
   const mapping: MappingType = [];
   for (let group of INPUT_MAPPING) {
     const filteredGroup = group.filter(key => {
-      const pos = parseInt(key.charAt(2)); // Extract position from key format like '18BMe'
+      const pos = parseInt(key.charAt(1)); // Extract position from key format like '18BMe'
       return pos <= limit;
     });
     mapping.push(filteredGroup);
@@ -100,7 +119,7 @@ export function generatePartialInputMapping(limit: number): MappingType {
 
 
 export function deriveZones(mapping = INPUT_MAPPING, siteCount = 3): { label: string; size: number }[] {
-  const labels = mapping[0].filter((_, i) => (i%siteCount === 0) ).map(el => el.charAt(2));
+  const labels = mapping[0].filter((_, i) => (i%siteCount === 0) ).map(el => el.charAt(1)); // Extract position from key format like '18BMe'
   return labels.map(label => ({ label, size: siteCount }));
 }
 
