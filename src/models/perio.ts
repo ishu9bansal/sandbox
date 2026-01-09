@@ -1,8 +1,6 @@
 import { PerioInputRecord } from "./perioInput";
-import { Quadrant } from "./theeth";
+import { TeethSelection } from "./theeth";
 
-export type SelectionMeasurement = 'X' | 'O' | '-'; // 'X' = missing, 'O' = Selected, 'S' = Skipped
-export type TeethSelection = Quadrant<SelectionMeasurement>;
 export type PPDRecord = PerioInputRecord;
 export type LGMRecord = PerioInputRecord;
 

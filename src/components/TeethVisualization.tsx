@@ -1,6 +1,6 @@
 "use client";
 
-import { SelectionMeasurement, TeethSelection } from "@/models/perio";
+import { SelectionMeasurement, TeethSelection } from "@/models/theeth";
 
 // Component to visualize teeth data in anatomical layout
 // Color coding:

@@ -1,10 +1,11 @@
-import { SelectionMeasurement, TeethSelection } from "./perio";
-
 // A utility type for a fixed-size array
 type FixedArray<T, N extends number, A extends T[] = []> = 
   A['length'] extends N ? A : FixedArray<T, N, [...A, T]>;
 
 export type Quadrant<T> = FixedArray<FixedArray<T, 8>, 4>; // 4 quadrants, each with 8 teeth
+
+export type SelectionMeasurement = 'X' | 'O' | '-'; // 'X' = missing, 'O' = Selected, 'S' = Skipped
+export type TeethSelection = Quadrant<SelectionMeasurement>;
 
 export const COMMON_TOOTH_MAPPING = [
   [18, 17, 16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26, 27, 28],
