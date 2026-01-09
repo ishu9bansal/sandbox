@@ -3,7 +3,7 @@
 import Card from "@/components/Card";
 import Button from "@/components/Button";
 import { PerioRecord } from '@/models/perio';
-import TeethVisualization from "@/components/TeethVisualization";
+import TeethVisualization from "./input/TeethVisualization";
 import PerioInput from "./input/PerioInput";
 import PatientCard from "@/app/patients/components/PatientCard";
 import { useSelector } from "react-redux";
