@@ -5,12 +5,11 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import PerioRecordForm from "../../components/PerioRecordForm";
 import { selectPerioRecordById, updatePerioRecord } from "@/store/slices/perioSlice";
 import { PerioRecord } from '@/models/perio';
-import { useCallback, useMemo } from "react";
+import { useCallback, useState } from "react";
 import PatientForm from "../../components/PatientForm";
 import useFormField from "@/hooks/useFormField";
 import PerioInput from "../../components/input/PerioInput";
 import EditLayout from "../../components/EditLayout";
-import { Survey, SurveyView, SurveyViewProxy, useSurveyContext } from "../../../../components/Survey/SurveyView";
 
 export default function EditPatientPage() {
   const { id: record_id } = useParams();
@@ -25,6 +24,9 @@ function RecordView({ record }: { record: PerioRecord }) {
   const onCancel = useCallback(() => router.back(), [router]);
   const onSubmit = useCallback(() => router.push(`/periodontics/${id}`), [router, id]);
   
+  const { view, handleBack, handleNext, backLabel, nextLabel } = useViewsNavigation(onCancel, onSubmit);
+  const viewTitle = viewTitleMap[view];
+  
   const {
     ppd, setPpd, commitPpd,
     lgm, setLgm, commitLgm,
@@ -32,26 +34,30 @@ function RecordView({ record }: { record: PerioRecord }) {
     basicInfo, setBasicInfo, commitBasicInfo,
   } = useFormFieldGroups(record);
 
-  const commitFunctions = useMemo(() => ({
+  const commitFunctions: Record<ViewType, () => void> = {
     basic: commitBasicInfo,
     ppd: commitPpd,
     lgm: commitLgm,
     patient: commitPatientId,
-  }), [commitBasicInfo, commitLgm, commitPatientId, commitPpd]);
+  };
+  const commit = commitFunctions[view];
+  const handleSubmit = useCallback(() => {
+    commit();
+    handleNext();
+  }, [handleNext, commit]);
 
   // TODO: show progress indicator of which step we are on
   // TODO: is there a better way to manage multi-step forms, instead of conditional rendering?
   return (
     <div className="max-w-3xl mx-auto">
-    <Survey defaultViewIndex={3}>
-      <SurveyContextHandler
-        onCancel={onCancel}
-        onSubmit={onSubmit}
-        commitFunctions={commitFunctions}
+      <EditLayout
+        title={viewTitle}
+        onSubmit={handleSubmit}
+        onCancel={handleBack}
+        backLabel={backLabel}
+        nextLabel={nextLabel}
       >
-        <SurveyViewProxy />
-      </SurveyContextHandler>
-      <SurveyView id="basic">
+      { view === 'basic' &&
         <PerioRecordForm
           errors={null}
           label={basicInfo.label}
@@ -59,50 +65,14 @@ function RecordView({ record }: { record: PerioRecord }) {
           onLabelChange={(label) => setBasicInfo(prev => ({ ...prev, label }))}
           onNoteChange={(note) => setBasicInfo(prev => ({ ...prev, note }))}
         />
-      </SurveyView>
-      <SurveyView id="ppd">
-        <PerioInput data={ppd} onUpdate={setPpd} />
-      </SurveyView>
-      <SurveyView id="lgm">
-        <PerioInput data={lgm} onUpdate={setLgm} />
-      </SurveyView>
-      <SurveyView id="patient">
+      }
+      { view === 'ppd' && <PerioInput data={ppd} onUpdate={setPpd} /> }
+      { view === 'lgm' && <PerioInput data={lgm} onUpdate={setLgm} /> }
+      { view === 'patient' &&
         <PatientForm patient_id={patientId} onChange={setPatientId} />
-      </SurveyView>
-    </Survey>
+      }
+      </EditLayout>
     </div>
-  );
-}
-
-type SurveyContextHandlerProps = {
-  children: React.ReactNode;
-  onCancel: () => void;
-  onSubmit: () => void;
-  commitFunctions: Record<ViewType, () => void>;
-};
-function SurveyContextHandler({ children, onCancel, onSubmit, commitFunctions }: SurveyContextHandlerProps) {
-  const { currentViewId, prevViewId, nextViewId, onNextView, onPrevView } = useSurveyContext();
-  const view = VIEW_ORDER.find(v => v === currentViewId) || null;
-  const viewTitle = view ? viewTitleMap[view] : "";
-  const backLabel = prevViewId ? BACK : CANCEL;
-  const nextLabel = nextViewId ? NEXT : SUBMIT;
-  const handleBack = prevViewId ? onPrevView : onCancel;
-  const handleNext = nextViewId ? onNextView : onSubmit;
-  const commit = view && commitFunctions[view] ? commitFunctions[view] : () => {};
-  const handleSubmit = useCallback(() => {
-    commit();
-    handleNext();
-  }, [handleNext, commit]);
-  return (
-    <EditLayout
-        title={viewTitle}
-        onSubmit={handleSubmit}
-        onCancel={handleBack}
-        backLabel={backLabel}
-        nextLabel={nextLabel}
-      >
-      {children}
-    </EditLayout>
   );
 }
 
@@ -129,6 +99,18 @@ const BACK = "Back";
 const NEXT = "Next";
 const CANCEL = "Cancel";
 const SUBMIT = "Submit";
+
+function useViewsNavigation(onCancel: () => void, onSubmit: () => void) {
+  const [view, setView] = useState<ViewType>('ppd');
+  const currentIndex = VIEW_ORDER.indexOf(view);
+  const prevView = currentIndex > 0 ? VIEW_ORDER[currentIndex - 1] : null;
+  const nextView = currentIndex < VIEW_ORDER.length - 1 ? VIEW_ORDER[currentIndex + 1] : null;
+  const handleBack = prevView ? () => setView(prevView) : onCancel;
+  const handleNext = nextView ? () => setView(nextView) : onSubmit;
+  const backLabel = prevView ? BACK : CANCEL;
+  const nextLabel = nextView ? NEXT : SUBMIT;
+  return { view, handleBack, handleNext, backLabel, nextLabel };
+}
 
 function useFormFieldGroups(record: PerioRecord) {
   const { id } = record;
