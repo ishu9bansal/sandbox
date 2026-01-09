@@ -1,5 +1,5 @@
 import { PerioRecord } from "@/models/perio";
-import { MappingType, PerioSerializer } from "@/models/perioInput";
+import { PerioMappingType, PerioSerializer } from "@/models/perioInput";
 import { generateDefaultTeeth } from "@/models/theeth";
 import { ModelInput } from "@/models/type";
 import { INPUT_MAPPING } from "./perioMappings";
@@ -20,15 +20,15 @@ export function generateNewRecord(): ModelInput<PerioRecord> {
   };
 }
 
-export const REPORT_MAPPING: MappingType = [
+export const REPORT_MAPPING: PerioMappingType = [
   INPUT_MAPPING.flat()
 ];
 
 export const inputSerializer = new PerioSerializer(INPUT_MAPPING);
 export const reportSerializer = new PerioSerializer(REPORT_MAPPING);
 
-export function generatePartialInputMapping(limit: number): MappingType {
-  const mapping: MappingType = [];
+export function generatePartialInputMapping(limit: number): PerioMappingType {
+  const mapping: PerioMappingType = [];
   for (let group of INPUT_MAPPING) {
     const filteredGroup = group.filter(key => {
       const pos = parseInt(key.charAt(1)); // Extract position from key format like '18BMe'

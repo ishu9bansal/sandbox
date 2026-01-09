@@ -1,6 +1,6 @@
-import { MappingType } from "@/models/perioInput";
+import { PerioMappingType } from "@/models/perioInput";
 
-export const INPUT_MAPPING: MappingType = [
+export const INPUT_MAPPING: PerioMappingType = [
   [
     '18BMe', '18BMi', '18BDi',
     '17BMe', '17BMi', '17BDi',

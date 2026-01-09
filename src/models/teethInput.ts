@@ -1,12 +1,11 @@
-import { TKey } from "./teethInput";
 
-export type Site = 'Me' | 'Mi' | 'Di';
-export type Area = 'B' | 'L';
-export type MKey = `${TKey}${Area}${Site}`;
+export type Posi = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+export type Quad = 1 | 2 | 3 | 4;
+export type TKey = `${Quad}${Posi}`;
 
-export type PerioInputRecord = Partial<Record<MKey, number>>;
+export type PerioInputRecord = Partial<Record<TKey, number>>;
 
-export type PerioMappingType = MKey[][];
+export type PerioMappingType = TKey[][];
 
 export class PerioSerializer {
   constructor(public mapping: PerioMappingType) {}
