@@ -1,39 +1,33 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { calculateColumnsFromZones, calculateZoneSeparators, dataUpdaterFromValues, deriveValues, deriveZones } from "./utils";
+import { SetStateAction, useCallback, useRef } from "react";
 import QuickInputRow, { QuickInputRowRef } from "./QuickInputRow";
 import { stylesGenerator } from "./style";
-import { Quadrant } from "@/models/theeth";
-import { CommonMeasurement } from "@/models/perio";
+import { calculateColumnsFromZones, calculateZoneSeparators, deriveZones, generatePartialInputMapping } from "@/utils/perio";
+import { PerioInputRecord, Serializer } from "@/models/perioInput";
 
 
-const ZONES = deriveZones();
-const COLUMNS = calculateColumnsFromZones(ZONES);
-const ZONE_SEPARATORS = calculateZoneSeparators(ZONES);
 const labels = ['Buccal', 'Lingual', 'Lingual', 'Buccal'];
 
+const INPUT_LIMIT = 7;
+const KEY_MAPPING = generatePartialInputMapping(INPUT_LIMIT);
+const serializer = new Serializer(KEY_MAPPING);
+
+const ZONES = deriveZones(KEY_MAPPING);
+const COLUMNS = calculateColumnsFromZones(ZONES);
+const ZONE_SEPARATORS = calculateZoneSeparators(ZONES);
+
 interface PerioInputProps {
-  data: Quadrant<CommonMeasurement>;
-  onUpdate?: (data: Quadrant<CommonMeasurement>) => void;
+  data: PerioInputRecord;
+  onUpdate?: (data: SetStateAction<PerioInputRecord>) => void;
   onNextFocus?: () => void;
   onPrevFocus?: () => void;
   disabled?: boolean;
 }
 export default function PerioInput({ data, onUpdate, onNextFocus, onPrevFocus, disabled }: PerioInputProps) {
-  const [values, setValues] = useState<string[][]>(deriveValues(data));
-  const handleChange = (row: number, vs: string[]) => {
-    setValues((prev) => {
-      const updated = [...prev];
-      updated[row] = vs;
-      return updated;
-    })
+  const values = serializer.serialize(data);
+  const handleChange = (row: number, col: number, v: number) => {
+    const key = KEY_MAPPING[row][col];
+    onUpdate?.(prev => ({ ...prev, [key]: v, }));
   };
-  useEffect(() => {
-    if (onUpdate) {
-      const updateData = dataUpdaterFromValues(values);
-      const updated = updateData(data);
-      onUpdate(updated);
-    }
-  }, [values]);
   const inputRefs = useRef<(QuickInputRowRef | null)[]>(Array(labels.length).fill(null));
   const focus = (c: number, fromBehind: boolean = false): void => {
     if (c < 0) {
@@ -71,7 +65,7 @@ export default function PerioInput({ data, onUpdate, onNextFocus, onPrevFocus, d
           }}
           label={labels[i]}
           values={values[i]}
-          onRowChange={(vs) => handleChange(i, vs)}
+          onValueChange={(j, v) => handleChange(i, j, v)}
           disabled={disabled}
           onNextFocus={() => next(i)}
           onPrevFocus={() => prev(i)}

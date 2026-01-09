@@ -6,7 +6,7 @@ import { deletePerioRecord, deletePerioRecords } from "@/store/slices/perioSlice
 import { PerioRecord } from '@/models/perio';
 import Button from "@/components/Button";
 import PerioRecordList from "./components/PerioRecordList";
-import { generatePerioRecordsTable, transformPerioRecordToRep } from "@/models/representation";
+import { generatePerioRecordsTable, transformPerioRecordToRep } from "@/models/perioRep";
 import { copyToClipboard, tableToTsvString } from "@/utils/helpers";
 
 export default function PatientsPage() {

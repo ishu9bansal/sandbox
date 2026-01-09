@@ -3,8 +3,8 @@ import QuickInputCell from "./QuickInputCell";
 
 interface QuickInputRowProps {
   label: string;
-  values: string[];
-  onRowChange: (values: string[]) => void;
+  values: number[];
+  onValueChange: (index: number, value: number) => void;
   disabled?: boolean;
   onNextFocus?: () => void;
   onPrevFocus?: () => void;
@@ -20,7 +20,7 @@ export type QuickInputRowRef = {
 const QuickInputRow = forwardRef<QuickInputRowRef, QuickInputRowProps>(function QuickInputRow({
   label,
   values,
-  onRowChange,
+  onValueChange,
   disabled,
   onNextFocus,
   onPrevFocus,
@@ -41,12 +41,6 @@ const QuickInputRow = forwardRef<QuickInputRowRef, QuickInputRowProps>(function 
     focusLast: () => focus(columns - 1),
   }), [columns, focus]);
 
-  const handleChange = useCallback((c: number, v: string): void => {
-    const updated = [...values];
-    updated[c] = v;
-    onRowChange(updated);
-  }, [values, onRowChange]);
-
   return (
     <>
       <div style={labelStyle}>{label}</div>
@@ -55,7 +49,7 @@ const QuickInputRow = forwardRef<QuickInputRowRef, QuickInputRowProps>(function 
           key={c}
           value={values[c]}
           focus={c === currentFocus}
-          onChange={(v) => handleChange(c, v)}
+          onChange={(v) => onValueChange(c, v)}
           onNext={() => next(c)}
           onPrev={() => prev(c)}
           disabled={disabled}

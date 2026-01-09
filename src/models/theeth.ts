@@ -1,3 +1,5 @@
+import { SelectionMeasurement, TeethSelection } from "./perio";
+
 // A utility type for a fixed-size array
 type FixedArray<T, N extends number, A extends T[] = []> = 
   A['length'] extends N ? A : FixedArray<T, N, [...A, T]>;
@@ -52,3 +54,22 @@ export class TeethGrid<T> {
     return results;
   }
 }
+
+const STUDY_LIMIT = 3;
+const defaltLabel = (position: number): SelectionMeasurement => {
+    if (position>=7) return 'X'; // generally missing wisdom teeth
+    if (position < STUDY_LIMIT) return 'O'
+    return '-';
+}
+
+export const generateDefaultTeeth = (): TeethSelection => {
+    const nums = Array.from({length: 8}, (_, i) => i);  // [0,1,2,3,4,5,6,7]
+    const quadrant = nums.map(pos => defaltLabel(pos));
+    const teeth = [
+        [...quadrant],  // Quadrant 1
+        [...quadrant],  // Quadrant 2
+        [...quadrant],  // Quadrant 3
+        [...quadrant],  // Quadrant 4
+    ] as TeethSelection;
+    return teeth;
+};

@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 interface QuickInputCellProps {
-  value: string;  // TODO: change to number
-  onChange: (value: string) => void;
+  value: number;
+  onChange: (value: number) => void;
   focus: boolean;
   onNext: () => void;
   onPrev: () => void;
@@ -45,8 +45,8 @@ function QuickInputCell({
 
 export default QuickInputCell;
 
-function useInternalState(initialValue: string, onChange: (value: string) => void) {
-  const [initPrefix, initSuffix] = parseValue(initialValue);
+function useInternalState(initialValue: number, onChange: (value: number) => void) {
+  const [initPrefix, initSuffix] = parseValue(initialValue.toString());
   const [prefix, setPrefix] = useState<number>(initPrefix);
   const [suffix, setSuffix] = useState<number>(initSuffix);
   const displayPrefix = 
@@ -57,7 +57,7 @@ function useInternalState(initialValue: string, onChange: (value: string) => voi
   const displaySuffix = isNaN(suffix) ? (prefix === 0 ? "" : "0") : suffix;
   const displayValue = `${displayPrefix}${displaySuffix}`;
   useEffect(() => {
-    onChange(displayValue);
+    onChange(parseInt(displayValue));
   }, [displayValue]);
 
   const onBackspace = useCallback(() => {
