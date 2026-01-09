@@ -25,4 +25,8 @@ export class Serializer {
     }
     return record;
   }
+  updator(r: number, c: number, v: number): (data: PerioInputRecord) => PerioInputRecord {
+    const key = this.mapping[r][c];
+    return (data: PerioInputRecord) => ({ ...data, [key]: v });
+  }
 }

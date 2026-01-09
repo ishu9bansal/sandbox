@@ -24,10 +24,6 @@ interface PerioInputProps {
 }
 export default function PerioInput({ data, onUpdate, onNextFocus, onPrevFocus, disabled }: PerioInputProps) {
   const values = serializer.serialize(data);
-  const handleChange = (row: number, col: number, v: number) => {
-    const key = KEY_MAPPING[row][col];
-    onUpdate?.(prev => ({ ...prev, [key]: v, }));
-  };
   const inputRefs = useRef<(QuickInputRowRef | null)[]>(Array(labels.length).fill(null));
   const focus = (c: number, fromBehind: boolean = false): void => {
     if (c < 0) {
@@ -65,7 +61,7 @@ export default function PerioInput({ data, onUpdate, onNextFocus, onPrevFocus, d
           }}
           label={labels[i]}
           values={values[i]}
-          onValueChange={(j, v) => handleChange(i, j, v)}
+          onValueChange={(j, v) => onUpdate?.(serializer.updator(i, j, v))}
           disabled={disabled}
           onNextFocus={() => next(i)}
           onPrevFocus={() => prev(i)}
