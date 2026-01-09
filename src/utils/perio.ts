@@ -1,5 +1,5 @@
 import { PerioRecord } from "@/models/perio";
-import { MappingType, Serializer } from "@/models/perioInput";
+import { MappingType, PerioSerializer } from "@/models/perioInput";
 import { generateDefaultTeeth } from "@/models/theeth";
 import { ModelInput } from "@/models/type";
 import { INPUT_MAPPING } from "./perioMappings";
@@ -24,8 +24,8 @@ export const REPORT_MAPPING: MappingType = [
   INPUT_MAPPING.flat()
 ];
 
-export const inputSerializer = new Serializer(INPUT_MAPPING);
-export const reportSerializer = new Serializer(REPORT_MAPPING);
+export const inputSerializer = new PerioSerializer(INPUT_MAPPING);
+export const reportSerializer = new PerioSerializer(REPORT_MAPPING);
 
 export function generatePartialInputMapping(limit: number): MappingType {
   const mapping: MappingType = [];

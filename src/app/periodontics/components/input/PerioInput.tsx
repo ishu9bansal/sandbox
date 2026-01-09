@@ -2,14 +2,14 @@ import { SetStateAction, useCallback, useRef } from "react";
 import QuickInputRow, { QuickInputRowRef } from "./QuickInputRow";
 import { stylesGenerator } from "./style";
 import { calculateColumnsFromZones, calculateZoneSeparators, deriveZones, generatePartialInputMapping } from "@/utils/perio";
-import { PerioInputRecord, Serializer } from "@/models/perioInput";
+import { PerioInputRecord, PerioSerializer } from "@/models/perioInput";
 
 
 const labels = ['Buccal', 'Lingual', 'Lingual', 'Buccal'];
 
 const INPUT_LIMIT = 7;
 const KEY_MAPPING = generatePartialInputMapping(INPUT_LIMIT);
-const serializer = new Serializer(KEY_MAPPING);
+const serializer = new PerioSerializer(KEY_MAPPING);
 
 const ZONES = deriveZones(KEY_MAPPING);
 const COLUMNS = calculateColumnsFromZones(ZONES);

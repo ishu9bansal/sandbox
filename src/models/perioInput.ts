@@ -10,7 +10,7 @@ export type PerioInputRecord = Partial<Record<MKey, number>>;
 
 export type MappingType = MKey[][];
 
-export class Serializer {
+export class PerioSerializer {
   constructor(public mapping: MappingType) {}
   serialize(data: PerioInputRecord): number[][] {
     return this.mapping.map(group => group.map(key => (data[key] || NaN)));
