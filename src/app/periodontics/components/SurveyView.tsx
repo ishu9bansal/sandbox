@@ -185,3 +185,165 @@ export function useSurveyContext(): SurveyContextType {
   }
   return context;
 }
+
+// ============================================================================
+// Default Navigation & Layout Components
+// ============================================================================
+
+/**
+ * Props for navigation control customization
+ */
+type SurveyNavigationControlsProps = {
+  /** Label for the back button (default: "Back") */
+  backLabel?: string;
+  /** Label for the next/submit button (default: "Next" or "Submit") */
+  nextLabel?: string;
+  /** Additional CSS class for the container */
+  className?: string;
+  /** Additional CSS class for buttons */
+  buttonClassName?: string;
+};
+
+/**
+ * Default navigation controls component.
+ * Provides Back and Next/Submit buttons with automatic labels.
+ * 
+ * @example
+ * <SurveyNavigationControls backLabel="Previous" nextLabel="Continue" />
+ */
+export function SurveyNavigationControls({
+  backLabel = "Back",
+  nextLabel,
+  className = "flex justify-between gap-2",
+  buttonClassName = "px-4 py-2 rounded",
+}: SurveyNavigationControlsProps) {
+  const { onNextView, onPrevView, isLastView } = useSurveyContext();
+  const finalNextLabel = nextLabel || (isLastView ? "Submit" : "Next");
+
+  return (
+    <div className={className}>
+      <button onClick={onPrevView} className={buttonClassName}>
+        {backLabel}
+      </button>
+      <button onClick={onNextView} className={buttonClassName}>
+        {finalNextLabel}
+      </button>
+    </div>
+  );
+}
+
+/**
+ * Props for progress/step info display
+ */
+type SurveyProgressProps = {
+  /** Format string for progress text (default: "{current} of {total}") */
+  format?: string;
+  /** Show step IDs instead of numbers (default: false) */
+  showIds?: boolean;
+  /** Additional CSS class */
+  className?: string;
+};
+
+/**
+ * Displays current progress through survey steps.
+ * 
+ * @example
+ * <SurveyProgress />
+ * <SurveyProgress format="Step {current} of {total}" />
+ * <SurveyProgress showIds />
+ */
+export function SurveyProgress({
+  format = "{current} of {total}",
+  showIds = false,
+  className = "text-sm text-gray-600",
+}: SurveyProgressProps) {
+  const { currentIndex, totalViews, currentViewId } = useSurveyContext();
+  
+  if (showIds && currentViewId) {
+    return <div className={className}>{currentViewId}</div>;
+  }
+
+  const progressText = format
+    .replace("{current}", String(currentIndex + 1))
+    .replace("{total}", String(totalViews));
+
+  return <div className={className}>{progressText}</div>;
+}
+
+/**
+ * Props for the default survey layout
+ */
+type SurveyLayoutProps = {
+  /** Custom navigation controls component (uses default if not provided) */
+  navigationControls?: ReactNode | React.ComponentType<any>;
+  /** Custom header/progress component (uses default if not provided) */
+  headerContent?: ReactNode | React.ComponentType<any>;
+  /** Container CSS class */
+  containerClassName?: string;
+  /** Header section CSS class */
+  headerClassName?: string;
+  /** Content section CSS class */
+  contentClassName?: string;
+  /** Footer/navigation section CSS class */
+  footerClassName?: string;
+};
+
+/**
+ * Default layout component that organizes survey views with navigation.
+ * Automatically renders the current view via proxy.
+ * 
+ * Provides a customizable three-section layout:
+ * - Header (progress info)
+ * - Content (current view)
+ * - Footer (navigation controls)
+ * 
+ * @example
+ * // Basic usage with defaults
+ * <Survey>
+ *   <SurveyView id="step-1"><Form1 /></SurveyView>
+ *   <SurveyView id="step-2"><Form2 /></SurveyView>
+ *   <SurveyLayout />
+ * </Survey>
+ * 
+ * @example
+ * // Custom navigation component
+ * <SurveyLayout navigationControls={<CustomNavigation />} />
+ * 
+ * @example
+ * // No header
+ * <SurveyLayout headerContent={null} />
+ */
+export function SurveyLayout({
+  navigationControls,
+  headerContent,
+  containerClassName = "flex flex-col gap-6 w-full max-w-2xl mx-auto p-6",
+  headerClassName = "border-b pb-4",
+  contentClassName = "flex-1",
+  footerClassName = "border-t pt-4",
+}: SurveyLayoutProps) {
+  // Resolve navigation controls - if it's a component type, render it, otherwise use as-is
+  const resolvedNavigation = navigationControls === undefined 
+    ? <SurveyNavigationControls />
+    : typeof navigationControls === "function"
+    ? <navigationControls />
+    : navigationControls;
+
+  // Resolve header content - if it's a component type, render it, otherwise use as-is
+  const resolvedHeader = headerContent === undefined 
+    ? <SurveyProgress />
+    : typeof headerContent === "function"
+    ? <headerContent />
+    : headerContent;
+
+  return (
+    <div className={containerClassName}>
+      {headerContent !== null && <div className={headerClassName}>{resolvedHeader}</div>}
+      
+      <div className={contentClassName}>
+        <SurveyViewProxy />
+      </div>
+
+      <div className={footerClassName}>{resolvedNavigation}</div>
+    </div>
+  );
+}
