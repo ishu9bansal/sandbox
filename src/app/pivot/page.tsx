@@ -5,6 +5,7 @@ import Card from "@/components/Card";
 import Button from "@/components/Button";
 import { copyToClipboard } from "@/utils/helpers";
 import { processTsv } from "./utils";
+import { EXAMPLE_INPUT, PLACEHOLDER_INPUT, PLACEHOLDER_OUTPUT } from "./constants";
 
 export default function PivotPage() {
   const [input, setInput] = useState("");
@@ -16,9 +17,14 @@ export default function PivotPage() {
   const handleReset = useCallback(() => {
     setInput("");
   }, []);
+  const handleExampleSet = useCallback(() => {
+    setInput(EXAMPLE_INPUT);
+  }, []);
   const handleCopy = useCallback(() => {
     copyToClipboard(output);
+    alert("Copied to clipboard!");
   }, [output]);
+
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -39,12 +45,18 @@ export default function PivotPage() {
               fontSize: '16px',
             }}
             className="w-full h-40 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-            placeholder="Paste your pivot table data here..."
+            placeholder={PLACEHOLDER_INPUT}
             value={input}
             onChange={(e) => setInput(e.target.value)}
           ></textarea>
 
           <div className="flex justify-end gap-4">
+            <Button
+              variant="secondary"
+              onClick={handleExampleSet}
+            >
+              Use Example
+            </Button>
             <Button
               variant="outline"
               onClick={handleReset}
@@ -62,8 +74,8 @@ export default function PivotPage() {
       </Card>
 
       <Card title="Output">
-        <pre className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg overflow-x-auto">
-          {output || "Processed output will appear here."}
+        <pre className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg overflow-x-auto" style={{ color: output ? 'inherit' : 'gray' }}>
+          {output || PLACEHOLDER_OUTPUT}
         </pre>
         <div className="flex justify-end gap-4 mt-4">
           <Button
