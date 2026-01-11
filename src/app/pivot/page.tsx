@@ -78,10 +78,7 @@ export default function PivotPage() {
       </Card>
 
       <Card title="Output">
-        <pre className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg overflow-x-auto" style={{ color: output ? 'inherit' : 'gray' }}>
-          {output || PLACEHOLDER_OUTPUT}
-        </pre>
-        <div className="flex justify-end gap-4 mt-4">
+        <div className="flex justify-end gap-4 mb-4">
           <Button
               variant="secondary"
               onClick={handleTranspose}
@@ -95,6 +92,9 @@ export default function PivotPage() {
             Copy
           </Button>
         </div>
+        <pre className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg overflow-x-auto" style={{ color: output ? 'inherit' : 'gray' }}>
+          {output || PLACEHOLDER_OUTPUT}
+        </pre>
       </Card>
 
       <Card title="Features">
