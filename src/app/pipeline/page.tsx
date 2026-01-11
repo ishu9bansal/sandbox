@@ -82,7 +82,7 @@ export default function PivotPage() {
             >
               Reset Input
             </Button>
-            <Button
+            <Button // TODO: use new buttons
               variant="primary"
               onClick={handleProcess}
               disabled={!pipeline}
