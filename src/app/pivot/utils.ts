@@ -18,7 +18,16 @@ function processHeaders(headers: string[][]): string[] {
     return concat(fill(headers));
 }
 
-function concat(headers: string[][], delimeter: string = '_'): string[] {
+function clean(header: string, badChars: string = " "): string {
+    let cleaned = header;
+    for (const char of badChars) {
+        const regex = new RegExp(`\\${char}`, 'g');
+        cleaned = cleaned.replace(regex, '_');
+    }
+    return cleaned;
+}
+
+function concat(headers: string[][], delimeter: string = '_', badChars: string = " "): string[] {
     if (headers.length === 0) return [];
 
     const combined: string[] = [];
@@ -30,7 +39,7 @@ function concat(headers: string[][], delimeter: string = '_'): string[] {
             if (row > 0) combinedHeader += delimeter;
             combinedHeader += headers[row][col];
         }
-        combined.push(combinedHeader);
+        combined.push(clean(combinedHeader, badChars));
     }
 
     return combined;
