@@ -56,5 +56,12 @@ export const projects: Project[] = [
     path: "/patients",
     icon: "🏥",
   },
+  {
+    id: "pivot",
+    name: "Pivot Headers",
+    description: "Reduce your pivot table header clutter with this dynamic header management tool",
+    path: "/pivot",
+    icon: "📈",
+  },
   // Add your new projects here following this pattern
 ];
