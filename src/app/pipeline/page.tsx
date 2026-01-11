@@ -11,28 +11,33 @@ import DataSelector from "@/components/compositions/data-selector";
 type Pipeline = {
   id: string;
   label: string;
+  process: (data: string) => string;
 };
 const pipelines: Pipeline[] = [
-  { id: "pipeline1", label: "Pipeline 1" },
-  { id: "pipeline2", label: "Pipeline 2" },
-  { id: "pipeline3", label: "Pipeline 3" },
+  { id: "id", label: "Identity", process: (data: string) => data },
+  { id: "dup", label: "Duplicate", process: (data: string) => `${data}${data}` },
+  { id: "yell", label: "YELL AT ME", process: (data: string) => data.toUpperCase() },
 ];
 
 export default function PivotPage() {
   const [pipeline, setPipeline] = useState<Pipeline | null>(null);
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
-  const process = useCallback((data: string) => data, []);
 
   const handleProcess = useCallback(() => {
-    setOutput(process(input));
-  }, [input]);
+    if (pipeline) {
+      setOutput(pipeline.process(input));
+    }
+  }, [input, pipeline]);
   const handleReset = useCallback(() => {
     setInput("");
   }, []);
   const handleCopy = useCallback(() => {
     copyToClipboard(output);
     toast.success("Copied to clipboard!")
+  }, [output]);
+  const handleReuse = useCallback(() => {
+    setInput(output);
   }, [output]);
 
   return (
@@ -90,6 +95,12 @@ export default function PivotPage() {
           </div>
         </div>
         <div className="flex justify-end gap-4 m-4">
+          <Button
+            variant="outline"
+            onClick={handleReuse}
+          >
+            Use as Input
+          </Button>
           <Button
             variant="primary"
             onClick={handleCopy}
