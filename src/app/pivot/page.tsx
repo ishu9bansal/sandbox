@@ -1,16 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import Card from "@/components/Card";
 import Button from "@/components/Button";
+import { copyToClipboard } from "@/utils/helpers";
 
 export default function PivotPage() {
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
 
-  const handleProcess = () => {};
-  const handleReset = () => {};
-  const handleCopy = () => {};
+  const handleProcess = useCallback(() => {
+    setOutput(input);
+  }, [input]);
+  const handleReset = useCallback(() => {
+    setInput("");
+  }, []);
+  const handleCopy = useCallback(() => {
+    copyToClipboard(output);
+  }, [output]);
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
