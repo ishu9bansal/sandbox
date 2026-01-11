@@ -63,5 +63,12 @@ export const projects: Project[] = [
     path: "/pivot",
     icon: "📈",
   },
+  {
+    id: "pipeline",
+    name: "Run JS Pipelines Easily",
+    description: "Create and run multi-step JavaScript data processing pipelines with ease",
+    path: "/pipeline",
+    icon: "🔄",
+  },
   // Add your new projects here following this pattern
 ];
