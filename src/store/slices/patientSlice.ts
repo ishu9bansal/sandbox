@@ -1,4 +1,4 @@
-import { Patient } from '@/models/patient';
+import { Patient, PatientInput, PatientUpdate } from '@/models/patient';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface PatientState {
@@ -18,7 +18,7 @@ const patientSlice = createSlice({
   name: 'patients',
   initialState,
   reducers: {
-    addPatient: (state, action: PayloadAction<Omit<Patient, 'id' | 'createdAt' | 'updatedAt'>>) => {
+    addPatient: (state, action: PayloadAction<PatientInput>) => {
       const now = new Date().toISOString();
       const newPatient: Patient = {
         ...action.payload,
@@ -28,10 +28,11 @@ const patientSlice = createSlice({
       };
       state.patients.push(newPatient);
     },
-    updatePatient: (state, action: PayloadAction<Patient>) => {
+    updatePatient: (state, action: PayloadAction<PatientUpdate>) => {
       const index = state.patients.findIndex(p => p.id === action.payload.id);
       if (index !== -1) {
         state.patients[index] = {
+          ...state.patients[index],
           ...action.payload,
           updatedAt: new Date().toISOString(),
         };

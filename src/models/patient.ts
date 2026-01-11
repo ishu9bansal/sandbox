@@ -1,3 +1,4 @@
+import { ModelInput, ModelUpdate } from "./type";
 
 export interface Patient {
   id: string;
@@ -10,3 +11,6 @@ export interface Patient {
   createdAt: string;
   updatedAt: string;
 }
+
+export type PatientInput = ModelInput<Patient>;
+export type PatientUpdate = ModelUpdate<Patient>;
