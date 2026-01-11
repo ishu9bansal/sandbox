@@ -53,17 +53,16 @@ function fill(headers: string[][]): string[][] {
 }
 
 
-function tsvToTable(tsv: string): string[][] {
+export function tsvToTable(tsv: string): string[][] {
     const rows = tsv.trim().split('\n');
     return rows.map(row => row.split('\t'));
 }
 
-function tableToTsv(table: string[][]): string {
+export function tableToTsv(table: string[][]): string {
     return table.map(row => row.join('\t')).join('\n');
 }
 
-export function processTsv(tsv: string): string {
-    const table = tsvToTable(tsv);
+export function processTable(table: string[][]): string[][] {
     const headers = processHeaders(table);
-    return tableToTsv([headers]);
+    return [headers];
 }

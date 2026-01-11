@@ -4,15 +4,17 @@ import { useCallback, useState } from "react";
 import Card from "@/components/Card";
 import Button from "@/components/Button";
 import { copyToClipboard } from "@/utils/helpers";
-import { processTsv } from "./utils";
+import { processTable, tableToTsv, tsvToTable } from "./utils";
 import { EXAMPLE_INPUT, PLACEHOLDER_INPUT, PLACEHOLDER_OUTPUT } from "./constants";
 
 export default function PivotPage() {
   const [input, setInput] = useState("");
-  const [output, setOutput] = useState("");
+  const [data, setData] = useState<string[][]>([]);
+  const output = tableToTsv(data);
 
   const handleProcess = useCallback(() => {
-    setOutput(processTsv(input));
+    const table = tsvToTable(input);
+    setData(processTable(table));
   }, [input]);
   const handleReset = useCallback(() => {
     setInput("");
@@ -24,6 +26,9 @@ export default function PivotPage() {
     copyToClipboard(output);
     alert("Copied to clipboard!");
   }, [output]);
+  const handleTranspose = useCallback(() => {
+    // Future feature: Transpose the input table
+  }, []);
 
 
   return (
