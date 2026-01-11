@@ -4,13 +4,14 @@ import { useCallback, useState } from "react";
 import Card from "@/components/Card";
 import Button from "@/components/Button";
 import { copyToClipboard } from "@/utils/helpers";
+import { processTsv } from "./utils";
 
 export default function PivotPage() {
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
 
   const handleProcess = useCallback(() => {
-    setOutput(input);
+    setOutput(processTsv(input));
   }, [input]);
   const handleReset = useCallback(() => {
     setInput("");
