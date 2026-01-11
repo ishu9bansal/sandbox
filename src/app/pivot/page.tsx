@@ -4,7 +4,7 @@ import { useCallback, useState } from "react";
 import Card from "@/components/Card";
 import Button from "@/components/Button";
 import { copyToClipboard } from "@/utils/helpers";
-import { processTable, tableToTsv, tsvToTable } from "./utils";
+import { processTable, tableToTsv, transpose, tsvToTable } from "./utils";
 import { EXAMPLE_INPUT, PLACEHOLDER_INPUT, PLACEHOLDER_OUTPUT } from "./constants";
 
 export default function PivotPage() {
@@ -27,9 +27,8 @@ export default function PivotPage() {
     alert("Copied to clipboard!");
   }, [output]);
   const handleTranspose = useCallback(() => {
-    // Future feature: Transpose the input table
+    setData(transpose);
   }, []);
-
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -83,6 +82,12 @@ export default function PivotPage() {
           {output || PLACEHOLDER_OUTPUT}
         </pre>
         <div className="flex justify-end gap-4 mt-4">
+          <Button
+              variant="secondary"
+              onClick={handleTranspose}
+            >
+              Transpose
+            </Button>
           <Button
             variant="primary"
             onClick={handleCopy}

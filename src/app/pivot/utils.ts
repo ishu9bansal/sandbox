@@ -66,3 +66,21 @@ export function processTable(table: string[][]): string[][] {
     const headers = processHeaders(table);
     return [headers];
 }
+
+export function transpose(table: string[][]): string[][] {
+    if (table.length === 0) return [];
+
+    const transposed: string[][] = [];
+    const numRows = table.length;
+    const numCols = table[0].length;
+
+    for (let col = 0; col < numCols; col++) {
+        const newRow: string[] = [];
+        for (let row = 0; row < numRows; row++) {
+            newRow.push(table[row][col]);
+        }
+        transposed.push(newRow);
+    }
+
+    return transposed;
+}
