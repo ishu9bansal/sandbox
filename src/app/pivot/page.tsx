@@ -31,6 +31,12 @@ export default function PivotPage() {
       <Card title="Input">
         <div className="text-center space-y-6">
           <textarea
+            style={{
+              fontFamily: 'monospace',
+              whiteSpace: 'pre',
+              overflow: 'auto',
+              fontSize: '16px',
+            }}
             className="w-full h-40 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
             placeholder="Paste your pivot table data here..."
             value={input}
