@@ -5,7 +5,7 @@ import Card from "@/components/Card";
 import Button from "@/components/Button";
 import { copyToClipboard } from "@/utils/helpers";
 import { processTsv } from "./utils";
-import { PLACEHOLDER_INPUT, PLACEHOLDER_OUTPUT } from "./constants";
+import { EXAMPLE_INPUT, PLACEHOLDER_INPUT, PLACEHOLDER_OUTPUT } from "./constants";
 
 export default function PivotPage() {
   const [input, setInput] = useState("");
@@ -17,10 +17,14 @@ export default function PivotPage() {
   const handleReset = useCallback(() => {
     setInput("");
   }, []);
+  const handleExampleSet = useCallback(() => {
+    setInput(EXAMPLE_INPUT);
+  }, []);
   const handleCopy = useCallback(() => {
-    // add alert
     copyToClipboard(output);
+    alert("Copied to clipboard!");
   }, [output]);
+
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -47,6 +51,12 @@ export default function PivotPage() {
           ></textarea>
 
           <div className="flex justify-end gap-4">
+            <Button
+              variant="secondary"
+              onClick={handleExampleSet}
+            >
+              Use Example
+            </Button>
             <Button
               variant="outline"
               onClick={handleReset}
