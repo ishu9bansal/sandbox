@@ -5,75 +5,68 @@ import Card from "@/components/Card";
 import Button from "@/components/Button";
 
 export default function PivotPage() {
-  const [count, setCount] = useState(0);
+  const [input, setInput] = useState("");
+  const [output, setOutput] = useState("");
+
+  const handleProcess = () => {};
+  const handleReset = () => {};
+  const handleCopy = () => {};
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold mb-4">Counter Demo</h1>
+        <h1 className="text-3xl font-bold mb-4">Pivot Headers</h1>
         <p className="text-gray-600 dark:text-gray-300">
-          An interactive counter demonstrating state management and component interactivity.
+          Reduce your pivot table header clutter with this dynamic header management tool
         </p>
       </div>
 
-      <Card title="Counter">
+      <Card title="Input">
         <div className="text-center space-y-6">
-          <div className="text-6xl font-bold text-blue-600 dark:text-blue-400">
-            {count}
-          </div>
+          <textarea
+            className="w-full h-40 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+            placeholder="Paste your pivot table data here..."
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+          ></textarea>
 
-          <div className="flex justify-center gap-4">
-            <Button
-              variant="secondary"
-              onClick={() => setCount(count - 1)}
-            >
-              Decrement
-            </Button>
+          <div className="flex justify-end gap-4">
             <Button
               variant="outline"
-              onClick={() => setCount(0)}
+              onClick={handleReset}
             >
               Reset
             </Button>
             <Button
               variant="primary"
-              onClick={() => setCount(count + 1)}
+              onClick={handleProcess}
             >
-              Increment
+              Process
             </Button>
           </div>
         </div>
       </Card>
 
-      <Card title="Code Example">
+      <Card title="Output">
         <pre className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg overflow-x-auto">
-          <code className="text-sm">
-{`"use client";
-
-import { useState } from "react";
-
-export default function Counter() {
-  const [count, setCount] = useState(0);
-
-  return (
-    <div>
-      <p>Count: {count}</p>
-      <button onClick={() => setCount(count + 1)}>
-        Increment
-      </button>
-    </div>
-  );
-}`}
-          </code>
+          {output || "Processed output will appear here."}
         </pre>
+        <div className="flex justify-end gap-4 mt-4">
+          <Button
+            variant="primary"
+            onClick={handleCopy}
+          >
+            Copy
+          </Button>
+        </div>
       </Card>
 
       <Card title="Features">
         <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-300">
-          <li>Client-side state management with React hooks</li>
-          <li>Reusable Button component with variants</li>
-          <li>Responsive design with Tailwind CSS</li>
-          <li>Dark mode support</li>
+          <li>Very Useful tool</li>
+          <li>Saves so much time</li>
+          <li>Very much awesome</li>
+          <li>Wow!</li>
         </ul>
       </Card>
     </div>
