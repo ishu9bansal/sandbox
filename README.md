@@ -2,6 +2,9 @@
 
 A ready-to-use Next.js sandbox environment for experimenting with web projects. No more setup overhead - just add a route and start building!
 
+# Make a new release PR
+[Release PR](https://github.com/ishu9bansal/sandbox/compare/master...dev?expand=1&title=dev)
+
 ## 🚀 Features
 
 - **Pre-configured Next.js** with TypeScript and App Router
