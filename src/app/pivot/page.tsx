@@ -6,6 +6,7 @@ import Button from "@/components/Button";
 import { copyToClipboard } from "@/utils/helpers";
 import { processTable, tableToTsv, transpose, tsvToTable } from "./utils";
 import { EXAMPLE_INPUT, PLACEHOLDER_INPUT, PLACEHOLDER_OUTPUT } from "./constants";
+import { toast } from "sonner";
 
 export default function PivotPage() {
   const [input, setInput] = useState("");
@@ -24,7 +25,7 @@ export default function PivotPage() {
   }, []);
   const handleCopy = useCallback(() => {
     copyToClipboard(output);
-    alert("Copied to clipboard!");
+    toast.success("Copied to clipboard!")
   }, [output]);
   const handleTranspose = useCallback(() => {
     setData(transpose);

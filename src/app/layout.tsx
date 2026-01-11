@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
 import ReduxProvider from "@/store/ReduxProvider";
 import { SidebarProvider } from "@/contexts/SidebarContext";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Sandbox - Web Projects Playground",
@@ -27,6 +28,7 @@ export default function RootLayout({
                 <main className="flex-1 p-4 md:p-6 bg-gray-50 dark:bg-gray-900">
                   {children}
                 </main>
+                <Toaster />
               </div>
             </div>
           </SidebarProvider>
