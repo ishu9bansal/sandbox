@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { projects } from "@/lib/projects";
 import { useSidebar } from "@/contexts/SidebarContext";
+import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -40,6 +41,17 @@ export default function Navbar() {
           </h2>
         </div>
         <div className="flex items-center gap-4">
+          <SignedOut>
+            <SignInButton />
+            <SignUpButton>
+              <button className="bg-[#6c47ff] text-white rounded-full font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 cursor-pointer">
+                Sign Up
+              </button>
+            </SignUpButton>
+          </SignedOut>
+          <SignedIn>
+            <UserButton />
+          </SignedIn>
           <a
             href="https://github.com/ishu9bansal/sandbox"
             target="_blank"

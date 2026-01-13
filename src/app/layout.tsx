@@ -5,6 +5,7 @@ import Sidebar from "@/components/Sidebar";
 import ReduxProvider from "@/store/ReduxProvider";
 import { SidebarProvider } from "@/contexts/SidebarContext";
 import { Toaster } from "@/components/ui/sonner";
+import { ClerkProvider } from "@clerk/nextjs";
 
 export const metadata: Metadata = {
   title: "Sandbox - Web Projects Playground",
@@ -17,23 +18,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="antialiased">
-        <ReduxProvider>
-          <SidebarProvider>
-            <div className="flex min-h-screen">
-              <Sidebar />
-              <div className="flex-1 flex flex-col min-w-0">
-                <Navbar />
-                <main className="flex-1 p-4 md:p-6 bg-gray-50 dark:bg-gray-900">
-                  {children}
-                </main>
-                <Toaster />
+    <ClerkProvider>
+      <html lang="en">
+        <body className="antialiased">
+          <ReduxProvider>
+            <SidebarProvider>
+              <div className="flex min-h-screen">
+                <Sidebar />
+                <div className="flex-1 flex flex-col min-w-0">
+                  <Navbar />
+                  <main className="flex-1 p-4 md:p-6 bg-gray-50 dark:bg-gray-900">
+                    {children}
+                  </main>
+                  <Toaster />
+                </div>
               </div>
-            </div>
-          </SidebarProvider>
-        </ReduxProvider>
-      </body>
-    </html>
+            </SidebarProvider>
+          </ReduxProvider>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
