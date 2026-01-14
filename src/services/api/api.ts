@@ -9,6 +9,7 @@ interface ApiClientConfig {
 interface ApiCallOptions {
   headers?: Record<string, string>;
   params?: Record<string, any>;
+  timeout?: number; // miliseconds
 }
 
 export class ApiClient {
@@ -59,6 +60,7 @@ export class ApiClient {
     options?: ApiCallOptions
   ): Promise<T | null> {
     try {
+      const timeout = options?.timeout || 10000; // default timeout 10s
       const config: AxiosRequestConfig = {
         method,
         url: uri,
@@ -69,6 +71,7 @@ export class ApiClient {
           ...this.defaultParams,
           ...options?.params,
         },
+        timeout,
       };
 
       // Add body for methods that support it
