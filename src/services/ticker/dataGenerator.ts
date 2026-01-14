@@ -129,3 +129,14 @@ export class StraddleDataGenerator {
     this.trendDirection = Math.random() > 0.5 ? 1 : -1;
   }
 }
+
+export class PriceGenerator {
+  constructor(private basePrice: number = 19750, private volatility: number = 0.002) {}
+  generateNextPrice(): number {
+    const priceChange = (Math.random() - 0.5) * this.basePrice * this.volatility * 2;
+    const trendChange = (Math.random() - 0.5) * this.basePrice * 0.0001 * 2;
+    const spotPrice = this.basePrice + priceChange + trendChange;
+    this.basePrice = spotPrice;
+    return Math.round(spotPrice * 100) / 100;
+  }
+}

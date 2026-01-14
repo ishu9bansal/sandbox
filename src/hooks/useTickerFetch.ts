@@ -5,7 +5,8 @@ import { StraddleDataSimulator } from "@/services/ticker/apiServiceSimulator";
 import { HealthClient, TickerClient } from "@/services/ticker/tickerClient";
 import ApiClient from "@/services/api/api";
 import { BASE_URL } from "@/services/ticker/constants";
-import { Instrument, InstrumentResponse } from "@/models/ticker";
+import { Instrument, InstrumentResponse, PremiumSnapshot } from "@/models/ticker";
+import { PriceGenerator } from "@/services/ticker/dataGenerator";
 
 // const today = new Date();
 // const defaultStartTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 9, 30, 0, 0);
@@ -49,6 +50,55 @@ export function useInstruments() {
     reload();
   }, [])
   return { reload, instruments };
+}
+
+export function useLiveData(interval: number = 1000) {
+  const data = useAppSelector(selectTickerData);
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    let isMounted = true;
+    const fetchQuote = async () => {
+      try {
+        const quote = await tickerClient.getQuote('NIFTY');
+        if (!quote) {
+          throw new Error("No quote received");
+        }
+        const snapshot = snapshotFromQuote(quote);
+        if (!isMounted) return;
+        dispatch(addSnapshots([snapshot]));
+      } catch (error) {
+        console.error(error);
+        // Handle error appropriately, e.g., show notification to user
+      }
+    };
+    fetchQuote();
+    const intervalId = setInterval(fetchQuote, interval); // Check every seconds
+    return () => {
+      isMounted = false;
+      clearInterval(intervalId);
+    };
+  }, [interval]);
+  return { data };
+}
+
+const priceGenerator = new PriceGenerator();
+function snapshotFromQuote(quote: any): PremiumSnapshot {
+  const timestamp = (new Date()).getTime();
+  const spotPrice = priceGenerator.generateNextPrice();
+  const snapshot = {
+    timestamp,
+    spotPrice,
+    premiums: {
+      '-3': 0,
+      '-2': 0,
+      '-1': 0,
+      '0': 0,
+      '1': 0,
+      '2': 0,
+      '3': 0,
+    },
+  };
+  return snapshot;
 }
 
 function listFromMap(instrumentMap: InstrumentResponse): Instrument[] {
