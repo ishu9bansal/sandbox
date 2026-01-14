@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Card from "@/components/Card";
-import Button from "@/components/Button";
+import TickerView from './components/TickerView'
 import Obfuscation from "@/components/Obfuscate";
 
 export default function CounterPage() {
@@ -17,34 +16,7 @@ export default function CounterPage() {
         </p>
       </div>
       <Obfuscation>
-        <Card title="Main Content">
-          <div className="text-center space-y-6">
-            <div className="text-6xl font-bold text-blue-600 dark:text-blue-400">
-              {count}
-            </div>
-
-            <div className="flex justify-center gap-4">
-              <Button
-                variant="secondary"
-                onClick={() => setCount(count - 1)}
-              >
-                Decrement
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setCount(0)}
-              >
-                Reset
-              </Button>
-              <Button
-                variant="primary"
-                onClick={() => setCount(count + 1)}
-              >
-                Increment
-              </Button>
-            </div>
-          </div>
-        </Card>
+        <TickerView />
       </Obfuscation>
     </div>
   );
