@@ -1,1 +1,1 @@
-export const BASE_URL = 'https://ticker-duck.onrender.com';
+export const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
