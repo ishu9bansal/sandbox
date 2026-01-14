@@ -10,6 +10,7 @@ import {
 } from 'recharts';
 import { useLiveData } from '@/hooks/useTickerFetch';
 import { useState } from 'react';
+import { PriceSnapshot } from '@/models/ticker';
 
 const today = new Date();
 today.setHours(9, 15, 0, 0);
@@ -26,7 +27,7 @@ const TickerView = () => {
   const chartData = data;
   const lastDataPoint = data.length > 0 ? data[data.length - 1] : null;
   const lastTimestamp = lastDataPoint ? new Date(lastDataPoint.timestamp) : new Date();
-  const xAxisDomain = zoomLevel === 'zoom' ? zoomDomain(lastTimestamp) : [MARKET_OPEN_TIME, MARKET_CLOSE_TIME];
+  const xAxisDomain: [number, number] = zoomLevel === 'zoom' ? zoomDomain(lastTimestamp) : [MARKET_OPEN_TIME, MARKET_CLOSE_TIME];
 
   return (
     <div className="container mx-auto">
@@ -50,78 +51,11 @@ const TickerView = () => {
               </p>
             </div>
           ) : (
-            <ResponsiveContainer width="100%" height={600}>
-              <LineChart
-                data={chartData}
-                margin={{ top: 5, right: 80, left: 20, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.1)" />
-                
-                {/* X-axis: Time */}
-                <XAxis
-                  type='number'
-                  stroke="rgba(255, 255, 255, 0.6)"
-                  tick={{ fill: 'rgba(255, 255, 255, 0.6)', fontSize: 12 }}
-                  dataKey="timestamp"
-                  allowDataOverflow={true}
-                  tickFormatter={(value, index) => {
-                    if (!index) console.log('Formatting tick value:', new Date());
-                    const date = new Date(value);
-                    return `${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
-                  }}
-                  domain={xAxisDomain}
-                />
-                
-                {/* Left Y-axis: Premium (₹) */}
-                <YAxis
-                  yAxisId="left"
-                  stroke="rgba(255, 255, 255, 0.6)"
-                  tick={{ fill: 'rgba(255, 255, 255, 0.6)', fontSize: 12 }}
-                  label={{
-                    value: 'Combined Premium (₹)',
-                    angle: -90,
-                    position: 'insideLeft',
-                    style: { fill: 'rgba(255, 255, 255, 0.6)' },
-                  }}
-                  domain={['dataMin', 'dataMax']}
-                />
-                
-                {/* Right Y-axis: Spot Price */}
-                <YAxis
-                  yAxisId="right"
-                  orientation="right"
-                  stroke="rgba(255, 255, 255, 0.4)"
-                  tick={{ fill: 'rgba(255, 255, 255, 0.4)', fontSize: 12 }}
-                  label={{
-                    value: 'Spot Price (₹)',
-                    angle: 90,
-                    position: 'insideRight',
-                    style: { fill: 'rgba(255, 255, 255, 0.4)' },
-                  }}
-                  domain={['dataMin', 'dataMax']}
-                />
-                
-                <Tooltip content={<CustomTooltip />} />
-                <Legend
-                  wrapperStyle={{ color: '#fff' }}
-                  iconType="line"
-                />
-                
-                {/* Premium Lines - Same color family, varying opacity */}
-                {showExtraLines && <ExtraLines />}
-                {/* Spot Price Line - Lighter, on right axis */}
-                <Line
-                  yAxisId="right"
-                  type="monotone"
-                  dataKey="price"
-                  stroke="rgba(255, 0, 0, 0.5)"
-                  strokeWidth={1.5}
-                  dot={false}
-                  name="Spot Price"
-                  strokeDasharray="5 5"
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            <Chart
+              chartData={chartData}
+              xAxisDomain={xAxisDomain}
+              showExtraLines={showExtraLines}
+            />
           )}
         </div>
 
@@ -140,6 +74,83 @@ const TickerView = () => {
     </div>
   );
 };
+
+function Chart({ chartData, xAxisDomain, showExtraLines }: { chartData: PriceSnapshot[]; xAxisDomain: [number, number]; showExtraLines: boolean; }) {
+  return (
+    <ResponsiveContainer width="100%" height={600}>
+      <LineChart
+        data={chartData}
+        margin={{ top: 5, right: 80, left: 20, bottom: 5 }}
+      >
+        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.1)" />
+        
+        {/* X-axis: Time */}
+        <XAxis
+          type='number'
+          stroke="rgba(255, 255, 255, 0.6)"
+          tick={{ fill: 'rgba(255, 255, 255, 0.6)', fontSize: 12 }}
+          dataKey="timestamp"
+          allowDataOverflow={true}
+          tickFormatter={(value, index) => {
+            if (!index) console.log('Formatting tick value:', new Date());
+            const date = new Date(value);
+            return `${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
+          }}
+          domain={xAxisDomain}
+        />
+        
+        {/* Left Y-axis: Premium (₹) */}
+        <YAxis
+          yAxisId="left"
+          stroke="rgba(255, 255, 255, 0.6)"
+          tick={{ fill: 'rgba(255, 255, 255, 0.6)', fontSize: 12 }}
+          label={{
+            value: 'Combined Premium (₹)',
+            angle: -90,
+            position: 'insideLeft',
+            style: { fill: 'rgba(255, 255, 255, 0.6)' },
+          }}
+          domain={['dataMin', 'dataMax']}
+        />
+        
+        {/* Right Y-axis: Spot Price */}
+        <YAxis
+          yAxisId="right"
+          orientation="right"
+          stroke="rgba(255, 255, 255, 0.4)"
+          tick={{ fill: 'rgba(255, 255, 255, 0.4)', fontSize: 12 }}
+          label={{
+            value: 'Spot Price (₹)',
+            angle: 90,
+            position: 'insideRight',
+            style: { fill: 'rgba(255, 255, 255, 0.4)' },
+          }}
+          domain={['dataMin', 'dataMax']}
+        />
+        
+        <Tooltip content={<CustomTooltip />} />
+        <Legend
+          wrapperStyle={{ color: '#fff' }}
+          iconType="line"
+        />
+        
+        {/* Premium Lines - Same color family, varying opacity */}
+        {showExtraLines && <ExtraLines />}
+        {/* Spot Price Line - Lighter, on right axis */}
+        <Line
+          yAxisId="right"
+          type="monotone"
+          dataKey="price"
+          stroke="rgba(255, 0, 0, 0.5)"
+          strokeWidth={1.5}
+          dot={false}
+          name="Spot Price"
+          strokeDasharray="5 5"
+        />
+      </LineChart>
+    </ResponsiveContainer>
+  );
+}
 
 function ExtraLines() {
   return (
@@ -217,7 +228,7 @@ function ExtraLines() {
 export default TickerView;
 
 
-function zoomDomain(now: Date) {
+function zoomDomain(now: Date): [number, number] {
   return [
     Math.max(MARKET_OPEN_TIME, now.getTime() - HALF_HOUR_MS),
     Math.min(MARKET_CLOSE_TIME, now.getTime() + HALF_HOUR_MS),
