@@ -1,7 +1,11 @@
 import { useCallback, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { addSnapshots, selectTickerData } from "@/store/slices/tickerSlice";
+import { addSnapshots, selectTickerData, setInstruments } from "@/store/slices/tickerSlice";
 import { StraddleDataSimulator } from "@/services/ticker/apiServiceSimulator";
+import { TickerClient } from "@/services/ticker/tickerClient";
+import ApiClient from "@/services/api/api";
+import { BASE_URL } from "@/services/ticker/constants";
+import { Instrument, InstrumentResponse } from "@/models/ticker";
 
 const today = new Date();
 const defaultStartTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 9, 30, 0, 0);
@@ -19,4 +23,37 @@ export function useTickerFetch() {
     fetcher();
   }, [])
   return fetcher;
+}
+
+const tickerClient = new TickerClient(new ApiClient({
+  baseURL: BASE_URL,
+}));
+
+export function useInstruments() {
+  const dispatch = useAppDispatch();
+  const reload = useCallback(async () => {
+    try {
+      const instrumentMap = await tickerClient.getInstruments();
+      if (!instrumentMap) {
+        throw new Error("No instruments received");
+      }
+      const instruments = listFromMap(instrumentMap);
+      dispatch(setInstruments(instruments));
+    } catch (error) {
+      console.error(error);
+      // Handle error appropriately, e.g., show notification to user
+    }
+  }, []);
+  useEffect(() => {
+    reload();
+  }, [])
+  return reload;
+}
+
+function listFromMap(instrumentMap: InstrumentResponse): Instrument[] {
+  return Object.values(instrumentMap).map((instGroup) => {
+    return Object.values(instGroup).map((instGroup2) => {
+      return Object.values(instGroup2).flat();
+    }).flat();
+  }).flat();
 }

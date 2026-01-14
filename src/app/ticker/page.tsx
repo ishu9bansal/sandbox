@@ -1,12 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import TickerView from './components/TickerView'
 import Obfuscation from "@/components/Obfuscate";
+import InstrumentView from "./components/InstrumentsView";
 
 export default function CounterPage() {
-  const [count, setCount] = useState(0);
-
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
@@ -16,7 +13,7 @@ export default function CounterPage() {
         </p>
       </div>
       <Obfuscation>
-        <TickerView />
+        <InstrumentView />
       </Obfuscation>
     </div>
   );
