@@ -18,6 +18,9 @@ export class TickerClient {
     const queryString = queryParams.toString();
     const uri = `/ticker/quote/?${queryString}`;
     try {
+      console.log("Skipping getQuote implementation");
+      console.log("Time: ", new Date());
+      return {};
       const response = await this.client.get(uri);
       return response;
     } catch (error) {

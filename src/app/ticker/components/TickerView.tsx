@@ -10,6 +10,12 @@ import {
 } from 'recharts';
 import { useLiveData } from '@/hooks/useTickerFetch';
 
+const today = new Date();
+today.setHours(9, 15, 0, 0);
+const MARKET_OPEN_TIME = today.getTime();
+today.setHours(15, 30, 0, 0);
+const MARKET_CLOSE_TIME = today.getTime();
+
 const TickerView = () => {
   const showExtraLines = false;
   const { data } = useLiveData(1000);
@@ -72,8 +78,17 @@ const TickerView = () => {
                 
                 {/* X-axis: Time */}
                 <XAxis
+                  type='number'
                   stroke="rgba(255, 255, 255, 0.6)"
                   tick={{ fill: 'rgba(255, 255, 255, 0.6)', fontSize: 12 }}
+                  dataKey="timestamp"
+                  allowDataOverflow={true}
+                  tickFormatter={(value, index) => {
+                    if (!index) console.log('Formatting tick value:', new Date());
+                    const date = new Date(value);
+                    return `${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
+                  }}
+                  domain={[MARKET_OPEN_TIME, MARKET_CLOSE_TIME]}
                 />
                 
                 {/* Left Y-axis: Premium (₹) */}
