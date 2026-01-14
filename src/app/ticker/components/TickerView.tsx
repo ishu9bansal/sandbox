@@ -1,4 +1,3 @@
-import React, { useEffect } from 'react';
 import {
   LineChart,
   Line,
@@ -9,8 +8,6 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-import { useAppSelector } from '@/store/hooks';
-import { selectTickerData } from '@/store/slices/tickerSlice';
 import type { PremiumSnapshot } from '@/models/ticker';
 import { useLiveData } from '@/hooks/useTickerFetch';
 
@@ -31,7 +28,7 @@ const tickValueGenerator = (index: number) => {
 }
 const EMPTY_DATA = Array.from({ length: 1 + TOTAL_SIMULATION_DURATION / 5 }, (_, i) => ({ time: tickValueGenerator(i) }));
 
-const TickerView: React.FC = () => {
+const TickerView = () => {
   const { data } = useLiveData(1000);
 
   // Transform data for Recharts
