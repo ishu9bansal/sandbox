@@ -2,6 +2,7 @@
 
 import Obfuscation from "@/components/Obfuscate";
 import InstrumentView from "./components/InstrumentsView";
+import TickerView from "./components/TickerView";
 
 export default function CounterPage() {
   return (
@@ -13,7 +14,7 @@ export default function CounterPage() {
         </p>
       </div>
       <Obfuscation>
-        <InstrumentView />
+        <TickerView />
       </Obfuscation>
     </div>
   );

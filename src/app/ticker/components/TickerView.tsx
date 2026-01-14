@@ -12,7 +12,7 @@ import {
 import { useAppSelector } from '@/store/hooks';
 import { selectTickerData } from '@/store/slices/tickerSlice';
 import type { PremiumSnapshot } from '@/models/ticker';
-import { useTickerFetch } from '@/hooks/useTickerFetch';
+import { useLiveData } from '@/hooks/useTickerFetch';
 
 const XAXIS_TICK_INTERVAL = 15 * 60; // 15 minutes in seconds
 const TOTAL_SIMULATION_DURATION = 6 * 60 * 60 / 6; // 6 hours in seconds
@@ -31,14 +31,8 @@ const tickValueGenerator = (index: number) => {
 }
 const EMPTY_DATA = Array.from({ length: 1 + TOTAL_SIMULATION_DURATION / 5 }, (_, i) => ({ time: tickValueGenerator(i) }));
 
-const StraddleVisualization: React.FC = () => {
-  const data = useAppSelector(selectTickerData);
-  const fetcher = useTickerFetch();
-
-  useEffect(() => {
-    const interval = setInterval(fetcher, 5000);
-    return () => clearInterval(interval);
-  }, [fetcher]);
+const TickerView: React.FC = () => {
+  const { data } = useLiveData(1000);
 
   // Transform data for Recharts
   const chartData = [
@@ -286,4 +280,4 @@ const StraddleVisualization: React.FC = () => {
   );
 };
 
-export default StraddleVisualization;
+export default TickerView;
