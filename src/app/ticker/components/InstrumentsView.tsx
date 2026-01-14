@@ -1,6 +1,5 @@
 
 import DataTable from '@/components/DataTable';
-import { columnsBuilder } from '@/components/DataTable/columns';
 import { Column } from '@/components/DataTable/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -10,38 +9,14 @@ import { useAppSelector } from '@/store/hooks';
 import { selectInstruments } from '@/store/slices/tickerSlice';
 import { BadgeAlertIcon, BadgeCheckIcon } from 'lucide-react';
 import { useMemo } from 'react';
+import { instrumentsColumnBuilder } from './constants';
 
 export default function InstrumentView() {
+  // TODO: use shadcn data table to enable pagination
   const healthy = useTickerHealthStatus();
   const instruments = useAppSelector(selectInstruments);
   const reload = useInstruments();
-
-  const columns: Column<Instrument>[] = useMemo(() => columnsBuilder(
-    {
-      key: 'name',
-      header: 'Underlying',
-      sortable: true,
-      filterable: true,
-    },
-    {
-      key: 'expiry',
-      header: 'Expiry',
-      sortable: true,
-      filterable: true,
-    },
-    {
-      key: 'strike',
-      header: 'Strike',
-      sortable: true,
-      filterable: true,
-    },
-    {
-      key: 'instrument_type',
-      header: 'Option Type',
-      sortable: true,
-      filterable: true,
-    },
-  ), []);
+  const columns: Column<Instrument>[] = useMemo(instrumentsColumnBuilder, []);
 
   return (
     <div>
