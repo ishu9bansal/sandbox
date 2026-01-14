@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { addSnapshots, selectTickerData } from "@/store/slices/tickerSlice";
 import { StraddleDataSimulator } from "@/services/ticker/apiServiceSimulator";
@@ -15,5 +15,8 @@ export function useTickerFetch() {
     const newData = await defaultSimulator.fetchDeltaData(lastTimestamp);
     dispatch(addSnapshots(newData));
   }, [lastTimestamp]);
+  useEffect(() => {
+    fetcher();
+  }, [])
   return fetcher;
 }

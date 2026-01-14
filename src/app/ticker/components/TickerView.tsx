@@ -63,7 +63,7 @@ const StraddleVisualization: React.FC = () => {
         <div
           className="p-4 bg-black/90 border border-white/20 rounded"
         >
-          <p className="text-white text-sm mb-2">
+          <p className="text-black text-sm mb-2">
             Time: {payload[0]?.payload?.time}
           </p>
           {payload.map((entry, index: number) => (
@@ -87,10 +87,10 @@ const StraddleVisualization: React.FC = () => {
       <div className="p-6">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-4xl text-white mb-2">
+          <h1 className="text-4xl text-black mb-2">
             Intraday Straddle Premium Visualization
           </h1>
-          <p className="text-white/70">
+          <p className="text-black/70">
             Monitor combined option premiums (Call + Put) across nearby strikes with spot price context
           </p>
         </div>
@@ -122,7 +122,7 @@ const StraddleVisualization: React.FC = () => {
         <div className="p-6 bg-[#1a1a1a] border border-white/10 rounded">
           {data.length === 0 ? (
             <div className="h-[600px] flex items-center justify-center">
-              <p className="text-xl text-white/50">
+              <p className="text-xl text-black/50">
                 Click "Start Simulation" to begin monitoring
               </p>
             </div>
@@ -272,11 +272,11 @@ const StraddleVisualization: React.FC = () => {
 
         {/* Info */}
         <div className="mt-6">
-          <p className="text-sm text-white/60">
+          <p className="text-sm text-black/60">
             <strong>Data Points:</strong> {data.length} | <strong>Status:</strong>{' '}
             {false ? 'Updating live (every 5s)' : 'Paused'}
           </p>
-          <p className="text-xs text-white/50 block mt-2">
+          <p className="text-xs text-black/50 block mt-2">
             Note: This is a simulation with dummy data for prototype purposes. Each strike represents
             combined Call + Put premium. Strike offsets are relative to ATM (±50 points per strike).
           </p>
