@@ -12,6 +12,7 @@ import { useLiveData } from '@/hooks/useTickerFetch';
 import { useState } from 'react';
 import { PriceSnapshot } from '@/models/ticker';
 import { Button } from '@/components/ui/button';
+import TickerHealth from './TickerHealth';
 
 const today = new Date();
 today.setHours(9, 15, 0, 0);
@@ -63,6 +64,7 @@ const TickerView = () => {
           >
             Pause Simulation
           </button> */}
+          <TickerHealth />
           <Button onClick={toggleZoomLevel}>{
             zoomLevel === 'full' ? "Full Day" : "±30 Minutes"
           }</Button>
