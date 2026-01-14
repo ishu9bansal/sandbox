@@ -11,8 +11,7 @@ import {
 } from 'recharts';
 import { useAppSelector } from '@/store/hooks';
 import { selectTickerData } from '@/store/slices/tickerSlice';
-import ContainerLayout from '../components/Layout/ContainerLayout';
-import { Box, Button, Typography, Paper } from '@mui/material';
+import { Container, Box, Button, Typography, Paper } from '@mui/material';
 import type { PremiumSnapshot } from '@/models/ticker';
 import { useTickerFetch } from '@/hooks/useTickerFetch';
 
@@ -89,7 +88,7 @@ const StraddleVisualization: React.FC = () => {
   };
 
   return (
-    <ContainerLayout>
+    <Container>
       <Box sx={{ padding: 3 }}>
         {/* Header */}
         <Box sx={{ marginBottom: 3 }}>
@@ -304,7 +303,7 @@ const StraddleVisualization: React.FC = () => {
           </Typography>
         </Box>
       </Box>
-    </ContainerLayout>
+    </Container>
   );
 };
 
