@@ -11,6 +11,7 @@ import {
 import { useLiveData } from '@/hooks/useTickerFetch';
 import { useState } from 'react';
 import { PriceSnapshot } from '@/models/ticker';
+import { Button } from '@/components/ui/button';
 
 const today = new Date();
 today.setHours(9, 15, 0, 0);
@@ -23,6 +24,9 @@ const HALF_HOUR_MS = 30 * 60 * 1000;
 const TickerView = () => {
   const showExtraLines = false;
   const [zoomLevel, setZoomLevel] = useState<'full' | 'zoom'>('full');
+  const toggleZoomLevel = () => {
+    setZoomLevel((prev) => (prev === 'full' ? 'zoom' : 'full'));
+  }
   const { data } = useLiveData(1000);
   const chartData = data;
   const lastDataPoint = data.length > 0 ? data[data.length - 1] : null;
@@ -40,6 +44,28 @@ const TickerView = () => {
           <p className="text-black/70">
             Monitor combined option premiums (Call + Put) across nearby strikes with spot price context
           </p>
+        </div>
+        {/* Controls */}
+        <div className="flex items-center mb-4 space-x-4">
+          {/* <button
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+            onClick={() => {
+              // Start simulation logic
+            }}
+          >
+            Start Simulation
+          </button>
+          <button
+            className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition"
+            onClick={() => {
+              // Pause simulation logic
+            }}
+          >
+            Pause Simulation
+          </button> */}
+          <Button onClick={toggleZoomLevel}>{
+            zoomLevel === 'full' ? "Full Day" : "±30 Minutes"
+          }</Button>
         </div>
 
         {/* Chart */}
