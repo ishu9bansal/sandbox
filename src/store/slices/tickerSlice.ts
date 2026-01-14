@@ -1,8 +1,8 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { Instrument, PremiumSnapshot } from '@/models/ticker';
+import type { Instrument, PremiumSnapshot, PriceSnapshot } from '@/models/ticker';
 
 interface TickerState {
-  data: PremiumSnapshot[];
+  data: PriceSnapshot[];
   instruments: Instrument[];
 }
 
@@ -15,13 +15,13 @@ const tickerSlice = createSlice({
   name: 'ticker',
   initialState,
   reducers: {
-    setData: (state, action: PayloadAction<PremiumSnapshot[]>) => {
+    setData: (state, action: PayloadAction<PriceSnapshot[]>) => {
       state.data = action.payload;
     },
     setInstruments: (state, action: PayloadAction<Instrument[]>) => {
       state.instruments = action.payload;
     },
-    addSnapshots: (state, action: PayloadAction<PremiumSnapshot[]>) => {
+    addSnapshots: (state, action: PayloadAction<PriceSnapshot[]>) => {
       state.data = state.data.concat(action.payload);
     },
     clearData: (state) => {

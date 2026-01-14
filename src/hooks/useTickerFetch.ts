@@ -5,7 +5,7 @@ import { StraddleDataSimulator } from "@/services/ticker/apiServiceSimulator";
 import { HealthClient, TickerClient } from "@/services/ticker/tickerClient";
 import ApiClient from "@/services/api/api";
 import { BASE_URL } from "@/services/ticker/constants";
-import { Instrument, InstrumentResponse, PremiumSnapshot } from "@/models/ticker";
+import { Instrument, InstrumentResponse, PremiumSnapshot, PriceSnapshot } from "@/models/ticker";
 import { PriceGenerator } from "@/services/ticker/dataGenerator";
 
 // const today = new Date();
@@ -82,21 +82,14 @@ export function useLiveData(interval: number = 1000) {
 }
 
 const priceGenerator = new PriceGenerator();
-function snapshotFromQuote(quote: any): PremiumSnapshot {
-  const timestamp = (new Date()).getTime();
-  const spotPrice = priceGenerator.generateNextPrice();
+function snapshotFromQuote(quote: any): PriceSnapshot {
+  const underlying = 'NIFTY';
+  const timestamp = new Date().getTime();
+  const price = priceGenerator.generateNextPrice();
   const snapshot = {
+    underlying,
     timestamp,
-    spotPrice,
-    premiums: {
-      '-3': 0,
-      '-2': 0,
-      '-1': 0,
-      '0': 0,
-      '1': 0,
-      '2': 0,
-      '3': 0,
-    },
+    price,
   };
   return snapshot;
 }

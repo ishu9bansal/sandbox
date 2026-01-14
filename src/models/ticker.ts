@@ -14,6 +14,12 @@ export interface PremiumSnapshot {
   };
 }
 
+export interface PriceSnapshot {
+  price: number;
+  timestamp: number;
+  underlying: string;
+}
+
 export type Instrument = {
   instrument_token: number;
   exchange_token: string;

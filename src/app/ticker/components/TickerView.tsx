@@ -8,44 +8,12 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-import type { PremiumSnapshot } from '@/models/ticker';
 import { useLiveData } from '@/hooks/useTickerFetch';
 
-const XAXIS_TICK_INTERVAL = 15 * 60; // 15 minutes in seconds
-const TOTAL_SIMULATION_DURATION = 6 * 60 * 60 / 6; // 6 hours in seconds
-const MARKET_OPEN_TIME = 9.5 * 60 * 60; // 9:30 AM in seconds
-const tickValueGenerator = (index: number) => {
-    //  HH:MM:SS format
-    const secondsFromMarketOpen = 5*index;
-    const totalSeconds = MARKET_OPEN_TIME + secondsFromMarketOpen;
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
-    return `${hours.toString()
-        .padStart(2, '0')}:${minutes.toString()
-        .padStart(2, '0')}:${seconds.toString()
-        .padStart(2, '0')}`;
-}
-const EMPTY_DATA = Array.from({ length: 1 + TOTAL_SIMULATION_DURATION / 5 }, (_, i) => ({ time: tickValueGenerator(i) }));
-
 const TickerView = () => {
+  const showExtraLines = false;
   const { data } = useLiveData(1000);
-
-  // Transform data for Recharts
-  const chartData = [
-    ...data.map((snapshot: PremiumSnapshot) => ({
-      time: snapshot.timestamp,
-      spotPrice: snapshot.spotPrice,
-      'Strike -3': snapshot.premiums['-3'],
-      'Strike -2': snapshot.premiums['-2'],
-      'Strike -1': snapshot.premiums['-1'],
-      'Strike 0 (ATM)': snapshot.premiums['0'],
-      'Strike +1': snapshot.premiums['1'],
-      'Strike +2': snapshot.premiums['2'],
-      'Strike +3': snapshot.premiums['3'],
-    })),
-    ...EMPTY_DATA.slice(data.length),
-  ]
+  const chartData = data;
 
   // Custom tooltip
   const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{name: string; value: number; color: string; payload?: {time: string}}>}) => {
@@ -86,29 +54,6 @@ const TickerView = () => {
           </p>
         </div>
 
-        {/* Controls */}
-        {/* <Box sx={{ marginBottom: 3, display: 'flex', gap: 2 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={startSimulation}
-            disabled={isSimulating}
-          >
-            {data.length === 0 ? 'Start Simulation' : 'Resume Simulation'}
-          </Button>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={stopSimulation}
-            disabled={!isSimulating}
-          >
-            Pause Simulation
-          </Button>
-          <Button variant="outlined" color="error" onClick={resetData}>
-            Reset Data
-          </Button>
-        </Box> */}
-
         {/* Chart */}
         <div className="p-6 bg-[#1a1a1a] border border-white/10 rounded">
           {data.length === 0 ? (
@@ -129,17 +74,6 @@ const TickerView = () => {
                 <XAxis
                   stroke="rgba(255, 255, 255, 0.6)"
                   tick={{ fill: 'rgba(255, 255, 255, 0.6)', fontSize: 12 }}
-                  tickFormatter={(value) => {
-                    // Show only HH:MM for cleaner display
-                    const secondsFromMarketOpen = 5*value;
-                    const totalSeconds = MARKET_OPEN_TIME + secondsFromMarketOpen;
-                    const hours = Math.floor(totalSeconds / 3600);
-                    const minutes = Math.floor((totalSeconds % 3600) / 60);
-                    return `${hours.toString().padStart(2, '0')}:${minutes
-                      .toString()
-                      .padStart(2, '0')}`;
-                  }}
-                  interval={XAXIS_TICK_INTERVAL/5} // ticks are every 5 seconds
                 />
                 
                 {/* Left Y-axis: Premium (₹) */}
@@ -178,78 +112,12 @@ const TickerView = () => {
                 />
                 
                 {/* Premium Lines - Same color family, varying opacity */}
-                <Line
-                  yAxisId="left"
-                  type="monotone"
-                  dataKey="Strike -3"
-                  stroke="rgba(99, 179, 237, 0.4)"
-                  strokeWidth={1.5}
-                  dot={false}
-                  name="Strike -3"
-                />
-                <Line
-                  yAxisId="left"
-                  type="monotone"
-                  dataKey="Strike -2"
-                  stroke="rgba(99, 179, 237, 0.5)"
-                  strokeWidth={1.5}
-                  dot={false}
-                  name="Strike -2"
-                />
-                <Line
-                  yAxisId="left"
-                  type="monotone"
-                  dataKey="Strike -1"
-                  stroke="rgba(99, 179, 237, 0.7)"
-                  strokeWidth={2}
-                  dot={false}
-                  name="Strike -1"
-                />
-                
-                {/* ATM Line - Emphasized */}
-                <Line
-                  yAxisId="left"
-                  type="monotone"
-                  dataKey="Strike 0 (ATM)"
-                  stroke="rgba(99, 179, 237, 1)"
-                  strokeWidth={3}
-                  dot={false}
-                  name="Strike 0 (ATM)"
-                />
-                
-                <Line
-                  yAxisId="left"
-                  type="monotone"
-                  dataKey="Strike +1"
-                  stroke="rgba(99, 179, 237, 0.7)"
-                  strokeWidth={2}
-                  dot={false}
-                  name="Strike +1"
-                />
-                <Line
-                  yAxisId="left"
-                  type="monotone"
-                  dataKey="Strike +2"
-                  stroke="rgba(99, 179, 237, 0.5)"
-                  strokeWidth={1.5}
-                  dot={false}
-                  name="Strike +2"
-                />
-                <Line
-                  yAxisId="left"
-                  type="monotone"
-                  dataKey="Strike +3"
-                  stroke="rgba(99, 179, 237, 0.4)"
-                  strokeWidth={1.5}
-                  dot={false}
-                  name="Strike +3"
-                />
-                
+                {showExtraLines && <ExtraLines />}
                 {/* Spot Price Line - Lighter, on right axis */}
                 <Line
                   yAxisId="right"
                   type="monotone"
-                  dataKey="spotPrice"
+                  dataKey="price"
                   stroke="rgba(255, 0, 0, 0.5)"
                   strokeWidth={1.5}
                   dot={false}
@@ -276,5 +144,78 @@ const TickerView = () => {
     </div>
   );
 };
+
+function ExtraLines() {
+  return (
+    <>
+      <Line
+        yAxisId="left"
+        type="monotone"
+        dataKey="Strike -3"
+        stroke="rgba(99, 179, 237, 0.4)"
+        strokeWidth={1.5}
+        dot={false}
+        name="Strike -3"
+      />
+      <Line
+        yAxisId="left"
+        type="monotone"
+        dataKey="Strike -2"
+        stroke="rgba(99, 179, 237, 0.5)"
+        strokeWidth={1.5}
+        dot={false}
+        name="Strike -2"
+      />
+      <Line
+        yAxisId="left"
+        type="monotone"
+        dataKey="Strike -1"
+        stroke="rgba(99, 179, 237, 0.7)"
+        strokeWidth={2}
+        dot={false}
+        name="Strike -1"
+      />
+      
+      {/* ATM Line - Emphasized */}
+      <Line
+        yAxisId="left"
+        type="monotone"
+        dataKey="Strike 0 (ATM)"
+        stroke="rgba(99, 179, 237, 1)"
+        strokeWidth={3}
+        dot={false}
+        name="Strike 0 (ATM)"
+      />
+      
+      <Line
+        yAxisId="left"
+        type="monotone"
+        dataKey="Strike +1"
+        stroke="rgba(99, 179, 237, 0.7)"
+        strokeWidth={2}
+        dot={false}
+        name="Strike +1"
+      />
+      <Line
+        yAxisId="left"
+        type="monotone"
+        dataKey="Strike +2"
+        stroke="rgba(99, 179, 237, 0.5)"
+        strokeWidth={1.5}
+        dot={false}
+        name="Strike +2"
+      />
+      <Line
+        yAxisId="left"
+        type="monotone"
+        dataKey="Strike +3"
+        stroke="rgba(99, 179, 237, 0.4)"
+        strokeWidth={1.5}
+        dot={false}
+        name="Strike +3"
+      />
+    </>
+  );
+}
 
 export default TickerView;
