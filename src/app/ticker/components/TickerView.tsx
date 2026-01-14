@@ -9,6 +9,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { useLiveData } from '@/hooks/useTickerFetch';
+import { useState } from 'react';
 
 const today = new Date();
 today.setHours(9, 15, 0, 0);
@@ -16,11 +17,16 @@ const MARKET_OPEN_TIME = today.getTime();
 today.setHours(15, 30, 0, 0);
 const MARKET_CLOSE_TIME = today.getTime();
 
+const HALF_HOUR_MS = 30 * 60 * 1000;
+
 const TickerView = () => {
   const showExtraLines = false;
+  const [zoomLevel, setZoomLevel] = useState<'full' | 'zoom'>('full');
   const { data } = useLiveData(1000);
   const chartData = data;
-
+  const lastDataPoint = data.length > 0 ? data[data.length - 1] : null;
+  const lastTimestamp = lastDataPoint ? new Date(lastDataPoint.timestamp) : new Date();
+  const xAxisDomain = zoomLevel === 'zoom' ? zoomDomain(lastTimestamp) : [MARKET_OPEN_TIME, MARKET_CLOSE_TIME];
   // Custom tooltip
   const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{name: string; value: number; color: string; payload?: {time: string}}>}) => {
     if (active && payload && payload.length) {
@@ -88,7 +94,7 @@ const TickerView = () => {
                     const date = new Date(value);
                     return `${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
                   }}
-                  domain={[MARKET_OPEN_TIME, MARKET_CLOSE_TIME]}
+                  domain={xAxisDomain}
                 />
                 
                 {/* Left Y-axis: Premium (₹) */}
@@ -234,3 +240,11 @@ function ExtraLines() {
 }
 
 export default TickerView;
+
+
+function zoomDomain(now: Date) {
+  return [
+    Math.max(MARKET_OPEN_TIME, now.getTime() - HALF_HOUR_MS),
+    Math.min(MARKET_CLOSE_TIME, now.getTime() + HALF_HOUR_MS),
+  ];
+}
