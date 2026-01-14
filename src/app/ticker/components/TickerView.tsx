@@ -27,31 +27,6 @@ const TickerView = () => {
   const lastDataPoint = data.length > 0 ? data[data.length - 1] : null;
   const lastTimestamp = lastDataPoint ? new Date(lastDataPoint.timestamp) : new Date();
   const xAxisDomain = zoomLevel === 'zoom' ? zoomDomain(lastTimestamp) : [MARKET_OPEN_TIME, MARKET_CLOSE_TIME];
-  // Custom tooltip
-  const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{name: string; value: number; color: string; payload?: {time: string}}>}) => {
-    if (active && payload && payload.length) {
-      return (
-        <div
-          className="p-4 bg-black/90 border border-white/20 rounded"
-        >
-          <p className="text-black text-sm mb-2">
-            Time: {payload[0]?.payload?.time}
-          </p>
-          {payload.map((entry, index: number) => (
-            <p
-              key={index}
-              className="text-sm"
-              style={{ color: entry.color }}
-            >
-              {entry.name}: {entry.name === 'Spot Price' ? '₹' : '₹'}
-              {entry.value.toFixed(2)}
-            </p>
-          ))}
-        </div>
-      );
-    }
-    return null;
-  };
 
   return (
     <div className="container mx-auto">
@@ -248,3 +223,29 @@ function zoomDomain(now: Date) {
     Math.min(MARKET_CLOSE_TIME, now.getTime() + HALF_HOUR_MS),
   ];
 }
+
+// Custom tooltip
+const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{name: string; value: number; color: string; payload?: {timestamp: number}}>}) => {
+  if (active && payload && payload.length) {
+    return (
+      <div
+        className="p-4 bg-black/90 border border-white/20 rounded"
+      >
+        <p className="text-black text-sm mb-2">
+          Time: {payload[0]?.payload?.timestamp ? new Date(payload[0].payload.timestamp).toLocaleTimeString() : ''}
+        </p>
+        {payload.map((entry, index: number) => (
+          <p
+            key={index}
+            className="text-sm"
+            style={{ color: entry.color }}
+          >
+            {entry.name}: {entry.name === 'Spot Price' ? '₹' : '₹'}
+            {entry.value.toFixed(2)}
+          </p>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
