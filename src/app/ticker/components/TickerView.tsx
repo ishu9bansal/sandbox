@@ -11,7 +11,6 @@ import {
 } from 'recharts';
 import { useAppSelector } from '@/store/hooks';
 import { selectTickerData } from '@/store/slices/tickerSlice';
-import { Container, Box, Button, Typography, Paper } from '@mui/material';
 import type { PremiumSnapshot } from '@/models/ticker';
 import { useTickerFetch } from '@/hooks/useTickerFetch';
 
@@ -61,44 +60,40 @@ const StraddleVisualization: React.FC = () => {
   const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{name: string; value: number; color: string; payload?: {time: string}}>}) => {
     if (active && payload && payload.length) {
       return (
-        <Paper
-          sx={{
-            padding: 2,
-            backgroundColor: 'rgba(0, 0, 0, 0.9)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-          }}
+        <div
+          className="p-4 bg-black/90 border border-white/20 rounded"
         >
-          <Typography variant="body2" sx={{ color: '#fff', marginBottom: 1 }}>
+          <p className="text-white text-sm mb-2">
             Time: {payload[0]?.payload?.time}
-          </Typography>
+          </p>
           {payload.map((entry, index: number) => (
-            <Typography
+            <p
               key={index}
-              variant="body2"
-              sx={{ color: entry.color, fontSize: '0.85rem' }}
+              className="text-sm"
+              style={{ color: entry.color }}
             >
               {entry.name}: {entry.name === 'Spot Price' ? '₹' : '₹'}
               {entry.value.toFixed(2)}
-            </Typography>
+            </p>
           ))}
-        </Paper>
+        </div>
       );
     }
     return null;
   };
 
   return (
-    <Container>
-      <Box sx={{ padding: 3 }}>
+    <div className="container mx-auto">
+      <div className="p-6">
         {/* Header */}
-        <Box sx={{ marginBottom: 3 }}>
-          <Typography variant="h4" sx={{ color: '#fff', marginBottom: 1 }}>
+        <div className="mb-6">
+          <h1 className="text-4xl text-white mb-2">
             Intraday Straddle Premium Visualization
-          </Typography>
-          <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+          </h1>
+          <p className="text-white/70">
             Monitor combined option premiums (Call + Put) across nearby strikes with spot price context
-          </Typography>
-        </Box>
+          </p>
+        </div>
 
         {/* Controls */}
         {/* <Box sx={{ marginBottom: 3, display: 'flex', gap: 2 }}>
@@ -124,26 +119,13 @@ const StraddleVisualization: React.FC = () => {
         </Box> */}
 
         {/* Chart */}
-        <Paper
-          sx={{
-            padding: 3,
-            backgroundColor: '#1a1a1a',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-          }}
-        >
+        <div className="p-6 bg-[#1a1a1a] border border-white/10 rounded">
           {data.length === 0 ? (
-            <Box
-              sx={{
-                height: 600,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Typography variant="h6" sx={{ color: 'rgba(255, 255, 255, 0.5)' }}>
+            <div className="h-[600px] flex items-center justify-center">
+              <p className="text-xl text-white/50">
                 Click "Start Simulation" to begin monitoring
-              </Typography>
-            </Box>
+              </p>
+            </div>
           ) : (
             <ResponsiveContainer width="100%" height={600}>
               <LineChart
@@ -286,24 +268,21 @@ const StraddleVisualization: React.FC = () => {
               </LineChart>
             </ResponsiveContainer>
           )}
-        </Paper>
+        </div>
 
         {/* Info */}
-        <Box sx={{ marginTop: 3 }}>
-          <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.6)' }}>
+        <div className="mt-6">
+          <p className="text-sm text-white/60">
             <strong>Data Points:</strong> {data.length} | <strong>Status:</strong>{' '}
             {false ? 'Updating live (every 5s)' : 'Paused'}
-          </Typography>
-          <Typography
-            variant="caption"
-            sx={{ color: 'rgba(255, 255, 255, 0.5)', display: 'block', marginTop: 1 }}
-          >
+          </p>
+          <p className="text-xs text-white/50 block mt-2">
             Note: This is a simulation with dummy data for prototype purposes. Each strike represents
             combined Call + Put premium. Strike offsets are relative to ATM (±50 points per strike).
-          </Typography>
-        </Box>
-      </Box>
-    </Container>
+          </p>
+        </div>
+      </div>
+    </div>
   );
 };
 
