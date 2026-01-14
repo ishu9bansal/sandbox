@@ -50,3 +50,19 @@ export class TickerClient {
     }).replace(' ', 'T').replace(',', '');
   }
 };
+
+export class HealthClient {
+  constructor(private client: ApiClient) {}
+  async checkHealth() {
+    const uri = `/health`;
+    try {
+      const response = await this.client.get<{ status: string }>(uri, {
+        timeout: 800
+      });
+      return response?.status === 'healthy';
+    } catch (error) {
+      console.error(error); // NOTE: do not expose internal error details to user
+      throw Error("Error while checking service health");  // user facing message
+    }
+  }
+}

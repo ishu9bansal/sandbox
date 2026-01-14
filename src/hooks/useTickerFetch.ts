@@ -1,8 +1,8 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { addSnapshots, selectTickerData, setInstruments } from "@/store/slices/tickerSlice";
 import { StraddleDataSimulator } from "@/services/ticker/apiServiceSimulator";
-import { TickerClient } from "@/services/ticker/tickerClient";
+import { HealthClient, TickerClient } from "@/services/ticker/tickerClient";
 import ApiClient from "@/services/api/api";
 import { BASE_URL } from "@/services/ticker/constants";
 import { Instrument, InstrumentResponse } from "@/models/ticker";
@@ -56,4 +56,35 @@ function listFromMap(instrumentMap: InstrumentResponse): Instrument[] {
       return Object.values(instGroup2).flat();
     }).flat();
   }).flat();
+}
+
+const healthClient = new HealthClient(new ApiClient({
+  baseURL: BASE_URL,
+}));
+export function useTickerHealthStatus() {
+  // add a polling call to health api that updates a state variable
+  // this state could  be exposed to show health status in UI
+  const [healthy, setHealthy] = useState(false);
+  useEffect(() => {
+    let isMounted = true;
+    const checkHealth = async () => {
+      try {
+        const status = await healthClient.checkHealth();
+        if (isMounted) {
+          setHealthy(!!status);
+        }
+      } catch (error) {
+        if (isMounted) {
+          setHealthy(false);
+        }
+      }
+    };
+    checkHealth();
+    const intervalId = setInterval(checkHealth, 1000); // Check every seconds
+    return () => {
+      isMounted = false;
+      clearInterval(intervalId);
+    };
+  }, []);
+  return healthy;
 }
