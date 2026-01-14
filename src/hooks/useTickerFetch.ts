@@ -83,15 +83,7 @@ export function useLiveData(interval: number = 1000) {
 
 const priceGenerator = new PriceGenerator();
 function snapshotFromQuote(quote: any): PriceSnapshot {
-  const underlying = 'NIFTY';
-  const timestamp = new Date().getTime();
-  const price = priceGenerator.generateNextPrice();
-  const snapshot = {
-    underlying,
-    timestamp,
-    price,
-  };
-  return snapshot;
+  return priceGenerator.generateNextPrice();
 }
 
 function listFromMap(instrumentMap: InstrumentResponse): Instrument[] {
