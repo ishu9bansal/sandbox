@@ -70,5 +70,12 @@ export const projects: Project[] = [
     path: "/pipeline",
     icon: "🔄",
   },
+  {
+    id: "ticker",
+    name: "Ticker",
+    description: "See the combined stock ticker prices in real-time for your intraday trading needs",
+    path: "/ticker",
+    icon: "📈",
+  },
   // Add your new projects here following this pattern
 ];
