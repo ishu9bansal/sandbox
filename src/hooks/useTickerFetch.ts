@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { addSnapshots, selectTickerData, setInstruments } from "@/store/slices/tickerSlice";
+import { addSnapshots, selectInstruments, selectTickerData, setInstruments } from "@/store/slices/tickerSlice";
 import { StraddleDataSimulator } from "@/services/ticker/apiServiceSimulator";
 import { HealthClient, TickerClient } from "@/services/ticker/tickerClient";
 import ApiClient from "@/services/api/api";
@@ -30,6 +30,7 @@ const tickerClient = new TickerClient(new ApiClient({
 }));
 
 export function useInstruments() {
+  const instruments = useAppSelector(selectInstruments);
   const dispatch = useAppDispatch();
   const reload = useCallback(async () => {
     try {
@@ -47,7 +48,7 @@ export function useInstruments() {
   useEffect(() => {
     reload();
   }, [])
-  return reload;
+  return { reload, instruments };
 }
 
 function listFromMap(instrumentMap: InstrumentResponse): Instrument[] {

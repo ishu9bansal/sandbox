@@ -5,8 +5,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useInstruments, useTickerHealthStatus } from '@/hooks/useTickerFetch';
 import { Instrument } from '@/models/ticker';
-import { useAppSelector } from '@/store/hooks';
-import { selectInstruments } from '@/store/slices/tickerSlice';
 import { BadgeAlertIcon, BadgeCheckIcon } from 'lucide-react';
 import { useMemo } from 'react';
 import { instrumentsColumnBuilder } from './constants';
@@ -14,8 +12,7 @@ import { instrumentsColumnBuilder } from './constants';
 export default function InstrumentView() {
   // TODO: use shadcn data table to enable pagination
   const healthy = useTickerHealthStatus();
-  const instruments = useAppSelector(selectInstruments);
-  const reload = useInstruments();
+  const { reload, instruments } = useInstruments();
   const columns: Column<Instrument>[] = useMemo(instrumentsColumnBuilder, []);
 
   return (
