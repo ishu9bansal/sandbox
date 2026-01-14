@@ -47,6 +47,7 @@ export default function CounterPage() {
         </Card>
       </SignedIn>
       <SignedOut>
+        {/* TODO: This is not safe, just obfuscation. Check how to configure route protection via middleware in clerk. */}
         <Card title="You need to Login">
           <div className="mb-4 text-gray-600 dark:text-gray-300">
             Please sign in to access this feature.
