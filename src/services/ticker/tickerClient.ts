@@ -1,3 +1,4 @@
+import { InstrumentResponse } from "@/models/ticker";
 import ApiClient from "../api/api";
 
 export class TickerClient {
@@ -5,7 +6,7 @@ export class TickerClient {
   async getInstruments() {
     const uri = `/ticker/instruments`;
     try {
-      const response = await this.client.get(uri);
+      const response = await this.client.get<InstrumentResponse>(uri);
       return response;
     } catch (error) {
       console.error(error); // NOTE: do not expose internal error details to user
