@@ -16,7 +16,7 @@ export const localStorageMiddleware: Middleware = (store) => {
         const serializedState = JSON.stringify(state);
         
         // Only save if state actually changed
-        if (serializedState !== lastState) {
+        if (serializedState !== lastState) {  // TODO: compare only relevant fields and save only relevant data
           localStorage.setItem(STORAGE_KEY, serializedState);
           lastState = serializedState;
         }
