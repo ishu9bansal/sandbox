@@ -3,6 +3,7 @@ import Button from "@/components/Button";
 import Input from "@/components/Input";
 import ComboboxDemo from "./ComboExample";
 import DialogDemo from "./DialogExample";
+import { CardDemo } from "./CardDemo";
 
 export default function ExamplePage() {
   return (
@@ -99,6 +100,15 @@ export default function ExamplePage() {
 
       <Card title="Dialog Example">
         <DialogDemo />
+      </Card>
+
+      <Card title="Collapsible Card Example" collapsible>
+        <CardDemo
+          title="Example"
+          description="This is a collapsible card demo"
+        >
+          <ComboboxDemo />
+        </CardDemo>
       </Card>
     </div>
   );
