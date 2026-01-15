@@ -12,7 +12,6 @@ import { useLiveData } from '@/hooks/useTickerFetch';
 import { useState } from 'react';
 import { PriceSnapshot } from '@/models/ticker';
 import { Button } from '@/components/ui/button';
-import TickerHealth from './TickerHealth';
 
 const today = new Date();
 today.setHours(9, 15, 0, 0);
@@ -48,23 +47,6 @@ const TickerView = () => {
         </div>
         {/* Controls */}
         <div className="flex items-center mb-4 space-x-4">
-          {/* <button
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-            onClick={() => {
-              // Start simulation logic
-            }}
-          >
-            Start Simulation
-          </button>
-          <button
-            className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition"
-            onClick={() => {
-              // Pause simulation logic
-            }}
-          >
-            Pause Simulation
-          </button> */}
-          <TickerHealth />
           <Button onClick={toggleZoomLevel}>{
             zoomLevel === 'full' ? "Full Day" : "±30 Minutes"
           }</Button>

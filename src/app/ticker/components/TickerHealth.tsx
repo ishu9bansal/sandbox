@@ -5,7 +5,7 @@ import { BadgeAlertIcon, BadgeCheckIcon } from "lucide-react";
 export default function TickerHealth() {
   const healthy = useTickerHealthStatus();
   return (
-    <>
+    <span className="m-2">
     { healthy
         ? <Badge variant='default'>
             <BadgeCheckIcon size={12} />
@@ -16,6 +16,6 @@ export default function TickerHealth() {
             Offline
           </Badge>
         }
-    </>
+    </span>
   )
 }

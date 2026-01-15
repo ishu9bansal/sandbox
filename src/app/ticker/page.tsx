@@ -3,6 +3,8 @@
 import Obfuscation from "@/components/Obfuscate";
 import InstrumentView from "./components/InstrumentsView";
 import TickerView from "./components/TickerView";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import TickerHealth from "./components/TickerHealth";
 
 export default function CounterPage() {
   return (
@@ -14,8 +16,19 @@ export default function CounterPage() {
         </p>
       </div>
       <Obfuscation>
-        {/* <TickerView /> */}
-        <InstrumentView />
+        <Tabs defaultValue="instruments" className="mb-4">
+          <TabsList>
+            <TabsTrigger value="instruments">Instruments</TabsTrigger>
+            <TabsTrigger value="live">Live</TabsTrigger>
+          </TabsList>
+          <TickerHealth />
+          <TabsContent value="live">
+            <TickerView />
+          </TabsContent>
+          <TabsContent value="instruments">
+            <InstrumentView />
+          </TabsContent>
+        </Tabs>
       </Obfuscation>
     </div>
   );

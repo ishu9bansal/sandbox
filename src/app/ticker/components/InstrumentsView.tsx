@@ -6,7 +6,6 @@ import { useInstruments } from '@/hooks/useTickerFetch';
 import { Instrument } from '@/models/ticker';
 import { useMemo } from 'react';
 import { instrumentsColumnBuilder } from './constants';
-import TickerHealth from './TickerHealth';
 
 export default function InstrumentView() {
   // TODO: use shadcn data table to enable pagination
@@ -15,11 +14,7 @@ export default function InstrumentView() {
 
   return (
     <div>
-      <div className="flex justify-between">
-      <div className="flex w-full flex-wrap gap-4 align-center">
-        <h2>Instruments</h2>
-        <TickerHealth />
-      </div>
+      <div className="flex justify-end">
       <Button onClick={reload}>Reload Instruments</Button>
       </div>
       <DataTable
