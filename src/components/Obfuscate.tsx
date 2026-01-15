@@ -1,5 +1,5 @@
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
-import Card from "./Card";
+import Card from "./compositions/card";
 import { Button } from "./ui/button";
 
 export default function Obfuscation({ children }: { children: React.ReactNode }) {

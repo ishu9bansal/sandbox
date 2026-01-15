@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { projects } from "@/lib/projects";
+import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from "@/components/ui/item";
+import { ChevronRightIcon } from "lucide-react";
 
 export default function Home() {
   return (
@@ -39,19 +41,19 @@ export default function Home() {
         <h2 className="text-2xl font-semibold mb-4">Projects</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map((project) => (
-            <Link
-              key={project.id}
-              href={project.path}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
-            >
-              <h3 className="text-xl font-semibold mb-2">{project.name}</h3>
-              <p className="text-gray-600 dark:text-gray-300 mb-4">
-                {project.description}
-              </p>
-              <span className="text-blue-500 hover:text-blue-600 font-medium">
-                View Project →
-              </span>
-            </Link>
+            <Item key={project.id} className="shadow-md hover:shadow-lg transition-shadow" asChild>
+              <Link href={project.path} >
+                <ItemContent>
+                  <ItemTitle>{project.name}</ItemTitle>
+                  <ItemDescription>
+                    {project.description}
+                  </ItemDescription>
+                </ItemContent>
+                <ItemActions>
+                  <ChevronRightIcon className="hover:text-blue-600" />
+                </ItemActions>
+              </Link>
+            </Item>
           ))}
         </div>
       </div>

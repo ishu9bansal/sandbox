@@ -1,6 +1,6 @@
 "use client";
 
-import Card from "@/components/Card";
+import Card from "@/components/compositions/card";
 import Button from "@/components/Button";
 import { Patient } from '@/models/patient';
 import PatientCard from "./PatientCard";

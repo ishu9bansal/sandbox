@@ -1,5 +1,5 @@
 import Button from "@/components/Button";
-import Card from "@/components/Card";
+import Card from "@/components/compositions/card";
 
 type EditLayoutProps = {
   children: React.ReactNode;
