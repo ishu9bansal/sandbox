@@ -1,30 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { addSnapshots, selectInstruments, selectTickerData, setInstruments } from "@/store/slices/tickerSlice";
-import { StraddleDataSimulator } from "@/services/ticker/apiServiceSimulator";
 import { HealthClient, TickerClient } from "@/services/ticker/tickerClient";
 import ApiClient from "@/services/api/api";
 import { BASE_URL } from "@/services/ticker/constants";
-import { Instrument, InstrumentResponse, PremiumSnapshot, PriceSnapshot } from "@/models/ticker";
+import { Instrument, InstrumentResponse, PriceSnapshot } from "@/models/ticker";
 import { PriceGenerator } from "@/services/ticker/dataGenerator";
-
-// const today = new Date();
-// const defaultStartTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 9, 30, 0, 0);
-// const defaultSimulator = new StraddleDataSimulator(defaultStartTime);
-
-// export function useTickerFetch() {
-//   const dispatch = useAppDispatch();
-//   const data = useAppSelector(selectTickerData);
-//   const lastTimestamp = data.length > 0 ? data[data.length - 1].timestamp : null;
-//   const fetcher = useCallback(async () => {
-//     const newData = await defaultSimulator.fetchDeltaData(lastTimestamp);
-//     dispatch(addSnapshots(newData));
-//   }, [lastTimestamp]);
-//   useEffect(() => {
-//     fetcher();
-//   }, [])
-//   return fetcher;
-// }
 
 const tickerClient = new TickerClient(new ApiClient({
   baseURL: BASE_URL,
@@ -98,6 +79,7 @@ const healthClient = new HealthClient(new ApiClient({
   baseURL: BASE_URL,
 }));
 export function useTickerHealthStatus() {
+  // TODO: introduce exponential backoff for health checks
   // add a polling call to health api that updates a state variable
   // this state could  be exposed to show health status in UI
   const [healthy, setHealthy] = useState(false);
