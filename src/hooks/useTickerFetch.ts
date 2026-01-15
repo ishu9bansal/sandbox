@@ -5,6 +5,7 @@ import { HealthClient, TickerClient } from "@/services/ticker/tickerClient";
 import { BASE_URL } from "@/services/ticker/constants";
 import { Instrument, InstrumentResponse, PriceSnapshot, Quote } from "@/models/ticker";
 import { useAuth } from "@clerk/nextjs";
+import { toast } from "sonner";
 
 export function useInstruments() {
   const tickerClient = useTickerClient();
@@ -20,7 +21,7 @@ export function useInstruments() {
       dispatch(setInstruments(instruments));
     } catch (error) {
       console.error(error);
-      // Handle error appropriately, e.g., show notification to user
+      toast.error("Error while fetching instruments");
     }
   }, []);
   useEffect(() => {
@@ -47,7 +48,7 @@ export function useLiveData(interval: number = 1000) {
         dispatch(addSnapshots([snapshot]));
       } catch (error) {
         console.error(error);
-        // Handle error appropriately, e.g., show notification to user
+        toast.error("Error while fetching live data");
       }
     };
     fetchQuote();
