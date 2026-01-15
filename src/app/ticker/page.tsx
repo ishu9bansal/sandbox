@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import TickerView from './components/TickerView'
 import Obfuscation from "@/components/Obfuscate";
+import InstrumentView from "./components/InstrumentsView";
+import TickerView from "./components/TickerView";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import TickerHealth from "./components/TickerHealth";
 
 export default function CounterPage() {
-  const [count, setCount] = useState(0);
-
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
@@ -16,7 +16,19 @@ export default function CounterPage() {
         </p>
       </div>
       <Obfuscation>
-        <TickerView />
+        <Tabs defaultValue="instruments" className="mb-4">
+          <TabsList>
+            <TabsTrigger value="instruments">Instruments</TabsTrigger>
+            <TabsTrigger value="live">Live</TabsTrigger>
+          </TabsList>
+          <TickerHealth />
+          <TabsContent value="live">
+            <TickerView />
+          </TabsContent>
+          <TabsContent value="instruments">
+            <InstrumentView />
+          </TabsContent>
+        </Tabs>
       </Obfuscation>
     </div>
   );

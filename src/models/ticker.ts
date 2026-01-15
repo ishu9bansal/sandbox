@@ -13,3 +13,27 @@ export interface PremiumSnapshot {
     '3': number;
   };
 }
+
+export interface PriceSnapshot {
+  price: number;
+  timestamp: number;
+  underlying: string;
+}
+
+export type Instrument = {
+  instrument_token: number;
+  exchange_token: string;
+  tradingsymbol: string;
+  name: string;
+  last_price: number;
+  expiry: string;
+  strike: number;
+  tick_size: number;
+  lot_size: number;
+  instrument_type: string;
+  segment: string;
+  exchange: string;
+};
+
+// map of underlying -> instrument type -> expiry -> list of instruments
+export type InstrumentResponse = Record<string, Record<string, Record<string, Instrument[]>>>;
