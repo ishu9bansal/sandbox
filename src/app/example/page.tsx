@@ -4,6 +4,7 @@ import Input from "@/components/Input";
 import ComboboxDemo from "./ComboExample";
 import DialogDemo from "./DialogExample";
 import { CardDemo } from "./CardDemo";
+import { ItemDemo } from "./ItemDemo";
 
 export default function ExamplePage() {
   return (
@@ -96,6 +97,10 @@ export default function ExamplePage() {
 
       <Card title="Data Selector Example">
         <ComboboxDemo />
+      </Card>
+
+      <Card title="Item Demo">
+        <ItemDemo />
       </Card>
 
       <Card title="Dialog Example">
