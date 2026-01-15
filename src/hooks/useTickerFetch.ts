@@ -110,6 +110,9 @@ function useTickerClient() {
   const { getToken } = useAuth();
   const authBuilder = useCallback(async () => {
     const token = await getToken();
+    if (!token) {
+      throw new Error("User is not authenticated");
+    }
     return {
       Authorization: `Bearer ${token}`,
     };
