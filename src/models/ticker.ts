@@ -13,3 +13,44 @@ export interface PremiumSnapshot {
     '3': number;
   };
 }
+
+export interface PriceSnapshot {
+  price: number;
+  timestamp: number;
+  underlying: string;
+}
+
+export type Instrument = {
+  instrument_token: number;
+  exchange_token: string;
+  tradingsymbol: string;
+  name: string;
+  last_price: number;
+  expiry: string;
+  strike: number;
+  tick_size: number;
+  lot_size: number;
+  instrument_type: string;
+  segment: string;
+  exchange: string;
+};
+
+// map of underlying -> instrument type -> expiry -> list of instruments
+export type InstrumentResponse = Record<string, Record<string, Record<string, Instrument[]>>>;
+
+type InsrumentRef = string;
+type OHLC = {
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+};
+export type Quote = {
+  instrument_token: number;
+  tradingsymbol: string;
+  timestamp: string;
+  last_price: number;
+  net_change: number;
+  ohlc: OHLC;
+};
+export type QuoteResponse = Record<InsrumentRef, Quote>;

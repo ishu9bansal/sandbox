@@ -1,6 +1,6 @@
 "use client";
 
-import Card from "@/components/Card";
+import Card from "@/components/compositions/card";
 import Button from "@/components/Button";
 import { PerioRecord } from '@/models/perio';
 import TeethVisualization from "@/components/TeethVisualization";

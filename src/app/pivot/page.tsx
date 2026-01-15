@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import Card from "@/components/Card";
+import Card from "@/components/compositions/card";
 import Button from "@/components/Button";
 import { copyToClipboard } from "@/utils/helpers";
 import { processTable, tableToTsv, transpose, tsvToTable } from "./utils";

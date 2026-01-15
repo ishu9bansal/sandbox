@@ -1,8 +1,10 @@
-import Card from "@/components/Card";
+import Card from "@/components/compositions/card";
 import Button from "@/components/Button";
 import Input from "@/components/Input";
 import ComboboxDemo from "./ComboExample";
 import DialogDemo from "./DialogExample";
+import { CardDemo } from "./CardDemo";
+import { ItemDemo } from "./ItemDemo";
 
 export default function ExamplePage() {
   return (
@@ -97,8 +99,22 @@ export default function ExamplePage() {
         <ComboboxDemo />
       </Card>
 
+      <Card title="Item Demo">
+        <ItemDemo />
+      </Card>
+
       <Card title="Dialog Example">
         <DialogDemo />
+      </Card>
+
+      <Card title="Collapsible Card Example" collapsible>
+        <CardDemo
+          title="Example"
+          description="This is a collapsible card demo"
+          collapsible
+        >
+          <ComboboxDemo />
+        </CardDemo>
       </Card>
     </div>
   );
