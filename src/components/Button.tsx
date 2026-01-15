@@ -6,6 +6,9 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   size?: "sm" | "md" | "lg";
 }
 
+/**
+ * @deprecated use the Button from ui/button instead
+ */
 export default function Button({
   children,
   variant = "primary",
