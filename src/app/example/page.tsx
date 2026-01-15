@@ -106,6 +106,7 @@ export default function ExamplePage() {
         <CardDemo
           title="Example"
           description="This is a collapsible card demo"
+          collapsible
         >
           <ComboboxDemo />
         </CardDemo>

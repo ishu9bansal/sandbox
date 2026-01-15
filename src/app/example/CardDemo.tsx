@@ -1,38 +1,53 @@
-import { Button } from "@/components/ui/button"
+"use client"
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { ChevronDown } from "lucide-react"
+import { ChevronDown, ChevronUp } from "lucide-react"
+import { useCallback, useState } from "react";
 
 
 type CardDemoProps = {
   title: string;
   children?: React.ReactNode;
   description?: string;
+  collapsible?: boolean;
   className?: string
+  defaultCollapsed?: boolean;
 }
-export function CardDemo({ className, title, description, children }: CardDemoProps) {
+export function CardDemo({ className, title, description, children, defaultCollapsed, collapsible }: CardDemoProps) {
+  const [isCollapsed, setIsCollapsed] = useState(collapsible && defaultCollapsed);
+  const toggleCollapse = useCallback(() => collapsible && setIsCollapsed(prev => !prev), [collapsible])
   return (
     <Card className={className}>
-      <CardHeader>
-        <CardTitle className="text-xl">{title}</CardTitle>
-        <CardDescription>
-          {description}
-        </CardDescription>
-          <ChevronDown />
-        <Separator />
+      <CardHeader onClick={toggleCollapse}>
+        <div>
+          <CardTitle className={`text-xl flex justify-between items-center ${ collapsible ? "cursor-pointer" : ""}`}>
+            <span>
+              {title}
+            </span>
+            {collapsible &&
+              <span>
+                { isCollapsed ? <ChevronUp /> : <ChevronDown />}
+              </span>
+            }
+          </CardTitle>
+          <CardDescription>
+            {description}
+          </CardDescription>
+        </div>
+        
+        {!isCollapsed && <Separator />}
       </CardHeader>
-      <CardContent>
-        {children}
-      </CardContent>
+      { !isCollapsed && 
+        <CardContent>
+          {children}
+        </CardContent>
+      }
     </Card>
   )
 }
