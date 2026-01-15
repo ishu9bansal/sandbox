@@ -14,7 +14,8 @@ export default function CounterPage() {
         </p>
       </div>
       <Obfuscation>
-        <TickerView />
+        {/* <TickerView /> */}
+        <InstrumentView />
       </Obfuscation>
     </div>
   );
