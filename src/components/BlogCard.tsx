@@ -1,4 +1,4 @@
-import Card from "@/components/Card";
+import Card from "@/components/compositions/card";
 import { OGMetadata } from "@/utils/ogMetadata";
 import { BlogMetadata } from "@/lib/blogs";
 

@@ -1,5 +1,5 @@
 import { Patient } from '@/models/patient';
-import Card from "@/components/Card";
+import Card from "@/components/compositions/card";
 
 export default function PatientCard({ patient }: { patient: Patient }) {
   return (

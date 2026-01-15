@@ -1,4 +1,4 @@
-import Card from "@/components/Card";
+import Card from "@/components/compositions/card";
 import Button from "@/components/Button";
 import Input from "@/components/Input";
 import ComboboxDemo from "./ComboExample";
