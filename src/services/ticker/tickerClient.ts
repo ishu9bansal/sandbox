@@ -1,4 +1,4 @@
-import { InstrumentResponse } from "@/models/ticker";
+import { InstrumentResponse, QuoteResponse } from "@/models/ticker";
 import ApiClient from "../api/api";
 
 export class TickerClient {
@@ -18,11 +18,11 @@ export class TickerClient {
     const queryString = queryParams.toString();
     const uri = `/ticker/quote/?${queryString}`;
     try {
-      console.log("Skipping getQuote implementation");
-      console.log("Time: ", new Date());
-      return {};
-      const response = await this.client.get(uri);
-      return response;
+      const now = new Date();
+      const timestamp = now.getTime();
+      const response = await this.client.get<QuoteResponse>(uri);
+      const quote = response ? Object.values(response)[0] : null;
+      return { timestamp, quote };
     } catch (error) {
       console.error(error); // NOTE: do not expose internal error details to user
       throw Error("Error while fetching quote");  // user facing message
