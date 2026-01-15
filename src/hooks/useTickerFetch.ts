@@ -4,9 +4,10 @@ import { addSnapshots, selectInstruments, selectTickerData, setInstruments } fro
 import { HealthClient, TickerClient } from "@/services/ticker/tickerClient";
 import { BASE_URL } from "@/services/ticker/constants";
 import { Instrument, InstrumentResponse, PriceSnapshot, Quote } from "@/models/ticker";
+import { useAuth } from "@clerk/nextjs";
 
-const tickerClient = new TickerClient({ baseURL: BASE_URL });
 export function useInstruments() {
+  const tickerClient = useTickerClient();
   const instruments = useAppSelector(selectInstruments);
   const dispatch = useAppDispatch();
   const reload = useCallback(async () => {
@@ -29,6 +30,7 @@ export function useInstruments() {
 }
 
 export function useLiveData(interval: number = 1000) {
+  const tickerClient = useTickerClient();
   const data = useAppSelector(selectTickerData);
   const dispatch = useAppDispatch();
   useEffect(() => {
@@ -102,4 +104,19 @@ export function useTickerHealthStatus() {
     };
   }, []);
   return healthy;
+}
+
+function useTickerClient() {
+  const { getToken } = useAuth();
+  const authBuilder = useCallback(async () => {
+    const token = await getToken();
+    return {
+      Authorization: `Bearer ${token}`,
+    };
+  }, [getToken]);
+  const tickerClient = new TickerClient({
+    baseURL: BASE_URL,
+    authBuilder,
+  });
+  return tickerClient;
 }
