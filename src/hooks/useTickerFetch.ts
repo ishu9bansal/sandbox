@@ -5,7 +5,6 @@ import { HealthClient, TickerClient } from "@/services/ticker/tickerClient";
 import ApiClient from "@/services/api/api";
 import { BASE_URL } from "@/services/ticker/constants";
 import { Instrument, InstrumentResponse, PriceSnapshot, Quote } from "@/models/ticker";
-import { PriceGenerator } from "@/services/ticker/dataGenerator";
 
 const tickerClient = new TickerClient(new ApiClient({
   baseURL: BASE_URL,
@@ -63,7 +62,6 @@ export function useLiveData(interval: number = 1000) {
   return { data };
 }
 
-// const priceGenerator = new PriceGenerator();
 function snapshotFromQuote(timestamp: number, quote: Quote | null, underlying: string): PriceSnapshot {
   const price = quote?.last_price;
   if (price === undefined || price === null) {
