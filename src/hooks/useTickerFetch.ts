@@ -4,8 +4,7 @@ import { addSnapshots, selectInstruments, selectTickerData, setInstruments } fro
 import { HealthClient, TickerClient } from "@/services/ticker/tickerClient";
 import ApiClient from "@/services/api/api";
 import { BASE_URL } from "@/services/ticker/constants";
-import { Instrument, InstrumentResponse, PriceSnapshot } from "@/models/ticker";
-import { PriceGenerator } from "@/services/ticker/dataGenerator";
+import { Instrument, InstrumentResponse, PriceSnapshot, Quote } from "@/models/ticker";
 
 const tickerClient = new TickerClient(new ApiClient({
   baseURL: BASE_URL,
@@ -40,11 +39,12 @@ export function useLiveData(interval: number = 1000) {
     let isMounted = true;
     const fetchQuote = async () => {
       try {
-        const quote = await tickerClient.getQuote('NIFTY');
+        const underlying = 'NIFTY';
+        const { timestamp, quote } = await tickerClient.getQuote(underlying);
         if (!quote) {
           throw new Error("No quote received");
         }
-        const snapshot = snapshotFromQuote(quote);
+        const snapshot = snapshotFromQuote(timestamp, quote, underlying);
         if (!isMounted) return;
         dispatch(addSnapshots([snapshot]));
       } catch (error) {
@@ -62,9 +62,12 @@ export function useLiveData(interval: number = 1000) {
   return { data };
 }
 
-const priceGenerator = new PriceGenerator();
-function snapshotFromQuote(quote: any): PriceSnapshot {
-  return priceGenerator.generateNextPrice();
+function snapshotFromQuote(timestamp: number, quote: Quote | null, underlying: string): PriceSnapshot {
+  const price = quote?.last_price;
+  if (price === undefined || price === null) {
+    throw new Error("Invalid quote data");
+  }
+  return { underlying, timestamp, price };
 }
 
 function listFromMap(instrumentMap: InstrumentResponse): Instrument[] {
