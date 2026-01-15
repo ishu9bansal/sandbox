@@ -1,3 +1,4 @@
+"use client";
 import { BadgeCheckIcon, ChevronRightIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -9,18 +10,19 @@ import {
   ItemMedia,
   ItemTitle,
 } from "@/components/ui/item"
+import { toast } from "sonner";
 
 export function ItemDemo() {
   return (
     <div className="flex w-full max-w-md flex-col gap-6">
-      <Item variant="outline">
+      <Item className="shadow-md hover:shadow-lg transition-shadow" variant="outline">
         <ItemContent>
-          <ItemTitle>Basic Item</ItemTitle>
+          <ItemTitle>Example Item</ItemTitle>
           <ItemDescription>
-            A simple item with title and description.
+            A simple example to demonstrate the sandbox pattern
           </ItemDescription>
         </ItemContent>
-        <ItemActions>
+        <ItemActions onClick={() => toast("Action clicked!")}>
           <Button variant="outline" size="sm">
             Action
           </Button>
