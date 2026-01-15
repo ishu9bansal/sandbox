@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 
-interface ApiClientConfig {
+export interface ApiClientConfig {
   baseURL: string;
   defaultHeaders?: Record<string, string>;
   defaultParams?: Record<string, any>;

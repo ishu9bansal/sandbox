@@ -1,8 +1,11 @@
 import { InstrumentResponse, QuoteResponse } from "@/models/ticker";
-import ApiClient from "../api/api";
+import ApiClient, { ApiClientConfig } from "../api/api";
 
 export class TickerClient {
-  constructor(private client: ApiClient) {}
+  private client: ApiClient;
+  constructor(config: ApiClientConfig) {
+    this.client = new ApiClient(config);
+  }
   async getInstruments() {
     const uri = `/ticker/instruments`;
     try {
@@ -55,7 +58,10 @@ export class TickerClient {
 };
 
 export class HealthClient {
-  constructor(private client: ApiClient) {}
+  private client: ApiClient;
+  constructor(config: ApiClientConfig) {
+    this.client = new ApiClient(config);
+  }
   async checkHealth() {
     const uri = `/health`;
     try {

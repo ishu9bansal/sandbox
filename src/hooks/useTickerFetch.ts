@@ -2,14 +2,10 @@ import { useCallback, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { addSnapshots, selectInstruments, selectTickerData, setInstruments } from "@/store/slices/tickerSlice";
 import { HealthClient, TickerClient } from "@/services/ticker/tickerClient";
-import ApiClient from "@/services/api/api";
 import { BASE_URL } from "@/services/ticker/constants";
 import { Instrument, InstrumentResponse, PriceSnapshot, Quote } from "@/models/ticker";
 
-const tickerClient = new TickerClient(new ApiClient({
-  baseURL: BASE_URL,
-}));
-
+const tickerClient = new TickerClient({ baseURL: BASE_URL });
 export function useInstruments() {
   const instruments = useAppSelector(selectInstruments);
   const dispatch = useAppDispatch();
@@ -78,9 +74,7 @@ function listFromMap(instrumentMap: InstrumentResponse): Instrument[] {
   }).flat();
 }
 
-const healthClient = new HealthClient(new ApiClient({
-  baseURL: BASE_URL,
-}));
+const healthClient = new HealthClient({ baseURL: BASE_URL });
 export function useTickerHealthStatus() {
   // TODO: introduce exponential backoff for health checks
   // add a polling call to health api that updates a state variable
