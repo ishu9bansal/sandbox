@@ -9,7 +9,7 @@ import { toast } from "sonner";
 
 export function useTickerUser() {
   const tickerClient = useTickerClient();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<any>({});
   const reload = useCallback(async () => {
     try {
       const userData = await tickerClient.getUser();
