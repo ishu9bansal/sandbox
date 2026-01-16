@@ -6,13 +6,12 @@ import { useTickerUser } from '@/hooks/useTickerFetch';
 
 export default function UserView() {
   const { reload, user } = useTickerUser();
-
   return (
     <div>
-      <div className="flex justify-end">
-      <Button onClick={reload}>Reload User</Button>
+      <div className="flex justify-end mb-4">
+        <Button onClick={reload}>Reload User</Button>
       </div>
-      <Card title="User Details">
+      <Card title="User Details" collapsible>
         <JsonView data={user} />
       </Card>
     </div>

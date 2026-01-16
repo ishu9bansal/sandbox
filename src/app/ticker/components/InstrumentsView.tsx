@@ -15,7 +15,7 @@ export default function InstrumentView() {
   return (
     <div>
       <div className="flex justify-end">
-      <Button onClick={reload}>Reload Instruments</Button>
+        <Button onClick={reload}>Reload Instruments</Button>
       </div>
       <DataTable
         title="Instrument List"
