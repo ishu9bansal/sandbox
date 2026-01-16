@@ -54,3 +54,12 @@ export type Quote = {
   ohlc: OHLC;
 };
 export type QuoteResponse = Record<InsrumentRef, Quote>;
+
+export type Straddle = {
+  underlying: string;
+  strike: number;
+  expiry: string;
+  call: Instrument;
+  put: Instrument;
+};
+export type StraddleResponse = Straddle[];

@@ -26,3 +26,24 @@ export const instrumentsColumnBuilder = () => columnsBuilder(
     filterable: true,
   },
 );
+
+export const straddlesColumnBuilder = () => columnsBuilder(
+  {
+    key: 'underlying',
+    header: 'Underlying',
+    sortable: true,
+    filterable: true,
+  },
+  {
+    key: 'expiry',
+    header: 'Expiry',
+    sortable: true,
+    filterable: true,
+  },
+  {
+    key: 'strike',
+    header: 'Strike',
+    sortable: true,
+    filterable: true,
+  },
+);

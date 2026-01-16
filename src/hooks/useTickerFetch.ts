@@ -3,13 +3,13 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { addSnapshots, selectInstruments, selectTickerData, setInstruments } from "@/store/slices/tickerSlice";
 import { HealthClient, TickerClient } from "@/services/ticker/tickerClient";
 import { BASE_URL } from "@/services/ticker/constants";
-import { Instrument, InstrumentResponse, PriceSnapshot, Quote } from "@/models/ticker";
+import { PriceSnapshot, Quote, Straddle } from "@/models/ticker";
 import { useAuth } from "@clerk/nextjs";
 import { toast } from "sonner";
 
 export function useTickerUser() {
   const tickerClient = useTickerClient();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<any>({});
   const reload = useCallback(async () => {
     try {
       const userData = await tickerClient.getUser();
@@ -48,6 +48,27 @@ export function useInstruments() {
     reload();
   }, [])
   return { reload, instruments };
+}
+
+export function useStraddles(underlying: string) {
+  const tickerClient = useTickerClient();
+  const [straddles, setStraddles] = useState<Straddle[]>([]);
+  const reload = useCallback(async () => {
+    try {
+      const straddleData = await tickerClient.getStraddles(underlying);
+      if (!straddleData) {
+        throw new Error("No straddle data received");
+      }
+      setStraddles(straddleData);
+    } catch (error) {
+      console.error(error);
+      toast.error("Error while fetching straddles");
+    }
+  }, [underlying]);
+  useEffect(() => {
+    reload();
+  }, [underlying])
+  return { reload, straddles };
 }
 
 export function useLiveData(interval: number = 1000) {
@@ -135,4 +156,14 @@ function useTickerClient() {
     authBuilder,
   });
   return tickerClient;
+}
+
+export function useLongLivedToken() {
+  const { getToken } = useAuth();
+  const copyLLT = useCallback(async () => {
+    const newToken = await getToken({ template: "long-lived-token" });
+    await navigator.clipboard.writeText(newToken || "");
+    toast.success("Long lived token copied to clipboard");
+  }, [getToken]);
+  return copyLLT;
 }

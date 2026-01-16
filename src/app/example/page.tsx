@@ -5,6 +5,7 @@ import ComboboxDemo from "./ComboExample";
 import DialogDemo from "./DialogExample";
 import { CardDemo } from "./CardDemo";
 import { ItemDemo } from "./ItemDemo";
+import { Calendar22 } from "./CalendarDemo";
 
 export default function ExamplePage() {
   return (
@@ -103,6 +104,11 @@ export default function ExamplePage() {
         <ItemDemo />
       </Card>
 
+      <Card title="Calendar Component Demo">
+        <Calendar22 />
+      </Card>
+      
+      {/* Add anything new above this line for easier viewing */}
       <Card title="Dialog Example">
         <DialogDemo />
       </Card>
