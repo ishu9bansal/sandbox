@@ -9,29 +9,41 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { useLiveData } from '@/hooks/useTickerFetch';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { PriceSnapshot } from '@/models/ticker';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { ZoomInIcon, ZoomOutIcon } from 'lucide-react';
 
-const today = new Date();
-today.setHours(9, 15, 0, 0);
-const MARKET_OPEN_TIME = today.getTime();
-today.setHours(15, 30, 0, 0);
-const MARKET_CLOSE_TIME = today.getTime();
-
+const MARKET_OPEN_TIME = '09:15:00';
+const MARKET_CLOSE_TIME = '15:30:00';
 const HALF_HOUR_MS = 30 * 60 * 1000;
 
 const TickerView = () => {
   const showExtraLines = false;
-  const [zoomLevel, setZoomLevel] = useState<'full' | 'zoom'>('full');
-  const toggleZoomLevel = () => {
-    setZoomLevel((prev) => (prev === 'full' ? 'zoom' : 'full'));
-  }
   const { data } = useLiveData(1000);
   const chartData = data;
   const lastDataPoint = data.length > 0 ? data[data.length - 1] : null;
   const lastTimestamp = lastDataPoint ? new Date(lastDataPoint.timestamp) : new Date();
-  const xAxisDomain: [number, number] = zoomLevel === 'zoom' ? zoomDomain(lastTimestamp) : [MARKET_OPEN_TIME, MARKET_CLOSE_TIME];
+  const [startTime, setStartTime] = useState(MARKET_OPEN_TIME);
+  const [endTime, setEndTime] = useState(MARKET_CLOSE_TIME);
+  const defaultZoom = startTime === MARKET_OPEN_TIME && endTime === MARKET_CLOSE_TIME;
+  const xAxisDomain: [number, number] = zoomDomain(lastTimestamp, startTime, endTime);
+  const set30minZoom = useCallback(() => {
+    setStartTime(formatTime(lastTimestamp.getTime() - HALF_HOUR_MS));
+    setEndTime(formatTime(lastTimestamp.getTime() + HALF_HOUR_MS));
+  }, [lastTimestamp]);
+  const setDefaultZoom = useCallback(() => {
+    setStartTime(MARKET_OPEN_TIME);
+    setEndTime(MARKET_CLOSE_TIME);
+  }, []);
+  const toggleZoomLevel = useCallback(() => {
+    if (defaultZoom) {
+      set30minZoom();
+    } else {
+      setDefaultZoom();
+    }
+  }, [defaultZoom, set30minZoom, setDefaultZoom]);
 
   return (
     <div className="container mx-auto">
@@ -47,9 +59,28 @@ const TickerView = () => {
         </div>
         {/* Controls */}
         <div className="flex items-center mb-4 space-x-4">
-          <Button onClick={toggleZoomLevel}>{
-            zoomLevel === 'full' ? "Full Day" : "±30 Minutes"
-          }</Button>
+          <Button onClick={toggleZoomLevel}>
+            {defaultZoom ? <ZoomInIcon /> : <ZoomOutIcon />}
+          </Button>
+          <Input
+            type='time'
+            step={1}
+            min={MARKET_OPEN_TIME}
+            max={endTime}
+            value={startTime}
+            onChange={(e) => setStartTime(e.target.value)}
+            className="w-auto"
+          />
+          <span className="text-black/60">-</span>
+          <Input
+            type='time'
+            step={1}
+            max={MARKET_CLOSE_TIME}
+            min={startTime}
+            value={endTime}
+            onChange={(e) => setEndTime(e.target.value)}
+            className="w-auto"
+          />
         </div>
 
         {/* Chart */}
@@ -238,11 +269,16 @@ function ExtraLines() {
 export default TickerView;
 
 
-function zoomDomain(now: Date): [number, number] {
-  return [
-    Math.max(MARKET_OPEN_TIME, now.getTime() - HALF_HOUR_MS),
-    Math.min(MARKET_CLOSE_TIME, now.getTime() + HALF_HOUR_MS),
-  ];
+function zoomDomain(now: Date, startTime: string, endTime: string): [number, number] {
+  const [startHours, startMinutes, startSeconds] = startTime.split(':').map(Number);
+  const [endHours, endMinutes, endSeconds] = endTime.split(':').map(Number);
+
+  const startDate = new Date(now);
+  startDate.setHours(startHours, startMinutes, startSeconds, 0);
+
+  const endDate = new Date(now);
+  endDate.setHours(endHours, endMinutes, endSeconds, 0);
+  return [startDate.getTime(), endDate.getTime()];
 }
 
 // Custom tooltip
@@ -270,3 +306,11 @@ const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<
   }
   return null;
 };
+
+function formatTime(timestamp: number): string {
+  const date = new Date(timestamp);
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+  return `${hours}:${minutes}:${seconds}`;
+}
