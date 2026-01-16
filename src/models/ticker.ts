@@ -36,7 +36,7 @@ export type Instrument = {
 };
 
 // map of underlying -> instrument type -> expiry -> list of instruments
-export type InstrumentResponse = Record<string, Record<string, Record<string, Instrument[]>>>;
+export type InstrumentResponse = Instrument[];
 
 type InsrumentRef = string;
 type OHLC = {

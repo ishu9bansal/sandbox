@@ -5,6 +5,7 @@ import InstrumentView from "./components/InstrumentsView";
 import TickerView from "./components/TickerView";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TickerHealth from "./components/TickerHealth";
+import UserView from "./components/UserView";
 
 export default function CounterPage() {
   return (
@@ -16,8 +17,9 @@ export default function CounterPage() {
         </p>
       </div>
       <Obfuscation>
-        <Tabs defaultValue="instruments" className="mb-4">
+        <Tabs defaultValue="user" className="mb-4">
           <TabsList>
+            <TabsTrigger value="user">User</TabsTrigger>
             <TabsTrigger value="instruments">Instruments</TabsTrigger>
             <TabsTrigger value="live">Live</TabsTrigger>
           </TabsList>
@@ -27,6 +29,9 @@ export default function CounterPage() {
           </TabsContent>
           <TabsContent value="instruments">
             <InstrumentView />
+          </TabsContent>
+          <TabsContent value="user">
+            <UserView />
           </TabsContent>
         </Tabs>
       </Obfuscation>
