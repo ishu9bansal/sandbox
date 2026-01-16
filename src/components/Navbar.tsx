@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import { projects } from "@/lib/projects";
 import { useSidebar } from "@/contexts/SidebarContext";
-import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -43,11 +43,6 @@ export default function Navbar() {
         <div className="flex items-center gap-4">
           <SignedOut>
             <SignInButton />
-            <SignUpButton>
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                Sign Up
-              </button>
-            </SignUpButton>
           </SignedOut>
           <SignedIn>
             <UserButton />
