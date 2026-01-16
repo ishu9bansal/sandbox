@@ -8,6 +8,7 @@ import TickerHealth from "./components/TickerHealth";
 import UserView from "./components/UserView";
 import { Button } from "@/components/ui/button";
 import { useLongLivedToken } from "@/hooks/useTickerFetch";
+import StraddleView from "./components/StraddleView";
 
 export default function CounterPage() {
   const copyLLT = useLongLivedToken();
@@ -25,6 +26,7 @@ export default function CounterPage() {
             <TabsList>
               <TabsTrigger value="user">User</TabsTrigger>
               <TabsTrigger value="instruments">Instruments</TabsTrigger>
+              <TabsTrigger value="straddles">Strddles</TabsTrigger>
               <TabsTrigger value="live">Live</TabsTrigger>
             </TabsList>
             <div className="flex items-center space-x-2">
@@ -39,6 +41,9 @@ export default function CounterPage() {
           </TabsContent>
           <TabsContent value="instruments">
             <InstrumentView />
+          </TabsContent>
+          <TabsContent value="straddles">
+            <StraddleView />
           </TabsContent>
           <TabsContent value="user">
             <UserView />
