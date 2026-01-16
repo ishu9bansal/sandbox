@@ -136,3 +136,13 @@ function useTickerClient() {
   });
   return tickerClient;
 }
+
+export function useLongLivedToken() {
+  const { getToken } = useAuth();
+  const copyLLT = useCallback(async () => {
+    const newToken = await getToken({ template: "long-lived-token" });
+    await navigator.clipboard.writeText(newToken || "");
+    toast.success("Long lived token copied to clipboard");
+  }, [getToken]);
+  return copyLLT;
+}
