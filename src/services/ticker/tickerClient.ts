@@ -6,6 +6,16 @@ export class TickerClient {
   constructor(config: ApiClientConfig) {
     this.client = new ApiClient(config);
   }
+  async getUser() {
+    const uri = `/ticker/user`;
+    try {
+      const response = await this.client.get<any>(uri);
+      return response;
+    } catch (error) {
+      console.error(error); // NOTE: do not expose internal error details to user
+      throw Error("Error while fetching user data");  // user facing message
+    }
+  }
   async getInstruments() {
     const uri = `/ticker/instruments`;
     try {
