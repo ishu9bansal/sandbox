@@ -2,15 +2,13 @@ import { useCallback, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { addSnapshots, selectInstruments, selectTickerData, setInstruments } from "@/store/slices/tickerSlice";
 import { HealthClient, TickerClient } from "@/services/ticker/tickerClient";
-import ApiClient from "@/services/api/api";
 import { BASE_URL } from "@/services/ticker/constants";
 import { Instrument, InstrumentResponse, PriceSnapshot, Quote } from "@/models/ticker";
-
-const tickerClient = new TickerClient(new ApiClient({
-  baseURL: BASE_URL,
-}));
+import { useAuth } from "@clerk/nextjs";
+import { toast } from "sonner";
 
 export function useInstruments() {
+  const tickerClient = useTickerClient();
   const instruments = useAppSelector(selectInstruments);
   const dispatch = useAppDispatch();
   const reload = useCallback(async () => {
@@ -23,7 +21,7 @@ export function useInstruments() {
       dispatch(setInstruments(instruments));
     } catch (error) {
       console.error(error);
-      // Handle error appropriately, e.g., show notification to user
+      toast.error("Error while fetching instruments");
     }
   }, []);
   useEffect(() => {
@@ -33,6 +31,7 @@ export function useInstruments() {
 }
 
 export function useLiveData(interval: number = 1000) {
+  const tickerClient = useTickerClient();
   const data = useAppSelector(selectTickerData);
   const dispatch = useAppDispatch();
   useEffect(() => {
@@ -49,7 +48,7 @@ export function useLiveData(interval: number = 1000) {
         dispatch(addSnapshots([snapshot]));
       } catch (error) {
         console.error(error);
-        // Handle error appropriately, e.g., show notification to user
+        toast.error("Error while fetching live data");
       }
     };
     fetchQuote();
@@ -78,9 +77,7 @@ function listFromMap(instrumentMap: InstrumentResponse): Instrument[] {
   }).flat();
 }
 
-const healthClient = new HealthClient(new ApiClient({
-  baseURL: BASE_URL,
-}));
+const healthClient = new HealthClient({ baseURL: BASE_URL });
 export function useTickerHealthStatus() {
   // TODO: introduce exponential backoff for health checks
   // add a polling call to health api that updates a state variable
@@ -108,4 +105,22 @@ export function useTickerHealthStatus() {
     };
   }, []);
   return healthy;
+}
+
+function useTickerClient() {
+  const { getToken } = useAuth();
+  const authBuilder = useCallback(async () => {
+    const token = await getToken();
+    if (!token) {
+      throw new Error("User is not authenticated");
+    }
+    return {
+      Authorization: `Bearer ${token}`,
+    };
+  }, [getToken]);
+  const tickerClient = new TickerClient({
+    baseURL: BASE_URL,
+    authBuilder,
+  });
+  return tickerClient;
 }

@@ -1,9 +1,10 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 
-interface ApiClientConfig {
+export interface ApiClientConfig {
   baseURL: string;
   defaultHeaders?: Record<string, string>;
   defaultParams?: Record<string, any>;
+  authBuilder?: () => Promise<Record<string, string>>; // function to build auth headers
 }
 
 interface ApiCallOptions {
@@ -15,8 +16,10 @@ interface ApiCallOptions {
 export class ApiClient {
   private axiosInstance: AxiosInstance;
   private defaultParams: Record<string, any>;
+  private authBuilder: () => Promise<Record<string, string>>;
 
   constructor(config: ApiClientConfig) {
+    this.authBuilder = config.authBuilder || (async () => ({}));
     this.defaultParams = config.defaultParams || {};
 
     this.axiosInstance = axios.create({
@@ -61,11 +64,13 @@ export class ApiClient {
   ): Promise<T | null> {
     try {
       const timeout = options?.timeout || 10000; // default timeout 10s
+      const authHeaders = await this.authBuilder();
       const config: AxiosRequestConfig = {
         method,
         url: uri,
         headers: {
           ...options?.headers,
+          ...authHeaders
         },
         params: {
           ...this.defaultParams,
