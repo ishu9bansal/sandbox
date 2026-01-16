@@ -34,11 +34,10 @@ export function useInstruments() {
   const dispatch = useAppDispatch();
   const reload = useCallback(async () => {
     try {
-      const instrumentMap = await tickerClient.getInstruments();
-      if (!instrumentMap) {
+      const instruments = await tickerClient.getInstruments();
+      if (!instruments) {
         throw new Error("No instruments received");
       }
-      const instruments = listFromMap(instrumentMap);
       dispatch(setInstruments(instruments));
     } catch (error) {
       console.error(error);
@@ -88,14 +87,6 @@ function snapshotFromQuote(timestamp: number, quote: Quote | null, underlying: s
     throw new Error("Invalid quote data");
   }
   return { underlying, timestamp, price };
-}
-
-function listFromMap(instrumentMap: InstrumentResponse): Instrument[] {
-  return Object.values(instrumentMap).map((instGroup) => {
-    return Object.values(instGroup).map((instGroup2) => {
-      return Object.values(instGroup2).flat();
-    }).flat();
-  }).flat();
 }
 
 const healthClient = new HealthClient({ baseURL: BASE_URL });
