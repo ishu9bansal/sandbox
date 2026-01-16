@@ -7,6 +7,27 @@ import { Instrument, InstrumentResponse, PriceSnapshot, Quote } from "@/models/t
 import { useAuth } from "@clerk/nextjs";
 import { toast } from "sonner";
 
+export function useTickerUser() {
+  const tickerClient = useTickerClient();
+  const [user, setUser] = useState<any>(null);
+  const reload = useCallback(async () => {
+    try {
+      const userData = await tickerClient.getUser();
+      if (!userData) {
+        throw new Error("No user data received");
+      }
+      setUser(userData);
+    } catch (error) {
+      console.error(error);
+      toast.error("Error while fetching user data");
+    }
+  }, []);
+  useEffect(() => {
+    reload();
+  }, [])
+  return { reload, user };
+}
+
 export function useInstruments() {
   const tickerClient = useTickerClient();
   const instruments = useAppSelector(selectInstruments);
