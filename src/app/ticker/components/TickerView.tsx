@@ -168,7 +168,6 @@ function Chart({ chartData, xAxisDomain }: { chartData: PriceSnapshot[]; xAxisDo
           yAxisId="right"
           type="monotone"
           dataKey="price"
-          data={[]}
           stroke="rgba(255, 0, 0, 0.5)"
           strokeWidth={1.5}
           dot={false}
