@@ -71,3 +71,11 @@ export type StraddleQuote = {
   quotes: Quote[];
 }
 export type StraddleQuoteResponse = Record<InsrumentRef, StraddleQuote>;
+
+
+export interface TickerState {
+  data: PriceSnapshot[];
+  instruments: Instrument[];
+  straddlePrices: Record<string, StraddleQuote[]>;
+  liveTrackingIds: string[];
+}

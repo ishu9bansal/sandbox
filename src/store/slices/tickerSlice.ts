@@ -1,12 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { Instrument, PriceSnapshot, StraddleQuote, StraddleQuoteResponse } from '@/models/ticker';
-
-interface TickerState {
-  data: PriceSnapshot[];
-  instruments: Instrument[];
-  straddlePrices: Record<string, StraddleQuote[]>;
-  liveTrackingIds: string[];
-}
+import type { Instrument, PriceSnapshot, StraddleQuote, StraddleQuoteResponse, TickerState } from '@/models/ticker';
 
 const initialState: TickerState = {
   data: [],
@@ -20,7 +13,10 @@ const tickerSlice = createSlice({
   initialState,
   reducers: {
     setLocalState: (state, action: PayloadAction<TickerState>) => {
-      state = action.payload;
+      state.data = action.payload.data;
+      state.instruments = action.payload.instruments;
+      state.straddlePrices = action.payload.straddlePrices;
+      state.liveTrackingIds = action.payload.liveTrackingIds;
     },
     setSnapshots: (state, action: PayloadAction<PriceSnapshot[]>) => {
       state.data = action.payload;

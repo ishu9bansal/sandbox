@@ -14,8 +14,9 @@ import { PriceSnapshot } from '@/models/ticker';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ZoomInIcon, ZoomOutIcon } from 'lucide-react';
-import { useAppSelector } from '@/store/hooks';
-import { selectLiveTrackingIds, selectStraddleData } from '@/store/slices/tickerSlice';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { selectLiveTrackingIds, selectStraddleData, setLocalState } from '@/store/slices/tickerSlice';
+import { buildSimulatedState } from '@/utils/ticker';
 
 const MARKET_OPEN_TIME = '09:15:00';
 const MARKET_CLOSE_TIME = '15:30:00';
@@ -46,6 +47,14 @@ const TickerView = () => {
       setDefaultZoom();
     }
   }, [defaultZoom, set30minZoom, setDefaultZoom]);
+
+  const dispatch = useAppDispatch();
+  const setAllData = useCallback((seconds: number) => {
+    dispatch(setLocalState(buildSimulatedState(seconds)));
+  }, []);
+  const onSimulate = useCallback(() => {
+    setAllData(15*60); // Last 15 minutes
+  }, [setAllData]);
 
   return (
     <div className="container mx-auto">
@@ -86,9 +95,17 @@ const TickerView = () => {
           {/* Live Toggle */}
           <Button
             variant={isLive ? 'destructive' : 'default'}
-            onClick={() => setIsLive(prev => !prev)}
+            onClick={() => {
+              setIsLive(prev => !prev);
+              if (!isLive) setAllData(0); // Clear data when starting live
+            }}
           >
             {isLive ? 'Stop Live' : 'Start Live'}
+          </Button>
+          <Button
+            onClick={onSimulate}
+          >
+            Set simulated data
           </Button>
         </div>
 
@@ -143,7 +160,8 @@ function Chart({ chartData, xAxisDomain, showExtraLines }: { chartData: PriceSna
           allowDataOverflow={true}
           tickFormatter={(value, index) => {
             const date = new Date(value);
-            return `${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
+            const isoDate = date.toISOString().split('T')[0];
+            return `${isoDate} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
           }}
           domain={xAxisDomain}
         />

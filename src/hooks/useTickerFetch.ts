@@ -116,6 +116,7 @@ export function useLiveData(interval: number = 1000) {
   const straddleIds = useAppSelector(selectLiveTrackingIds);
   const fetchStraddlePrices = useStraddlePriceApi(straddleIds);
   useEffect(() => {
+    if (!interval) return;
     let isMounted = true;
     const intervalMethod = async () => {
       await Promise.all([
@@ -124,7 +125,7 @@ export function useLiveData(interval: number = 1000) {
       ]);
     };
     intervalMethod(); // Initial
-    const intervalId = interval ? setInterval(intervalMethod, interval) : undefined;
+    const intervalId = setInterval(intervalMethod, interval);
     return () => {
       isMounted = false;
       clearInterval(intervalId);
