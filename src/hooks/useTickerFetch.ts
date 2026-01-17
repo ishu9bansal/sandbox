@@ -93,30 +93,33 @@ export function useLiveData(interval: number = 1000) {
   const tickerClient = useTickerClient();
   const data = useAppSelector(selectTickerData);
   const dispatch = useAppDispatch();
+  const fetchQuote = useCallback(async (cancel: boolean) => {
+    try {
+      const underlying = 'NIFTY';
+      const { timestamp, quote } = await tickerClient.getQuote(underlying);
+      if (!quote) {
+        throw new Error("No quote received");
+      }
+      const snapshot = snapshotFromQuote(timestamp, quote, underlying);
+      if (cancel) return;
+      dispatch(addSnapshots([snapshot]));
+    } catch (error) {
+      console.error(error);
+      toast.error("Error while fetching live data");
+    }
+  }, [tickerClient]);
   useEffect(() => {
     let isMounted = true;
-    const fetchQuote = async () => {
-      try {
-        const underlying = 'NIFTY';
-        const { timestamp, quote } = await tickerClient.getQuote(underlying);
-        if (!quote) {
-          throw new Error("No quote received");
-        }
-        const snapshot = snapshotFromQuote(timestamp, quote, underlying);
-        if (!isMounted) return;
-        dispatch(addSnapshots([snapshot]));
-      } catch (error) {
-        console.error(error);
-        toast.error("Error while fetching live data");
-      }
+    const intervalMethod = async () => {
+      await fetchQuote(!isMounted);
     };
-    fetchQuote();
-    const intervalId = setInterval(fetchQuote, interval); // Check every seconds
+    intervalMethod(); // Initial
+    const intervalId = setInterval(intervalMethod, interval); // Check every seconds
     return () => {
       isMounted = false;
       clearInterval(intervalId);
     };
-  }, [interval, tickerClient]);
+  }, [interval, fetchQuote]);
   return { data };
 }
 
