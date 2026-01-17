@@ -17,12 +17,13 @@ export function simulateStraddleQuotes(past_seconds: number): StraddleQuote[] {
 export function simulatePriceSnapshots(past_seconds: number): PriceSnapshot[] {
   const snapshots: PriceSnapshot[] = [];
   const now = Date.now();
+  const priceGenerator = new PriceGenerator();
   for (let i = past_seconds; i > 0; i--) {
-    const timestamp = now - i * 1000;
+    const { price, underlying } = priceGenerator.generateNextPrice();
     snapshots.push({
-      timestamp,
-      price: Math.random() * 1000 + 2000, // Random price between 2000-3000
-      underlying: "NIFTY",
+      price,
+      timestamp: now - i * 1000, // 1 second intervals
+      underlying,
     });
   }
   return snapshots;
@@ -47,4 +48,28 @@ export function buildSimulatedState(past_seconds: number): TickerState {
     },
     liveTrackingIds: ["SIMULATED_STRADDLE"],
   };
+}
+
+export class PriceGenerator {
+  private timeOffset: number = 0;
+  constructor(private basePrice: number = 19750, private volatility: number = 0.002) {
+    const now = new Date();
+    if (now.getHours() >= 15 && now.getMinutes() >= 30) {
+      now.setHours(10, 0, 0, 0);  // 10 AM same day
+      this.timeOffset = now.getTime() - new Date().getTime();
+    }
+  }
+  generateNextPrice(): { price: number; timestamp: number; underlying: string; } {
+    const priceChange = (Math.random() - 0.5) * this.basePrice * this.volatility * 2;
+    const trendChange = (Math.random() - 0.5) * this.basePrice * 0.0001 * 2;
+    const spotPrice = this.basePrice + priceChange + trendChange;
+    this.basePrice = spotPrice;
+    const price = Math.round(spotPrice * 100) / 100;
+    const timestamp = new Date().getTime() + this.timeOffset;
+    return { price, timestamp, underlying: 'NIFTY'}
+  }
+}
+
+export function volFac(vol: number = 0.002): number {
+  return (1 + (Math.random() - 0.5) * vol * 2);
 }
