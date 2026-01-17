@@ -17,13 +17,13 @@ export function simulateStraddleQuotes(past_seconds: number): StraddleQuote[] {
 export function simulatePriceSnapshots(past_seconds: number): PriceSnapshot[] {
   const snapshots: PriceSnapshot[] = [];
   const now = Date.now();
-  const priceGenerator = new PriceGenerator();
+  let price = 19750 + (Math.random() - 0.5) * 500; // Start around 19750 +/- 250
   for (let i = past_seconds; i > 0; i--) {
-    const { price, underlying } = priceGenerator.generateNextPrice();
+    price *= volFac(0.001); // 0.1% volatility
     snapshots.push({
       price,
       timestamp: now - i * 1000, // 1 second intervals
-      underlying,
+      underlying: "NIFTY",
     });
   }
   return snapshots;
