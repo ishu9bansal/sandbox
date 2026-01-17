@@ -143,31 +143,50 @@ function snapshotFromQuote(timestamp: number, quote: Quote | null, underlying: s
 
 const healthClient = new HealthClient({ baseURL: BASE_URL });
 export function useTickerHealthStatus() {
-  // TODO: introduce exponential backoff for health checks
-  // add a polling call to health api that updates a state variable
-  // this state could  be exposed to show health status in UI
   const [healthy, setHealthy] = useState(false);
+  
   useEffect(() => {
     let isMounted = true;
+    let timeoutId: NodeJS.Timeout | undefined;
+    let currentDelay = 60000; // Start with 60s for healthy state
+    
     const checkHealth = async () => {
       try {
         const status = await healthClient.checkHealth();
         if (isMounted) {
           setHealthy(!!status);
+          // Reset to normal interval when healthy
+          currentDelay = 60000;
         }
       } catch (error) {
         if (isMounted) {
           setHealthy(false);
+          // Exponential backoff: start at 500ms or double current delay
+          if (currentDelay >= 60000) {
+            // We were in healthy mode, start backoff at 500ms
+            currentDelay = 500;
+          } else {
+            // Continue backoff, double the delay (capped at 60s)
+            currentDelay = Math.min(currentDelay * 2, 60000);
+          }
         }
       }
+      
+      if (isMounted) {
+        timeoutId = setTimeout(checkHealth, currentDelay);
+      }
     };
-    checkHealth();
-    const intervalId = setInterval(checkHealth, 1000); // Check every seconds
+    
+    checkHealth(); // Initial check
+    
     return () => {
       isMounted = false;
-      clearInterval(intervalId);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
     };
   }, []);
+  
   return healthy;
 }
 
