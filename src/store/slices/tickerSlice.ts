@@ -1,14 +1,16 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { Instrument, PremiumSnapshot, PriceSnapshot } from '@/models/ticker';
+import type { Instrument, PriceSnapshot, StraddleQuote, StraddleQuoteResponse } from '@/models/ticker';
 
 interface TickerState {
   data: PriceSnapshot[];
   instruments: Instrument[];
+  straddlePrices: Record<string, StraddleQuote[]>;
 }
 
 const initialState: TickerState = {
   data: [],
   instruments: [],
+  straddlePrices: {},
 };
 
 const tickerSlice = createSlice({
@@ -33,10 +35,18 @@ const tickerSlice = createSlice({
     clearInstruments: (state) => {
       state.instruments = [];
     },
+    setStraddlePrices: (state, action: PayloadAction<StraddleQuoteResponse>) => {
+      Object.entries(action.payload).forEach(([key, value]) => {
+        if (!state.straddlePrices[key]) {
+          state.straddlePrices[key] = [];
+        }
+        state.straddlePrices[key].push(value);
+      });
+    },
   },
 });
 
-export const { setSnapshots, addSnapshots, clearData, setInstruments, clearInstruments } = tickerSlice.actions;
+export const { setSnapshots, addSnapshots, clearData, setInstruments, clearInstruments, setLocalState, setStraddlePrices } = tickerSlice.actions;
 export default tickerSlice.reducer;
 export const selectTickerData = (state: { ticker: TickerState }) => state.ticker.data;
 export const selectInstruments = (state: { ticker: TickerState }) => state.ticker.instruments;

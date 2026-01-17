@@ -71,6 +71,24 @@ export function useStraddles(underlying: string) {
   return { reload, straddles };
 }
 
+export function useStraddlePriceApi(ids: string[]) {
+  const tickerClient = useTickerClient();
+  const dispatch = useAppDispatch();
+  const fetchLatestPrice = useCallback(async () => {
+    try {
+      const prices = await tickerClient.getStraddleQuotes(ids);
+      if (!prices) {
+        throw new Error("Failed to fetch straddle prices");
+      }
+      dispatch(setStraddlePrices(prices));
+    } catch (error) {
+      console.error(error);
+      toast.error("Error while fetching straddle prices");
+    }
+  }, [ids, tickerClient]);
+  return fetchLatestPrice;
+}
+
 export function useLiveData(interval: number = 1000) {
   const tickerClient = useTickerClient();
   const data = useAppSelector(selectTickerData);

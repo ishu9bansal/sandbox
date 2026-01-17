@@ -63,3 +63,10 @@ export type Straddle = {
   put: Instrument;
 };
 export type StraddleResponse = Straddle[];
+
+export type StraddleQuote = {
+  timestamp: number;
+  price: number;
+  quotes: Quote[];
+}
+export type StraddleQuoteResponse = Record<InsrumentRef, StraddleQuote>;
