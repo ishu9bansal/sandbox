@@ -133,7 +133,6 @@ function Chart({ chartData, xAxisDomain }: { chartData: PriceSnapshot[]; xAxisDo
           dataKey="timestamp"
           allowDataOverflow={true}
           tickFormatter={(value, index) => {
-            if (!index) console.log('Formatting tick value:', new Date());
             const date = new Date(value);
             return `${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
           }}

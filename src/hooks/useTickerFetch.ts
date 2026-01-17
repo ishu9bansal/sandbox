@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { addSnapshots, selectInstruments, selectTickerData, setInstruments, setStraddlePrices } from "@/store/slices/tickerSlice";
+import { addSnapshots, selectInstruments, selectLiveTrackingIds, selectTickerData, setInstruments, setStraddlePrices } from "@/store/slices/tickerSlice";
 import { HealthClient, TickerClient } from "@/services/ticker/tickerClient";
 import { BASE_URL } from "@/services/ticker/constants";
 import { PriceSnapshot, Quote, Straddle } from "@/models/ticker";
@@ -74,12 +74,17 @@ export function useStraddles(underlying: string) {
 export function useStraddlePriceApi(ids: string[]) {
   const tickerClient = useTickerClient();
   const dispatch = useAppDispatch();
-  const fetchLatestPrice = useCallback(async () => {
+  const fetchLatestPrice = useCallback(async (cancel: boolean) => {
+    if (ids.length === 0) {
+      console.debug("No straddle IDs selected to fetch prices for");
+      return;
+    }
     try {
       const prices = await tickerClient.getStraddleQuotes(ids);
       if (!prices) {
         throw new Error("Failed to fetch straddle prices");
       }
+      if (cancel) return;
       dispatch(setStraddlePrices(prices));
     } catch (error) {
       console.error(error);
@@ -108,10 +113,15 @@ export function useLiveData(interval: number = 1000) {
       toast.error("Error while fetching live data");
     }
   }, [tickerClient]);
+  const straddleIds = useAppSelector(selectLiveTrackingIds);
+  const fetchStraddlePrices = useStraddlePriceApi(straddleIds);
   useEffect(() => {
     let isMounted = true;
     const intervalMethod = async () => {
-      await fetchQuote(!isMounted);
+      await Promise.all([
+        fetchQuote(!isMounted),
+        fetchStraddlePrices(!isMounted),
+      ]);
     };
     intervalMethod(); // Initial
     const intervalId = setInterval(intervalMethod, interval); // Check every seconds
@@ -119,7 +129,7 @@ export function useLiveData(interval: number = 1000) {
       isMounted = false;
       clearInterval(intervalId);
     };
-  }, [interval, fetchQuote]);
+  }, [interval, fetchQuote, fetchStraddlePrices]);
   return { data };
 }
 
