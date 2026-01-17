@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { addSnapshots, selectInstruments, selectTickerData, setInstruments } from "@/store/slices/tickerSlice";
+import { addSnapshots, selectInstruments, selectTickerData, setInstruments, setStraddlePrices } from "@/store/slices/tickerSlice";
 import { HealthClient, TickerClient } from "@/services/ticker/tickerClient";
 import { BASE_URL } from "@/services/ticker/constants";
 import { PriceSnapshot, Quote, Straddle } from "@/models/ticker";
@@ -21,7 +21,7 @@ export function useTickerUser() {
       console.error(error);
       toast.error("Error while fetching user data");
     }
-  }, []);
+  }, [tickerClient]);
   useEffect(() => {
     reload();
   }, [])
@@ -43,7 +43,7 @@ export function useInstruments() {
       console.error(error);
       toast.error("Error while fetching instruments");
     }
-  }, []);
+  }, [tickerClient]);
   useEffect(() => {
     reload();
   }, [])
@@ -64,7 +64,7 @@ export function useStraddles(underlying: string) {
       console.error(error);
       toast.error("Error while fetching straddles");
     }
-  }, [underlying]);
+  }, [underlying, tickerClient]);
   useEffect(() => {
     reload();
   }, [underlying])
@@ -98,7 +98,7 @@ export function useLiveData(interval: number = 1000) {
       isMounted = false;
       clearInterval(intervalId);
     };
-  }, [interval]);
+  }, [interval, tickerClient]);
   return { data };
 }
 
@@ -151,10 +151,10 @@ function useTickerClient() {
       Authorization: `Bearer ${token}`,
     };
   }, [getToken]);
-  const tickerClient = new TickerClient({
+  const tickerClient = useMemo(() => new TickerClient({
     baseURL: BASE_URL,
     authBuilder,
-  });
+  }), [authBuilder]);
   return tickerClient;
 }
 
