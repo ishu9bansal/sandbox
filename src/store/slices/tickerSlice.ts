@@ -5,12 +5,14 @@ interface TickerState {
   data: PriceSnapshot[];
   instruments: Instrument[];
   straddlePrices: Record<string, StraddleQuote[]>;
+  liveTrackingIds: string[];
 }
 
 const initialState: TickerState = {
   data: [],
   instruments: [],
   straddlePrices: {},
+  liveTrackingIds: [],
 };
 
 const tickerSlice = createSlice({
@@ -43,10 +45,29 @@ const tickerSlice = createSlice({
         state.straddlePrices[key].push(value);
       });
     },
+    setLiveTrackingIds: (state, action: PayloadAction<string[]>) => {
+      state.liveTrackingIds = action.payload;
+    },
   },
 });
 
-export const { setSnapshots, addSnapshots, clearData, setInstruments, clearInstruments, setLocalState, setStraddlePrices } = tickerSlice.actions;
+export const {
+  setSnapshots,
+  addSnapshots,
+  clearData,
+  setInstruments,
+  clearInstruments,
+  setLocalState,
+  setStraddlePrices,
+  setLiveTrackingIds,
+} = tickerSlice.actions;
 export default tickerSlice.reducer;
 export const selectTickerData = (state: { ticker: TickerState }) => state.ticker.data;
 export const selectInstruments = (state: { ticker: TickerState }) => state.ticker.instruments;
+export const selectStraddleData = (ids: string[]) => (state: { ticker: TickerState }) => {
+  const result: Record<string, StraddleQuote[]> = {};
+  ids.forEach(id => {
+    result[id] = state.ticker.straddlePrices[id] || [];
+  });
+  return result;
+};

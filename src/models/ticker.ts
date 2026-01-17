@@ -56,6 +56,7 @@ export type Quote = {
 export type QuoteResponse = Record<InsrumentRef, Quote>;
 
 export type Straddle = {
+  id: string;
   underlying: string;
   strike: number;
   expiry: string;
