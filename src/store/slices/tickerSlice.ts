@@ -15,6 +15,9 @@ const tickerSlice = createSlice({
   name: 'ticker',
   initialState,
   reducers: {
+    setLocalState: (state, action: PayloadAction<TickerState>) => {
+      state = action.payload;
+    },
     setSnapshots: (state, action: PayloadAction<PriceSnapshot[]>) => {
       state.data = action.payload;
     },
