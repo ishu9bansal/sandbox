@@ -64,6 +64,7 @@ export const {
 export default tickerSlice.reducer;
 export const selectTickerData = (state: { ticker: TickerState }) => state.ticker.data;
 export const selectInstruments = (state: { ticker: TickerState }) => state.ticker.instruments;
+export const selectLiveTrackingIds = (state: { ticker: TickerState }) => state.ticker.liveTrackingIds;
 export const selectStraddleData = (ids: string[]) => (state: { ticker: TickerState }) => {
   const result: Record<string, StraddleQuote[]> = {};
   ids.forEach(id => {

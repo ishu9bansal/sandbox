@@ -14,13 +14,14 @@ import { PriceSnapshot } from '@/models/ticker';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ZoomInIcon, ZoomOutIcon } from 'lucide-react';
+import { useAppSelector } from '@/store/hooks';
+import { selectLiveTrackingIds, selectStraddleData } from '@/store/slices/tickerSlice';
 
 const MARKET_OPEN_TIME = '09:15:00';
 const MARKET_CLOSE_TIME = '15:30:00';
 const HALF_HOUR_MS = 30 * 60 * 1000;
 
 const TickerView = () => {
-  const showExtraLines = false;
   const { data } = useLiveData(1000);
   const chartData = data;
   const lastDataPoint = data.length > 0 ? data[data.length - 1] : null;
@@ -95,7 +96,6 @@ const TickerView = () => {
             <Chart
               chartData={chartData}
               xAxisDomain={xAxisDomain}
-              showExtraLines={showExtraLines}
             />
           )}
         </div>
@@ -116,7 +116,7 @@ const TickerView = () => {
   );
 };
 
-function Chart({ chartData, xAxisDomain, showExtraLines }: { chartData: PriceSnapshot[]; xAxisDomain: [number, number]; showExtraLines: boolean; }) {
+function Chart({ chartData, xAxisDomain }: { chartData: PriceSnapshot[]; xAxisDomain: [number, number]; }) {
   return (
     <ResponsiveContainer width="100%" height={600}>
       <LineChart
@@ -138,20 +138,6 @@ function Chart({ chartData, xAxisDomain, showExtraLines }: { chartData: PriceSna
             return `${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
           }}
           domain={xAxisDomain}
-        />
-        
-        {/* Left Y-axis: Premium (₹) */}
-        <YAxis
-          yAxisId="left"
-          stroke="rgba(255, 255, 255, 0.6)"
-          tick={{ fill: 'rgba(255, 255, 255, 0.6)', fontSize: 12 }}
-          label={{
-            value: 'Combined Premium (₹)',
-            angle: -90,
-            position: 'insideLeft',
-            style: { fill: 'rgba(255, 255, 255, 0.6)' },
-          }}
-          domain={['dataMin', 'dataMax']}
         />
         
         {/* Right Y-axis: Spot Price */}
@@ -176,12 +162,13 @@ function Chart({ chartData, xAxisDomain, showExtraLines }: { chartData: PriceSna
         />
         
         {/* Premium Lines - Same color family, varying opacity */}
-        {showExtraLines && <ExtraLines />}
+        <ExtraLines />
         {/* Spot Price Line - Lighter, on right axis */}
         <Line
           yAxisId="right"
           type="monotone"
           dataKey="price"
+          data={[]}
           stroke="rgba(255, 0, 0, 0.5)"
           strokeWidth={1.5}
           dot={false}
@@ -194,74 +181,35 @@ function Chart({ chartData, xAxisDomain, showExtraLines }: { chartData: PriceSna
 }
 
 function ExtraLines() {
+  const straddleIds = useAppSelector(selectLiveTrackingIds);
+  const pricesMap = useAppSelector(selectStraddleData(straddleIds));
   return (
     <>
-      <Line
+      {/* Left Y-axis: Premium (₹) */}
+      <YAxis
         yAxisId="left"
-        type="monotone"
-        dataKey="Strike -3"
-        stroke="rgba(99, 179, 237, 0.4)"
-        strokeWidth={1.5}
-        dot={false}
-        name="Strike -3"
+        stroke="rgba(255, 255, 255, 0.6)"
+        tick={{ fill: 'rgba(255, 255, 255, 0.6)', fontSize: 12 }}
+        label={{
+          value: 'Combined Premium (₹)',
+          angle: -90,
+          position: 'insideLeft',
+          style: { fill: 'rgba(255, 255, 255, 0.6)' },
+        }}
+        domain={['dataMin', 'dataMax']}
       />
-      <Line
-        yAxisId="left"
-        type="monotone"
-        dataKey="Strike -2"
-        stroke="rgba(99, 179, 237, 0.5)"
-        strokeWidth={1.5}
-        dot={false}
-        name="Strike -2"
-      />
-      <Line
-        yAxisId="left"
-        type="monotone"
-        dataKey="Strike -1"
-        stroke="rgba(99, 179, 237, 0.7)"
-        strokeWidth={2}
-        dot={false}
-        name="Strike -1"
-      />
-      
-      {/* ATM Line - Emphasized */}
-      <Line
-        yAxisId="left"
-        type="monotone"
-        dataKey="Strike 0 (ATM)"
-        stroke="rgba(99, 179, 237, 1)"
-        strokeWidth={3}
-        dot={false}
-        name="Strike 0 (ATM)"
-      />
-      
-      <Line
-        yAxisId="left"
-        type="monotone"
-        dataKey="Strike +1"
-        stroke="rgba(99, 179, 237, 0.7)"
-        strokeWidth={2}
-        dot={false}
-        name="Strike +1"
-      />
-      <Line
-        yAxisId="left"
-        type="monotone"
-        dataKey="Strike +2"
-        stroke="rgba(99, 179, 237, 0.5)"
-        strokeWidth={1.5}
-        dot={false}
-        name="Strike +2"
-      />
-      <Line
-        yAxisId="left"
-        type="monotone"
-        dataKey="Strike +3"
-        stroke="rgba(99, 179, 237, 0.4)"
-        strokeWidth={1.5}
-        dot={false}
-        name="Strike +3"
-      />
+      {Object.entries(pricesMap).map(([strike, prices]) => (
+        <Line
+          yAxisId="left"
+          type="monotone"
+          data={prices}
+          dataKey="price"
+          stroke="rgba(99, 179, 237, 0.4)"
+          strokeWidth={1.5}
+          dot={false}
+          name={strike}
+        />
+      ))}
     </>
   );
 }
