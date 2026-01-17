@@ -22,7 +22,8 @@ const MARKET_CLOSE_TIME = '15:30:00';
 const HALF_HOUR_MS = 30 * 60 * 1000;
 
 const TickerView = () => {
-  const { data } = useLiveData(1000);
+  const [isLive, setIsLive] = useState(false);
+  const { data } = useLiveData(isLive ? 1000 : 0); // Fetch every second if live
   const chartData = data;
   const lastDataPoint = data.length > 0 ? data[data.length - 1] : null;
   const lastTimestamp = lastDataPoint ? new Date(lastDataPoint.timestamp) : new Date();
@@ -82,6 +83,13 @@ const TickerView = () => {
             onChange={(e) => setEndTime(e.target.value)}
             className="w-auto"
           />
+          {/* Live Toggle */}
+          <Button
+            variant={isLive ? 'destructive' : 'default'}
+            onClick={() => setIsLive(prev => !prev)}
+          >
+            {isLive ? 'Stop Live' : 'Start Live'}
+          </Button>
         </div>
 
         {/* Chart */}
@@ -96,6 +104,7 @@ const TickerView = () => {
             <Chart
               chartData={chartData}
               xAxisDomain={xAxisDomain}
+              showExtraLines={true}
             />
           )}
         </div>
@@ -116,7 +125,7 @@ const TickerView = () => {
   );
 };
 
-function Chart({ chartData, xAxisDomain }: { chartData: PriceSnapshot[]; xAxisDomain: [number, number]; }) {
+function Chart({ chartData, xAxisDomain, showExtraLines }: { chartData: PriceSnapshot[]; xAxisDomain: [number, number]; showExtraLines?: boolean }) {
   return (
     <ResponsiveContainer width="100%" height={600}>
       <LineChart
@@ -161,7 +170,7 @@ function Chart({ chartData, xAxisDomain }: { chartData: PriceSnapshot[]; xAxisDo
         />
         
         {/* Premium Lines - Same color family, varying opacity */}
-        <ExtraLines />
+        {showExtraLines && <ExtraLines />}
         {/* Spot Price Line - Lighter, on right axis */}
         <Line
           yAxisId="right"

@@ -124,7 +124,7 @@ export function useLiveData(interval: number = 1000) {
       ]);
     };
     intervalMethod(); // Initial
-    const intervalId = setInterval(intervalMethod, interval); // Check every seconds
+    const intervalId = interval ? setInterval(intervalMethod, interval) : undefined;
     return () => {
       isMounted = false;
       clearInterval(intervalId);
