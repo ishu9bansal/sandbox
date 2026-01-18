@@ -39,7 +39,7 @@ export type Instrument = {
 export type InstrumentResponse = Instrument[];
 
 type InsrumentRef = string;
-type OHLC = {
+export type OHLC = {
   open: number;
   high: number;
   low: number;

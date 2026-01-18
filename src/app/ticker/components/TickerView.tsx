@@ -10,7 +10,7 @@ import {
 } from 'recharts';
 import { useLiveData } from '@/hooks/useTickerFetch';
 import { useCallback, useState } from 'react';
-import { PriceSnapshot, StraddleQuote } from '@/models/ticker';
+import { OHLC, PriceSnapshot, StraddleQuote } from '@/models/ticker';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ZoomInIcon, ZoomOutIcon } from 'lucide-react';
@@ -321,23 +321,45 @@ function buildChartData(data: PriceSnapshot[], pricesMap: Record<string, Straddl
   // return straddlePrices;
   // return stockPrices;
   const chartData = stockPrices.concat(straddlePrices);
-  return groupByTimestamp(chartData, roundToNearest(MINUTE));
+  const groupedResults = groupByTimestamp(chartData, roundToNearest(30*SECOND));
+  return Object.entries(groupedResults).map(([timestampStr, values]) => ({
+    timestamp: Number(timestampStr),
+    ...Object.fromEntries(
+      Object.entries(values).map(([key, ohlc]) => [key, ohlc.close])
+    ),
+  })).sort((a, b) => a.timestamp - b.timestamp);
 }
 
-function groupByTimestamp(data: PriceDataPoint[], rounding: (timestamp: number) => number = ((t) => t)): PriceDataPoint[] {
-  const grouped: Record<number, PriceDataPoint> = {};
-  data.forEach(point => {
+function groupByTimestamp(data: PriceDataPoint[], rounding: (timestamp: number) => number = ((t) => t)) {
+  const sortedData = data.sort((a, b) => a.timestamp - b.timestamp);
+  const grouped: Record<number, Record<string, number[]>> = {};
+  sortedData.forEach(point => {
     const timestamp = rounding(point.timestamp);
     if (!grouped[timestamp]) {
-      grouped[timestamp] = { timestamp: timestamp };
+      grouped[timestamp] = {};
     }
     Object.entries(point).forEach(([key, value]) => {
       if (key !== 'timestamp') {
-        grouped[timestamp][key] = value;
+        if (!grouped[timestamp][key]) {
+          grouped[timestamp][key] = [];
+        }
+        grouped[timestamp][key].push(value);
       }
     });
   });
-  return Object.values(grouped).sort((a, b) => a.timestamp - b.timestamp);
+  const result: Record<number, Record<string, OHLC>> = {};
+  Object.entries(grouped).forEach(([timestampStr, values]) => {
+    const timestamp = Number(timestampStr);
+    result[timestamp] = {};
+    Object.entries(values).forEach(([key, vals]) => {
+      const open = vals[0];
+      const close = vals[vals.length - 1];
+      const high = Math.max(...vals);
+      const low = Math.min(...vals);
+      result[timestamp][key] = { open, high, low, close };
+    });
+  });
+  return result;
 }
 
 function roundToNearest(interval: number): (timestamp: number) => number {
