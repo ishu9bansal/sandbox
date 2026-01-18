@@ -183,8 +183,31 @@ function Chart({ chartData, xAxisDomain, straddleIds }: { chartData: PriceDataPo
           iconType="line"
         />
         
-        {/* Premium Lines - Same color family, varying opacity */}
-        {straddleIds && <ExtraLines ids={straddleIds} />}
+        {/* Left Y-axis: Premium (₹) */}
+        <YAxis
+          yAxisId="left"
+          stroke="rgba(255, 255, 255, 0.6)"
+          tick={{ fill: 'rgba(255, 255, 255, 0.6)', fontSize: 12 }}
+          label={{
+            value: 'Combined Premium (₹)',
+            angle: -90,
+            position: 'insideLeft',
+            style: { fill: 'rgba(255, 255, 255, 0.6)' },
+          }}
+          domain={['dataMin', 'dataMax']}
+        />
+        {straddleIds?.map((key) => (
+          <Line
+            key={key}
+            yAxisId="left"
+            type="monotone"
+            dataKey={key}
+            stroke="rgba(99, 179, 237, 0.4)"
+            strokeWidth={1.5}
+            dot={false}
+            name={key}
+          />
+        ))}
         {/* Spot Price Line - Lighter, on right axis */}
         <Line
           yAxisId="right"
@@ -293,8 +316,23 @@ function buildChartData(data: PriceSnapshot[], pricesMap: Record<string, Straddl
     timestamp: quote.timestamp,
     [id]: quote.price,
   }))).flat();
-  const chartData = stockPrices.concat([]);
-  // const chartData = stockPrices.concat(straddlePrices);
-  chartData.sort((a, b) => a.timestamp - b.timestamp);
-  return chartData;
+  // return straddlePrices;
+  // return stockPrices;
+  const chartData = stockPrices.concat(straddlePrices);
+  return groupByTimestamp(chartData);
+}
+
+function groupByTimestamp(data: PriceDataPoint[]): PriceDataPoint[] {
+  const grouped: Record<number, PriceDataPoint> = {};
+  data.forEach(point => {
+    if (!grouped[point.timestamp]) {
+      grouped[point.timestamp] = { timestamp: point.timestamp };
+    }
+    Object.entries(point).forEach(([key, value]) => {
+      if (key !== 'timestamp') {
+        grouped[point.timestamp][key] = value;
+      }
+    });
+  });
+  return Object.values(grouped).sort((a, b) => a.timestamp - b.timestamp);
 }
