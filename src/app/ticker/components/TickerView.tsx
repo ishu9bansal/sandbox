@@ -26,9 +26,9 @@ const TickerView = () => {
   const [isLive, setIsLive] = useState(false);
   const straddleIds = useAppSelector(selectLiveTrackingIds);
   const pricesMap = useAppSelector(selectStraddleData(straddleIds));
-  const { data } = useLiveData(isLive ? 1000 : 0); // Fetch every second if live
-  const chartData = buildChartData(data, pricesMap);
-  const lastDataPoint = data.length > 0 ? data[data.length - 1] : null;
+  const { data: stockData } = useLiveData(isLive ? 1000 : 0); // Fetch every second if live
+  const chartData = buildChartData(stockData, pricesMap);
+  const lastDataPoint = chartData.length > 0 ? chartData[chartData.length - 1] : null;
   const lastTimestamp = lastDataPoint ? new Date(lastDataPoint.timestamp) : new Date();
   const [startTime, setStartTime] = useState(MARKET_OPEN_TIME);
   const [endTime, setEndTime] = useState(MARKET_CLOSE_TIME);
@@ -113,13 +113,7 @@ const TickerView = () => {
 
         {/* Chart */}
         <div className="p-6 bg-[#1a1a1a] border border-white/10 rounded">
-          {data.length === 0 ? (
-            <div className="h-[600px] flex items-center justify-center">
-              <p className="text-xl text-black/50">
-                Click "Start Simulation" to begin monitoring
-              </p>
-            </div>
-          ) : (
+          {(
             <Chart
               chartData={chartData}
               xAxisDomain={xAxisDomain}
@@ -131,7 +125,7 @@ const TickerView = () => {
         {/* Info */}
         <div className="mt-6">
           <p className="text-sm text-black/60">
-            <strong>Data Points:</strong> {data.length} | <strong>Status:</strong>{' '}
+            <strong>Data Points:</strong> {chartData.length} | <strong>Status:</strong>{' '}
             {false ? 'Updating live (every 5s)' : 'Paused'}
           </p>
           <p className="text-xs text-black/50 block mt-2">
@@ -290,17 +284,18 @@ function formatTime(timestamp: number): string {
 
 type PriceDataPoint = { timestamp: number; } & Record<string, number>;
 function buildChartData(data: PriceSnapshot[], pricesMap: Record<string, StraddleQuote[]>): PriceDataPoint[] {
-  const chartData: PriceDataPoint[] = data.map(snapshot => {
+  const stockPrices: PriceDataPoint[] = data.map(snapshot => {
     const point: PriceDataPoint = { timestamp: snapshot.timestamp };
     point['NIFTY'] = snapshot.price;
-    // Add straddle prices for this timestamp
-    Object.entries(pricesMap).forEach(([id, quotes]) => {
-      const quoteAtTime = quotes.find(q => q.timestamp === snapshot.timestamp);
-      if (quoteAtTime) {
-        point[id] = quoteAtTime.price;
-      }
-    });
     return point;
   });
+  // Add straddle prices for this timestamp
+  const straddlePrices = Object.entries(pricesMap).map(([id, quotes]) => quotes.map(quote => ({
+    timestamp: quote.timestamp,
+    [id]: quote.price,
+  }))).flat();
+  const chartData = stockPrices.concat([]);
+  // const chartData = stockPrices.concat(straddlePrices);
+  chartData.sort((a, b) => a.timestamp - b.timestamp);
   return chartData;
 }
