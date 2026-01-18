@@ -225,6 +225,8 @@ function Chart({ chartData, xAxisDomain, straddleIds }: { chartData: PriceDataPo
 }
 
 function ExtraLines({ ids }: { ids: string[] }) {
+  // NOTE: Making a separate component for sub chart is not working with Recharts
+  // need to debug this later. For now, keep it in main Chart component.
   return (
     <>
       {/* Left Y-axis: Premium (₹) */}
@@ -322,15 +324,16 @@ function buildChartData(data: PriceSnapshot[], pricesMap: Record<string, Straddl
   return groupByTimestamp(chartData);
 }
 
-function groupByTimestamp(data: PriceDataPoint[]): PriceDataPoint[] {
+function groupByTimestamp(data: PriceDataPoint[], rounding: (timestamp: number) => number = ((t) => t)): PriceDataPoint[] {
   const grouped: Record<number, PriceDataPoint> = {};
   data.forEach(point => {
-    if (!grouped[point.timestamp]) {
-      grouped[point.timestamp] = { timestamp: point.timestamp };
+    const timestamp = rounding(point.timestamp);
+    if (!grouped[timestamp]) {
+      grouped[timestamp] = { timestamp: timestamp };
     }
     Object.entries(point).forEach(([key, value]) => {
       if (key !== 'timestamp') {
-        grouped[point.timestamp][key] = value;
+        grouped[timestamp][key] = value;
       }
     });
   });
