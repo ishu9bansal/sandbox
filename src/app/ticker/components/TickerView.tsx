@@ -10,7 +10,7 @@ import {
 } from 'recharts';
 import { useLiveData } from '@/hooks/useTickerFetch';
 import { useCallback, useState } from 'react';
-import { PriceSnapshot } from '@/models/ticker';
+import { PriceSnapshot, StraddleQuote } from '@/models/ticker';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ZoomInIcon, ZoomOutIcon } from 'lucide-react';
@@ -24,8 +24,10 @@ const HALF_HOUR_MS = 30 * 60 * 1000;
 
 const TickerView = () => {
   const [isLive, setIsLive] = useState(false);
+  const straddleIds = useAppSelector(selectLiveTrackingIds);
+  const pricesMap = useAppSelector(selectStraddleData(straddleIds));
   const { data } = useLiveData(isLive ? 1000 : 0); // Fetch every second if live
-  const chartData = data;
+  const chartData = buildChartData(data, pricesMap);
   const lastDataPoint = data.length > 0 ? data[data.length - 1] : null;
   const lastTimestamp = lastDataPoint ? new Date(lastDataPoint.timestamp) : new Date();
   const [startTime, setStartTime] = useState(MARKET_OPEN_TIME);
@@ -121,7 +123,7 @@ const TickerView = () => {
             <Chart
               chartData={chartData}
               xAxisDomain={xAxisDomain}
-              showExtraLines={true}
+              straddleIds={straddleIds}
             />
           )}
         </div>
@@ -142,7 +144,7 @@ const TickerView = () => {
   );
 };
 
-function Chart({ chartData, xAxisDomain, showExtraLines }: { chartData: PriceSnapshot[]; xAxisDomain: [number, number]; showExtraLines?: boolean }) {
+function Chart({ chartData, xAxisDomain, straddleIds }: { chartData: PriceDataPoint[]; xAxisDomain: [number, number]; straddleIds?: string[] }) {
   return (
     <ResponsiveContainer width="100%" height={600}>
       <LineChart
@@ -188,12 +190,12 @@ function Chart({ chartData, xAxisDomain, showExtraLines }: { chartData: PriceSna
         />
         
         {/* Premium Lines - Same color family, varying opacity */}
-        {showExtraLines && <ExtraLines />}
+        {straddleIds && <ExtraLines ids={straddleIds} />}
         {/* Spot Price Line - Lighter, on right axis */}
         <Line
           yAxisId="right"
           type="monotone"
-          dataKey="price"
+          dataKey="NIFTY"
           stroke="rgba(255, 0, 0, 0.5)"
           strokeWidth={1.5}
           dot={false}
@@ -205,9 +207,7 @@ function Chart({ chartData, xAxisDomain, showExtraLines }: { chartData: PriceSna
   );
 }
 
-function ExtraLines() {
-  const straddleIds = useAppSelector(selectLiveTrackingIds);
-  const pricesMap = useAppSelector(selectStraddleData(straddleIds));
+function ExtraLines({ ids }: { ids: string[] }) {
   return (
     <>
       {/* Left Y-axis: Premium (₹) */}
@@ -223,16 +223,16 @@ function ExtraLines() {
         }}
         domain={['dataMin', 'dataMax']}
       />
-      {Object.entries(pricesMap).map(([strike, prices]) => (
+      {ids.map((key) => (
         <Line
+          key={key}
           yAxisId="left"
           type="monotone"
-          data={prices}
-          dataKey="price"
+          dataKey={key}
           stroke="rgba(99, 179, 237, 0.4)"
           strokeWidth={1.5}
           dot={false}
-          name={strike}
+          name={key}
         />
       ))}
     </>
@@ -270,7 +270,7 @@ const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<
             className="text-sm"
             style={{ color: entry.color }}
           >
-            {entry.name}: {entry.name === 'Spot Price' ? '₹' : '₹'}
+            {entry.name}: {'₹'}
             {entry.value.toFixed(2)}
           </p>
         ))}
@@ -286,4 +286,21 @@ function formatTime(timestamp: number): string {
   const minutes = String(date.getMinutes()).padStart(2, '0');
   const seconds = String(date.getSeconds()).padStart(2, '0');
   return `${hours}:${minutes}:${seconds}`;
+}
+
+type PriceDataPoint = { timestamp: number; } & Record<string, number>;
+function buildChartData(data: PriceSnapshot[], pricesMap: Record<string, StraddleQuote[]>): PriceDataPoint[] {
+  const chartData: PriceDataPoint[] = data.map(snapshot => {
+    const point: PriceDataPoint = { timestamp: snapshot.timestamp };
+    point['NIFTY'] = snapshot.price;
+    // Add straddle prices for this timestamp
+    Object.entries(pricesMap).forEach(([id, quotes]) => {
+      const quoteAtTime = quotes.find(q => q.timestamp === snapshot.timestamp);
+      if (quoteAtTime) {
+        point[id] = quoteAtTime.price;
+      }
+    });
+    return point;
+  });
+  return chartData;
 }
