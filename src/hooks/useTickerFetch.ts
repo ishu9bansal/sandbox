@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { addSnapshots, selectInstruments, selectTickerData, setInstruments } from "@/store/slices/tickerSlice";
+import { addSnapshots, selectInstruments, selectLiveTrackingIds, selectTickerData, setInstruments, setStraddlePrices } from "@/store/slices/tickerSlice";
 import { HealthClient, TickerClient } from "@/services/ticker/tickerClient";
 import { BASE_URL } from "@/services/ticker/constants";
 import { PriceSnapshot, Quote, Straddle } from "@/models/ticker";
@@ -21,7 +21,7 @@ export function useTickerUser() {
       console.error(error);
       toast.error("Error while fetching user data");
     }
-  }, []);
+  }, [tickerClient]);
   useEffect(() => {
     reload();
   }, [])
@@ -43,7 +43,7 @@ export function useInstruments() {
       console.error(error);
       toast.error("Error while fetching instruments");
     }
-  }, []);
+  }, [tickerClient]);
   useEffect(() => {
     reload();
   }, [])
@@ -64,41 +64,73 @@ export function useStraddles(underlying: string) {
       console.error(error);
       toast.error("Error while fetching straddles");
     }
-  }, [underlying]);
+  }, [underlying, tickerClient]);
   useEffect(() => {
     reload();
   }, [underlying])
   return { reload, straddles };
 }
 
+export function useStraddlePriceApi(ids: string[]) {
+  const tickerClient = useTickerClient();
+  const dispatch = useAppDispatch();
+  const fetchLatestPrice = useCallback(async (cancel: boolean) => {
+    if (ids.length === 0) {
+      console.debug("No straddle IDs selected to fetch prices for");
+      return;
+    }
+    try {
+      const prices = await tickerClient.getStraddleQuotes(ids);
+      if (!prices) {
+        throw new Error("Failed to fetch straddle prices");
+      }
+      if (cancel) return;
+      dispatch(setStraddlePrices(prices));
+    } catch (error) {
+      console.error(error);
+      toast.error("Error while fetching straddle prices");
+    }
+  }, [ids, tickerClient]);
+  return fetchLatestPrice;
+}
+
 export function useLiveData(interval: number = 1000) {
   const tickerClient = useTickerClient();
   const data = useAppSelector(selectTickerData);
   const dispatch = useAppDispatch();
-  useEffect(() => {
-    let isMounted = true;
-    const fetchQuote = async () => {
-      try {
-        const underlying = 'NIFTY';
-        const { timestamp, quote } = await tickerClient.getQuote(underlying);
-        if (!quote) {
-          throw new Error("No quote received");
-        }
-        const snapshot = snapshotFromQuote(timestamp, quote, underlying);
-        if (!isMounted) return;
-        dispatch(addSnapshots([snapshot]));
-      } catch (error) {
-        console.error(error);
-        toast.error("Error while fetching live data");
+  const fetchQuote = useCallback(async (cancel: boolean) => {
+    try {
+      const underlying = 'NIFTY';
+      const { timestamp, quote } = await tickerClient.getQuote(underlying);
+      if (!quote) {
+        throw new Error("No quote received");
       }
+      const snapshot = snapshotFromQuote(timestamp, quote, underlying);
+      if (cancel) return;
+      dispatch(addSnapshots([snapshot]));
+    } catch (error) {
+      console.error(error);
+      toast.error("Error while fetching live data");
+    }
+  }, [tickerClient]);
+  const straddleIds = useAppSelector(selectLiveTrackingIds);
+  const fetchStraddlePrices = useStraddlePriceApi(straddleIds);
+  useEffect(() => {
+    if (!interval) return;
+    let isMounted = true;
+    const intervalMethod = async () => {
+      await Promise.all([
+        fetchQuote(!isMounted),
+        fetchStraddlePrices(!isMounted),
+      ]);
     };
-    fetchQuote();
-    const intervalId = setInterval(fetchQuote, interval); // Check every seconds
+    intervalMethod(); // Initial
+    const intervalId = setInterval(intervalMethod, interval);
     return () => {
       isMounted = false;
       clearInterval(intervalId);
     };
-  }, [interval]);
+  }, [interval, fetchQuote, fetchStraddlePrices]);
   return { data };
 }
 
@@ -112,31 +144,50 @@ function snapshotFromQuote(timestamp: number, quote: Quote | null, underlying: s
 
 const healthClient = new HealthClient({ baseURL: BASE_URL });
 export function useTickerHealthStatus() {
-  // TODO: introduce exponential backoff for health checks
-  // add a polling call to health api that updates a state variable
-  // this state could  be exposed to show health status in UI
   const [healthy, setHealthy] = useState(false);
+  
   useEffect(() => {
     let isMounted = true;
+    let timeoutId: NodeJS.Timeout | undefined;
+    let currentDelay = 60000; // Start with 60s for healthy state
+    
     const checkHealth = async () => {
       try {
         const status = await healthClient.checkHealth();
         if (isMounted) {
           setHealthy(!!status);
+          // Reset to normal interval when healthy
+          currentDelay = 60000;
         }
       } catch (error) {
         if (isMounted) {
           setHealthy(false);
+          // Exponential backoff: start at 500ms or double current delay
+          if (currentDelay >= 60000) {
+            // We were in healthy mode, start backoff at 500ms
+            currentDelay = 500;
+          } else {
+            // Continue backoff, double the delay (capped at 60s)
+            currentDelay = Math.min(currentDelay * 2, 60000);
+          }
         }
       }
+      
+      if (isMounted) {
+        timeoutId = setTimeout(checkHealth, currentDelay);
+      }
     };
-    checkHealth();
-    const intervalId = setInterval(checkHealth, 1000); // Check every seconds
+    
+    checkHealth(); // Initial check
+    
     return () => {
       isMounted = false;
-      clearInterval(intervalId);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
     };
   }, []);
+  
   return healthy;
 }
 
@@ -151,10 +202,10 @@ function useTickerClient() {
       Authorization: `Bearer ${token}`,
     };
   }, [getToken]);
-  const tickerClient = new TickerClient({
+  const tickerClient = useMemo(() => new TickerClient({
     baseURL: BASE_URL,
     authBuilder,
-  });
+  }), [authBuilder]);
   return tickerClient;
 }
 
