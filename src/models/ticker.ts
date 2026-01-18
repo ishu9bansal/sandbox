@@ -39,7 +39,7 @@ export type Instrument = {
 export type InstrumentResponse = Instrument[];
 
 type InsrumentRef = string;
-type OHLC = {
+export type OHLC = {
   open: number;
   high: number;
   low: number;
@@ -56,6 +56,7 @@ export type Quote = {
 export type QuoteResponse = Record<InsrumentRef, Quote>;
 
 export type Straddle = {
+  id: string;
   underlying: string;
   strike: number;
   expiry: string;
@@ -63,3 +64,18 @@ export type Straddle = {
   put: Instrument;
 };
 export type StraddleResponse = Straddle[];
+
+export type StraddleQuote = {
+  timestamp: number;
+  price: number;
+  quotes: Quote[];
+}
+export type StraddleQuoteResponse = Record<InsrumentRef, StraddleQuote>;
+
+
+export interface TickerState {
+  data: PriceSnapshot[];
+  instruments: Instrument[];
+  straddlePrices: Record<string, StraddleQuote[]>;
+  liveTrackingIds: string[];
+}

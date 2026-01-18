@@ -10,20 +10,25 @@ import {
 } from 'recharts';
 import { useLiveData } from '@/hooks/useTickerFetch';
 import { useCallback, useState } from 'react';
-import { PriceSnapshot } from '@/models/ticker';
+import { OHLC, PriceSnapshot, StraddleQuote } from '@/models/ticker';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ZoomInIcon, ZoomOutIcon } from 'lucide-react';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { selectLiveTrackingIds, selectStraddleData, setLocalState } from '@/store/slices/tickerSlice';
+import { buildSimulatedState } from '@/utils/ticker';
 
 const MARKET_OPEN_TIME = '09:15:00';
 const MARKET_CLOSE_TIME = '15:30:00';
 const HALF_HOUR_MS = 30 * 60 * 1000;
 
 const TickerView = () => {
-  const showExtraLines = false;
-  const { data } = useLiveData(1000);
-  const chartData = data;
-  const lastDataPoint = data.length > 0 ? data[data.length - 1] : null;
+  const [isLive, setIsLive] = useState(false);
+  const straddleIds = useAppSelector(selectLiveTrackingIds);
+  const pricesMap = useAppSelector(selectStraddleData(straddleIds));
+  const { data: stockData } = useLiveData(isLive ? 1000 : 0); // Fetch every second if live
+  const chartData = buildChartData(stockData, pricesMap);
+  const lastDataPoint = chartData.length > 0 ? chartData[chartData.length - 1] : null;
   const lastTimestamp = lastDataPoint ? new Date(lastDataPoint.timestamp) : new Date();
   const [startTime, setStartTime] = useState(MARKET_OPEN_TIME);
   const [endTime, setEndTime] = useState(MARKET_CLOSE_TIME);
@@ -44,6 +49,14 @@ const TickerView = () => {
       setDefaultZoom();
     }
   }, [defaultZoom, set30minZoom, setDefaultZoom]);
+
+  const dispatch = useAppDispatch();
+  const setAllData = useCallback((seconds: number) => {
+    dispatch(setLocalState(buildSimulatedState(seconds)));
+  }, []);
+  const onSimulate = useCallback(() => {
+    setAllData(15*60); // Last 15 minutes
+  }, [setAllData]);
 
   return (
     <div className="container mx-auto">
@@ -81,21 +94,30 @@ const TickerView = () => {
             onChange={(e) => setEndTime(e.target.value)}
             className="w-auto"
           />
+          {/* Live Toggle */}
+          <Button
+            variant={isLive ? 'destructive' : 'default'}
+            onClick={() => {
+              setIsLive(prev => !prev);
+              if (!isLive) setAllData(0); // Clear data when starting live
+            }}
+          >
+            {isLive ? 'Stop Live' : 'Start Live'}
+          </Button>
+          <Button
+            onClick={onSimulate}
+          >
+            Set simulated data
+          </Button>
         </div>
 
         {/* Chart */}
         <div className="p-6 bg-[#1a1a1a] border border-white/10 rounded">
-          {data.length === 0 ? (
-            <div className="h-[600px] flex items-center justify-center">
-              <p className="text-xl text-black/50">
-                Click "Start Simulation" to begin monitoring
-              </p>
-            </div>
-          ) : (
+          {(
             <Chart
               chartData={chartData}
               xAxisDomain={xAxisDomain}
-              showExtraLines={showExtraLines}
+              straddleIds={straddleIds}
             />
           )}
         </div>
@@ -103,7 +125,7 @@ const TickerView = () => {
         {/* Info */}
         <div className="mt-6">
           <p className="text-sm text-black/60">
-            <strong>Data Points:</strong> {data.length} | <strong>Status:</strong>{' '}
+            <strong>Data Points:</strong> {chartData.length} | <strong>Status:</strong>{' '}
             {false ? 'Updating live (every 5s)' : 'Paused'}
           </p>
           <p className="text-xs text-black/50 block mt-2">
@@ -116,7 +138,7 @@ const TickerView = () => {
   );
 };
 
-function Chart({ chartData, xAxisDomain, showExtraLines }: { chartData: PriceSnapshot[]; xAxisDomain: [number, number]; showExtraLines: boolean; }) {
+function Chart({ chartData, xAxisDomain, straddleIds }: { chartData: PriceDataPoint[]; xAxisDomain: [number, number]; straddleIds?: string[] }) {
   return (
     <ResponsiveContainer width="100%" height={600}>
       <LineChart
@@ -133,25 +155,11 @@ function Chart({ chartData, xAxisDomain, showExtraLines }: { chartData: PriceSna
           dataKey="timestamp"
           allowDataOverflow={true}
           tickFormatter={(value, index) => {
-            if (!index) console.log('Formatting tick value:', new Date());
             const date = new Date(value);
-            return `${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
+            const isoDate = date.toISOString().split('T')[0];
+            return `${isoDate} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
           }}
           domain={xAxisDomain}
-        />
-        
-        {/* Left Y-axis: Premium (₹) */}
-        <YAxis
-          yAxisId="left"
-          stroke="rgba(255, 255, 255, 0.6)"
-          tick={{ fill: 'rgba(255, 255, 255, 0.6)', fontSize: 12 }}
-          label={{
-            value: 'Combined Premium (₹)',
-            angle: -90,
-            position: 'insideLeft',
-            style: { fill: 'rgba(255, 255, 255, 0.6)' },
-          }}
-          domain={['dataMin', 'dataMax']}
         />
         
         {/* Right Y-axis: Spot Price */}
@@ -166,6 +174,7 @@ function Chart({ chartData, xAxisDomain, showExtraLines }: { chartData: PriceSna
             position: 'insideRight',
             style: { fill: 'rgba(255, 255, 255, 0.4)' },
           }}
+          tickFormatter={(val) => `${Math.round(val)}`}
           domain={['dataMin', 'dataMax']}
         />
         
@@ -175,15 +184,39 @@ function Chart({ chartData, xAxisDomain, showExtraLines }: { chartData: PriceSna
           iconType="line"
         />
         
-        {/* Premium Lines - Same color family, varying opacity */}
-        {showExtraLines && <ExtraLines />}
+        {/* Left Y-axis: Premium (₹) */}
+        <YAxis
+          yAxisId="left"
+          stroke="rgba(255, 255, 255, 0.6)"
+          tick={{ fill: 'rgba(255, 255, 255, 0.6)', fontSize: 12 }}
+          label={{
+            value: 'Combined Premium (₹)',
+            angle: -90,
+            position: 'insideLeft',
+            style: { fill: 'rgba(255, 255, 255, 0.6)' },
+          }}
+          tickFormatter={(val) => `${Math.round(val)}`}
+          domain={['dataMin', 'dataMax']}
+        />
+        {straddleIds?.map((key, i) => (
+          <Line
+            key={key}
+            yAxisId="left"
+            type="monotone"
+            dataKey={key}
+            stroke={COLOR_PALETTE[i % COLOR_PALETTE.length]}
+            strokeWidth={1.5}
+            dot={false}
+            name={key}
+          />
+        ))}
         {/* Spot Price Line - Lighter, on right axis */}
         <Line
           yAxisId="right"
           type="monotone"
-          dataKey="price"
-          stroke="rgba(255, 0, 0, 0.5)"
-          strokeWidth={1.5}
+          dataKey="NIFTY"
+          stroke="#FF5733"
+          strokeWidth={3}
           dot={false}
           name="Spot Price"
           strokeDasharray="5 5"
@@ -193,75 +226,36 @@ function Chart({ chartData, xAxisDomain, showExtraLines }: { chartData: PriceSna
   );
 }
 
-function ExtraLines() {
+function ExtraLines({ ids }: { ids: string[] }) {
+  // NOTE: Making a separate component for sub chart is not working with Recharts
+  // need to debug this later. For now, keep it in main Chart component.
   return (
     <>
-      <Line
+      {/* Left Y-axis: Premium (₹) */}
+      <YAxis
         yAxisId="left"
-        type="monotone"
-        dataKey="Strike -3"
-        stroke="rgba(99, 179, 237, 0.4)"
-        strokeWidth={1.5}
-        dot={false}
-        name="Strike -3"
+        stroke="rgba(255, 255, 255, 0.6)"
+        tick={{ fill: 'rgba(255, 255, 255, 0.6)', fontSize: 12 }}
+        label={{
+          value: 'Combined Premium (₹)',
+          angle: -90,
+          position: 'insideLeft',
+          style: { fill: 'rgba(255, 255, 255, 0.6)' },
+        }}
+        domain={['dataMin', 'dataMax']}
       />
-      <Line
-        yAxisId="left"
-        type="monotone"
-        dataKey="Strike -2"
-        stroke="rgba(99, 179, 237, 0.5)"
-        strokeWidth={1.5}
-        dot={false}
-        name="Strike -2"
-      />
-      <Line
-        yAxisId="left"
-        type="monotone"
-        dataKey="Strike -1"
-        stroke="rgba(99, 179, 237, 0.7)"
-        strokeWidth={2}
-        dot={false}
-        name="Strike -1"
-      />
-      
-      {/* ATM Line - Emphasized */}
-      <Line
-        yAxisId="left"
-        type="monotone"
-        dataKey="Strike 0 (ATM)"
-        stroke="rgba(99, 179, 237, 1)"
-        strokeWidth={3}
-        dot={false}
-        name="Strike 0 (ATM)"
-      />
-      
-      <Line
-        yAxisId="left"
-        type="monotone"
-        dataKey="Strike +1"
-        stroke="rgba(99, 179, 237, 0.7)"
-        strokeWidth={2}
-        dot={false}
-        name="Strike +1"
-      />
-      <Line
-        yAxisId="left"
-        type="monotone"
-        dataKey="Strike +2"
-        stroke="rgba(99, 179, 237, 0.5)"
-        strokeWidth={1.5}
-        dot={false}
-        name="Strike +2"
-      />
-      <Line
-        yAxisId="left"
-        type="monotone"
-        dataKey="Strike +3"
-        stroke="rgba(99, 179, 237, 0.4)"
-        strokeWidth={1.5}
-        dot={false}
-        name="Strike +3"
-      />
+      {ids.map((key) => (
+        <Line
+          key={key}
+          yAxisId="left"
+          type="monotone"
+          dataKey={key}
+          stroke="rgba(99, 179, 237, 0.4)"
+          strokeWidth={1.5}
+          dot={false}
+          name={key}
+        />
+      ))}
     </>
   );
 }
@@ -297,7 +291,7 @@ const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<
             className="text-sm"
             style={{ color: entry.color }}
           >
-            {entry.name}: {entry.name === 'Spot Price' ? '₹' : '₹'}
+            {entry.name}: {'₹'}
             {entry.value.toFixed(2)}
           </p>
         ))}
@@ -314,3 +308,80 @@ function formatTime(timestamp: number): string {
   const seconds = String(date.getSeconds()).padStart(2, '0');
   return `${hours}:${minutes}:${seconds}`;
 }
+
+type PriceDataPoint = { timestamp: number; } & Record<string, number>;
+function buildChartData(data: PriceSnapshot[], pricesMap: Record<string, StraddleQuote[]>): PriceDataPoint[] {
+  const stockPrices: PriceDataPoint[] = data.map(snapshot => ({
+    timestamp: snapshot.timestamp,
+    'NIFTY': snapshot.price,
+  }));
+  // Add straddle prices for this timestamp
+  const straddlePrices = Object.entries(pricesMap).map(([id, quotes]) => quotes.map(quote => ({
+    timestamp: quote.timestamp,
+    [id]: quote.price,
+  }))).flat();
+  // return straddlePrices;
+  // return stockPrices;
+  const chartData = stockPrices.concat(straddlePrices);
+  const groupedResults = groupByTimestamp(chartData, roundToNearest(30*SECOND));
+  return Object.entries(groupedResults).map(([timestampStr, values]) => ({
+    timestamp: Number(timestampStr),
+    ...Object.fromEntries(
+      Object.entries(values).map(([key, ohlc]) => [key, ohlc.close])
+    ),
+  })).sort((a, b) => a.timestamp - b.timestamp);
+}
+
+function groupByTimestamp(data: PriceDataPoint[], rounding: (timestamp: number) => number = ((t) => t)) {
+  const sortedData = data.sort((a, b) => a.timestamp - b.timestamp);
+  const grouped: Record<number, Record<string, number[]>> = {};
+  sortedData.forEach(point => {
+    const timestamp = rounding(point.timestamp);
+    if (!grouped[timestamp]) {
+      grouped[timestamp] = {};
+    }
+    Object.entries(point).forEach(([key, value]) => {
+      if (key !== 'timestamp') {
+        if (!grouped[timestamp][key]) {
+          grouped[timestamp][key] = [];
+        }
+        grouped[timestamp][key].push(value);
+      }
+    });
+  });
+  const result: Record<number, Record<string, OHLC>> = {};
+  Object.entries(grouped).forEach(([timestampStr, values]) => {
+    const timestamp = Number(timestampStr);
+    result[timestamp] = {};
+    Object.entries(values).forEach(([key, vals]) => {
+      const open = vals[0];
+      const close = vals[vals.length - 1];
+      const high = Math.max(...vals);
+      const low = Math.min(...vals);
+      result[timestamp][key] = { open, high, low, close };
+    });
+  });
+  return result;
+}
+
+function roundToNearest(interval: number): (timestamp: number) => number {
+  return (timestamp: number) => Math.round(timestamp / interval) * interval;
+}
+const SECOND = 1000;
+const MINUTE = 60 * SECOND;
+const FIVE_MINUTES = 5 * MINUTE;
+const FIFTEEN_MINUTES = 15 * MINUTE;
+const THIRTY_MINUTES = 30 * MINUTE;
+const ONE_HOUR = 60 * MINUTE;
+const TWO_HOURS = 2 * ONE_HOUR;
+const FOUR_HOURS = 4 * ONE_HOUR;
+
+const COLOR_PALETTE = [
+  '#33FF57', // Green
+  '#3357FF', // Blue
+  '#F333FF', // Magenta
+  '#33FFF5', // Cyan
+  '#F5FF33', // Yellow
+  '#FF33A8', // Pink
+  '#A833FF', // Purple
+];

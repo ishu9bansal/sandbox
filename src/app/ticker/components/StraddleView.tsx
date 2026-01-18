@@ -4,16 +4,27 @@ import { Column } from '@/components/DataTable/types';
 import { Button } from '@/components/ui/button';
 import { useStraddles } from '@/hooks/useTickerFetch';
 import { Straddle } from '@/models/ticker';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { straddlesColumnBuilder } from './constants';
+import { useAppDispatch } from '@/store/hooks';
+import { setLiveTrackingIds } from '@/store/slices/tickerSlice';
+import { toast } from 'sonner';
 
 export default function StraddleView() {
   const { reload, straddles } = useStraddles('NIFTY');
   const columns: Column<Straddle>[] = useMemo(straddlesColumnBuilder, []);
-  const straddleKey = (straddle: Straddle) => {
-    return `${straddle.underlying}-${straddle.expiry}-${straddle.strike}`;
-  };
-
+  const dispatch = useAppDispatch();
+  const onTrackPrices = useCallback((straddles: Straddle[]) => {
+    dispatch(setLiveTrackingIds(straddles.map(s => s.id)));
+    toast.success(`Tracking prices for ${straddles.length} straddles`);
+  }, []);
+  const bulkActions = useMemo(() => ([
+    {
+      key: 'straddle-track-prices',
+      label: 'Track Prices',
+      action: onTrackPrices,
+    },
+  ]), [onTrackPrices]);
   return (
     <div>
       <div className="flex justify-end">
@@ -23,7 +34,8 @@ export default function StraddleView() {
         title="Straddle List"
         data={straddles}
         columns={columns}
-        getRowId={straddleKey}
+        getRowId={s => s.id}
+        bulkActions={bulkActions}
       />
     </div>
   );

@@ -1,4 +1,4 @@
-import { InstrumentResponse, QuoteResponse, StraddleResponse } from "@/models/ticker";
+import { InstrumentResponse, QuoteResponse, StraddleQuoteResponse, StraddleResponse } from "@/models/ticker";
 import ApiClient, { ApiClientConfig } from "../api/api";
 
 export class TickerClient {
@@ -39,6 +39,18 @@ export class TickerClient {
     } catch (error) {
       console.error(error); // NOTE: do not expose internal error details to user
       throw Error("Error while fetching quote");  // user facing message
+    }
+  }
+  async getStraddleQuotes(ids: string[]) {
+    const queryParams = new URLSearchParams({ ids: ids.join(',') });
+    const queryString = queryParams.toString();
+    const uri = `/ticker/straddleQuotes/?${queryString}`;
+    try {
+      const response = await this.client.get<StraddleQuoteResponse>(uri);
+      return response;
+    } catch (error) {
+      console.error(error); // NOTE: do not expose internal error details to user
+      throw Error("Error while fetching straddle quotes");  // user facing message
     }
   }
   async getStraddles(underlying: string) {
