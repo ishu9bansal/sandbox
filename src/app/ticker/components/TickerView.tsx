@@ -321,7 +321,7 @@ function buildChartData(data: PriceSnapshot[], pricesMap: Record<string, Straddl
   // return straddlePrices;
   // return stockPrices;
   const chartData = stockPrices.concat(straddlePrices);
-  return groupByTimestamp(chartData);
+  return groupByTimestamp(chartData, roundToNearest(MINUTE));
 }
 
 function groupByTimestamp(data: PriceDataPoint[], rounding: (timestamp: number) => number = ((t) => t)): PriceDataPoint[] {
@@ -339,3 +339,15 @@ function groupByTimestamp(data: PriceDataPoint[], rounding: (timestamp: number) 
   });
   return Object.values(grouped).sort((a, b) => a.timestamp - b.timestamp);
 }
+
+function roundToNearest(interval: number): (timestamp: number) => number {
+  return (timestamp: number) => Math.round(timestamp / interval) * interval;
+}
+const SECOND = 1000;
+const MINUTE = 60 * SECOND;
+const FIVE_MINUTES = 5 * MINUTE;
+const FIFTEEN_MINUTES = 15 * MINUTE;
+const THIRTY_MINUTES = 30 * MINUTE;
+const ONE_HOUR = 60 * MINUTE;
+const TWO_HOURS = 2 * ONE_HOUR;
+const FOUR_HOURS = 4 * ONE_HOUR;
