@@ -215,8 +215,8 @@ function Chart({ chartData, xAxisDomain, straddleIds }: { chartData: PriceDataPo
           yAxisId="right"
           type="monotone"
           dataKey="NIFTY"
-          stroke="rgba(255, 0, 0, 0.5)"
-          strokeWidth={1.5}
+          stroke="#FF5733"
+          strokeWidth={3}
           dot={false}
           name="Spot Price"
           strokeDasharray="5 5"
@@ -377,7 +377,6 @@ const TWO_HOURS = 2 * ONE_HOUR;
 const FOUR_HOURS = 4 * ONE_HOUR;
 
 const COLOR_PALETTE = [
-  '#FF5733', // Red-Orange
   '#33FF57', // Green
   '#3357FF', // Blue
   '#F333FF', // Magenta

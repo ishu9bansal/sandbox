@@ -29,7 +29,7 @@ export function simulatePriceSnapshots(past_seconds: number): PriceSnapshot[] {
   return snapshots;
 }
 
-export function buildSimulatedState(past_seconds: number): TickerState {
+export function buildSimulatedState(past_seconds: number, straddleCount: number = 3): TickerState {
   if (past_seconds == 0) {  // Clear state
     return {
       data: [],
@@ -39,14 +39,16 @@ export function buildSimulatedState(past_seconds: number): TickerState {
     }
   }
   const snapshots = simulatePriceSnapshots(past_seconds);
+  const straddlePrices = Object.fromEntries(Array.from({ length: straddleCount }, (_, i) => 
+    ([`STRADDLE_${i + 1}`, simulateStraddleQuotes(past_seconds)])
+  ));
+  const liveTrackingIds = Object.keys(straddlePrices);
   const straddleQuotes = simulateStraddleQuotes(past_seconds);
   return {
     data: snapshots,
     instruments: [],
-    straddlePrices: {
-      "SIMULATED_STRADDLE": straddleQuotes,
-    },
-    liveTrackingIds: ["SIMULATED_STRADDLE"],
+    straddlePrices: straddlePrices,
+    liveTrackingIds,
   };
 }
 
