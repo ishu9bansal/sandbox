@@ -284,11 +284,10 @@ function formatTime(timestamp: number): string {
 
 type PriceDataPoint = { timestamp: number; } & Record<string, number>;
 function buildChartData(data: PriceSnapshot[], pricesMap: Record<string, StraddleQuote[]>): PriceDataPoint[] {
-  const stockPrices: PriceDataPoint[] = data.map(snapshot => {
-    const point: PriceDataPoint = { timestamp: snapshot.timestamp };
-    point['NIFTY'] = snapshot.price;
-    return point;
-  });
+  const stockPrices: PriceDataPoint[] = data.map(snapshot => ({
+    timestamp: snapshot.timestamp,
+    'NIFTY': snapshot.price,
+  }));
   // Add straddle prices for this timestamp
   const straddlePrices = Object.entries(pricesMap).map(([id, quotes]) => quotes.map(quote => ({
     timestamp: quote.timestamp,
