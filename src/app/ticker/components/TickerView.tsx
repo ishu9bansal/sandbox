@@ -174,6 +174,7 @@ function Chart({ chartData, xAxisDomain, straddleIds }: { chartData: PriceDataPo
             position: 'insideRight',
             style: { fill: 'rgba(255, 255, 255, 0.4)' },
           }}
+          tickFormatter={(val) => `${Math.round(val)}`}
           domain={['dataMin', 'dataMax']}
         />
         
@@ -194,15 +195,16 @@ function Chart({ chartData, xAxisDomain, straddleIds }: { chartData: PriceDataPo
             position: 'insideLeft',
             style: { fill: 'rgba(255, 255, 255, 0.6)' },
           }}
+          tickFormatter={(val) => `${Math.round(val)}`}
           domain={['dataMin', 'dataMax']}
         />
-        {straddleIds?.map((key) => (
+        {straddleIds?.map((key, i) => (
           <Line
             key={key}
             yAxisId="left"
             type="monotone"
             dataKey={key}
-            stroke="rgba(99, 179, 237, 0.4)"
+            stroke={COLOR_PALETTE[i % COLOR_PALETTE.length]}
             strokeWidth={1.5}
             dot={false}
             name={key}
@@ -373,3 +375,14 @@ const THIRTY_MINUTES = 30 * MINUTE;
 const ONE_HOUR = 60 * MINUTE;
 const TWO_HOURS = 2 * ONE_HOUR;
 const FOUR_HOURS = 4 * ONE_HOUR;
+
+const COLOR_PALETTE = [
+  '#FF5733', // Red-Orange
+  '#33FF57', // Green
+  '#3357FF', // Blue
+  '#F333FF', // Magenta
+  '#33FFF5', // Cyan
+  '#F5FF33', // Yellow
+  '#FF33A8', // Pink
+  '#A833FF', // Purple
+];
