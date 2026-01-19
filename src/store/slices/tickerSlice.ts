@@ -12,11 +12,11 @@ const tickerSlice = createSlice({
   name: 'ticker',
   initialState,
   reducers: {
-    setLocalState: (state, action: PayloadAction<TickerState>) => {
-      state.data = action.payload.data;
-      state.instruments = action.payload.instruments;
-      state.straddlePrices = action.payload.straddlePrices;
-      state.liveTrackingIds = action.payload.liveTrackingIds;
+    setLocalState: (state, action: PayloadAction<Partial<TickerState>>) => {
+      state.data = action.payload.data || state.data;
+      state.instruments = action.payload.instruments || state.instruments;
+      state.straddlePrices = action.payload.straddlePrices || state.straddlePrices;
+      state.liveTrackingIds = action.payload.liveTrackingIds || state.liveTrackingIds;
     },
     setSnapshots: (state, action: PayloadAction<PriceSnapshot[]>) => {
       state.data = action.payload;
