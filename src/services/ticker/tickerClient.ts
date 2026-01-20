@@ -1,4 +1,4 @@
-import { InstrumentResponse, QuoteResponse, StraddleQuoteResponse, StraddleResponse } from "@/models/ticker";
+import { HistoryResponse, InstrumentResponse, StraddleQuoteResponse, StraddleResponse } from "@/models/ticker";
 import ApiClient, { ApiClientConfig } from "../api/api";
 
 export class TickerClient {
@@ -31,11 +31,9 @@ export class TickerClient {
     const queryString = queryParams.toString();
     const uri = `/ticker/quote?${queryString}`;
     try {
-      const now = new Date();
-      const timestamp = now.getTime();
-      const response = await this.client.get<QuoteResponse>(uri);
-      const quote = response ? Object.values(response)[0] : null;
-      return { timestamp, quote };
+      const response = await this.client.get<StraddleQuoteResponse>(uri);
+      const quote = response ? response[underlying] : null;
+      return quote;
     } catch (error) {
       console.error(error); // NOTE: do not expose internal error details to user
       throw Error("Error while fetching quote");  // user facing message
@@ -65,13 +63,17 @@ export class TickerClient {
       throw Error("Error while fetching straddles");  // user facing message
     }
   }
-  async getHistory(underlying: string, from_time: Date) {
+  async getHistory(underlying: string, from_time: Date, to_time: Date | null = null) {
     const from = this.formatDate(from_time); 
     const queryParams = new URLSearchParams({ underlying, from });
+    const to = to_time ? this.formatDate(to_time) : undefined;
+    if (to) {
+      queryParams.append('to', to);
+    }
     const queryString = queryParams.toString();
     const uri = `/ticker/history?${queryString}`;
     try {
-      const response = await this.client.get(uri);
+      const response = await this.client.get<HistoryResponse>(uri);
       return response;
     } catch (error) {
       console.error(error); // NOTE: do not expose internal error details to user
