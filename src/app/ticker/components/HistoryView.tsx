@@ -8,6 +8,7 @@ import { SelectInput } from '@/components/compositions/select-input';
 import { useHistory } from '@/hooks/useTickerFetch';
 import { Button } from '@/components/ui/button';
 import { HistoryRecord, PriceDataPoint } from '@/models/ticker';
+import Chart, { ChartProps } from './Chart';
 
 
 const MARKET_OPEN_TIME = '09:15:00';
@@ -24,7 +25,7 @@ export default function HistoryView() {
   const { reload, history } = useHistory(underlying, from, to);
 
   const { chartData, primaryKeys, secondaryKeys } = useMemo(() => buildChartData(history, underlying), [history, underlying]);
-  const xAxisDomain = useMemo(() => [from.getTime(), to.getTime()], [from, to]);  // using from and to directly as they are stable references
+  const xAxisDomain: [number, number] = useMemo(() => [from.getTime(), to.getTime()], [from, to]);  // using from and to directly as they are stable references
 
   return (
     <div>
@@ -51,6 +52,14 @@ export default function HistoryView() {
           options={['NIFTY', 'SENSEX']}
         />
         <Button onClick={reload}>Reload History</Button>
+      </div>
+      <div className="p-6 bg-[#1a1a1a] border border-white/10 rounded">
+        <Chart
+          chartData={chartData}
+          xAxisDomain={xAxisDomain}
+          primaryKeys={primaryKeys}
+          secondaryKeys={secondaryKeys}
+        />
       </div>
       <Card title="Selected Details" collapsible>
         <JsonView data={{
@@ -85,13 +94,7 @@ function calLimits(date: Date, startTime: string, endTime: string) {
 }
 
 
-type ChartDataProps = {
-  chartData: PriceDataPoint[];
-  primaryKeys: string[];
-  secondaryKeys: string[];
-  xAxisDomain: [number, number];
-}
-function buildChartData(history: HistoryRecord[], underlying: string): ChartDataProps {
+function buildChartData(history: HistoryRecord[], underlying: string): ChartProps {
   const secondaryKeys: string[] = []; // will add straddle prices later
   const primaryKeys = [underlying];
   const chartData = history.map(record => ({
