@@ -100,7 +100,7 @@ export class HealthClient {
     const uri = `/health`;
     try {
       const response = await this.client.get<{ status: string }>(uri, {
-        timeout: 800
+        timeout: 8000
       });
       return response?.status === 'healthy';
     } catch (error) {
