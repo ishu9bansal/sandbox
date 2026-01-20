@@ -7,6 +7,7 @@ import { DatePicker } from '@/components/compositions/date-picker';
 import { SelectInput } from '@/components/compositions/select-input';
 import { useHistory } from '@/hooks/useTickerFetch';
 import { Button } from '@/components/ui/button';
+import { HistoryRecord, PriceDataPoint } from '@/models/ticker';
 
 
 const MARKET_OPEN_TIME = '09:15:00';
@@ -21,6 +22,9 @@ export default function HistoryView() {
 
   const { from, to } = useMemo(() => calLimits(date, startTime, endTime), [date, startTime, endTime]);
   const { reload, history } = useHistory(underlying, from, to);
+
+  const { chartData, primaryKeys, secondaryKeys } = useMemo(() => buildChartData(history, underlying), [history, underlying]);
+  const xAxisDomain = useMemo(() => [from.getTime(), to.getTime()], [from, to]);  // using from and to directly as they are stable references
 
   return (
     <div>
@@ -49,7 +53,17 @@ export default function HistoryView() {
         <Button onClick={reload}>Reload History</Button>
       </div>
       <Card title="Selected Details" collapsible>
-        <JsonView data={{ date, startTime, endTime, underlying, history }} />
+        <JsonView data={{
+          date,
+          startTime,
+          endTime,
+          underlying,
+          primaryKeys,
+          secondaryKeys,
+          xAxisDomain,
+          history,
+          chartData,
+        }} />
       </Card>
     </div>
   );
@@ -68,4 +82,24 @@ function calLimits(date: Date, startTime: string, endTime: string) {
   const to = new Date(year, month, day, endHour, endMinute, endSecond);
 
   return { from, to };
+}
+
+
+type ChartDataProps = {
+  chartData: PriceDataPoint[];
+  primaryKeys: string[];
+  secondaryKeys: string[];
+  xAxisDomain: [number, number];
+}
+function buildChartData(history: HistoryRecord[], underlying: string): ChartDataProps {
+  const secondaryKeys: string[] = []; // will add straddle prices later
+  const primaryKeys = [underlying];
+  const chartData = history.map(record => ({
+    timestamp: record.timestamp,
+    [underlying]: record.close,
+  })).sort((a, b) => a.timestamp - b.timestamp);
+  const firstTimestamp = chartData[0]?.timestamp || 0;
+  const lastTimestamp = chartData[chartData.length - 1]?.timestamp || 0;
+  const xAxisDomain: [number, number] = [firstTimestamp, lastTimestamp];
+  return { chartData, primaryKeys, secondaryKeys, xAxisDomain };
 }
