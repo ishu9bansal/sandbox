@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { addSnapshots, selectInstruments, selectLiveTrackingIds, selectTickerData, setInstruments, setStraddlePrices } from "@/store/slices/tickerSlice";
 import { HealthClient, TickerClient } from "@/services/ticker/tickerClient";
 import { BASE_URL } from "@/services/ticker/constants";
-import { PriceSnapshot, Quote, Straddle, StraddleQuote } from "@/models/ticker";
+import { HistoryRecord, PriceSnapshot, Quote, Straddle, StraddleQuote } from "@/models/ticker";
 import { useAuth } from "@clerk/nextjs";
 import { toast } from "sonner";
 
@@ -92,6 +92,42 @@ export function useStraddlePriceApi(ids: string[]) {
     }
   }, [ids, tickerClient]);
   return fetchLatestPrice;
+}
+
+export function useHistory(underlying: string, from: Date, to: Date) {
+  const fetchHistory = useHistoryApi();
+  const [history, setHistory] = useState<HistoryRecord[]>([]);
+  const reload = useCallback(async () => {
+    try {
+      const historyData = await fetchHistory(underlying, from, to);
+      setHistory(historyData);
+    } catch (error) {
+      console.error(error);
+      toast.error("Error while fetching history");
+    }
+  }, [underlying, from, to, fetchHistory]);
+  useEffect(() => {
+    // reload();
+  }, [underlying, from, to])
+  return { reload, history };
+}
+
+export function useHistoryApi() {
+  const tickerClient = useTickerClient();
+  const fetchHistory = useCallback(async (underlying: string, from: Date, to: Date) => {
+    try {
+      const history = await tickerClient.getHistory(underlying, from, to);
+      if (!history) {
+        throw new Error("Failed to fetch histiry");
+      }
+      return history;
+    } catch (error) {
+      console.error(error);
+      toast.error("Error while fetching history");
+      return [];
+    }
+  }, [tickerClient]);
+  return fetchHistory;
 }
 
 export function useLiveData(interval: number = 1000) {
