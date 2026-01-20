@@ -84,3 +84,13 @@ export interface TickerState {
   straddlePrices: Record<string, StraddleQuote[]>;
   liveTrackingIds: string[];
 }
+
+export type HistoryRecord = {
+  timestamp: number;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+}
+export type HistoryResponse = HistoryRecord[];
