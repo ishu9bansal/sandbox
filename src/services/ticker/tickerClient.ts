@@ -29,7 +29,7 @@ export class TickerClient {
   async getQuote(underlying: string) {
     const queryParams = new URLSearchParams({ underlying });
     const queryString = queryParams.toString();
-    const uri = `/ticker/quote/?${queryString}`;
+    const uri = `/ticker/quote?${queryString}`;
     try {
       const now = new Date();
       const timestamp = now.getTime();
@@ -44,7 +44,7 @@ export class TickerClient {
   async getStraddleQuotes(ids: string[]) {
     const queryParams = new URLSearchParams({ ids: ids.join(',') });
     const queryString = queryParams.toString();
-    const uri = `/ticker/straddleQuotes/?${queryString}`;
+    const uri = `/ticker/straddleQuotes?${queryString}`;
     try {
       const response = await this.client.get<StraddleQuoteResponse>(uri);
       return response;
@@ -56,7 +56,7 @@ export class TickerClient {
   async getStraddles(underlying: string) {
     const queryParams = new URLSearchParams({ underlying });
     const queryString = queryParams.toString();
-    const uri = `/ticker/straddles/?${queryString}`;
+    const uri = `/ticker/straddles?${queryString}`;
     try {
       const response = await this.client.get<StraddleResponse>(uri);
       return response;
@@ -69,7 +69,7 @@ export class TickerClient {
     const from = this.formatDate(from_time); 
     const queryParams = new URLSearchParams({ underlying, from });
     const queryString = queryParams.toString();
-    const uri = `/ticker/history/?${queryString}`;
+    const uri = `/ticker/history?${queryString}`;
     try {
       const response = await this.client.get(uri);
       return response;
@@ -100,7 +100,7 @@ export class HealthClient {
     const uri = `/health`;
     try {
       const response = await this.client.get<{ status: string }>(uri, {
-        timeout: 800
+        timeout: 8000
       });
       return response?.status === 'healthy';
     } catch (error) {
