@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { addSnapshots, selectInstruments, selectLiveTrackingIds, selectTickerData, setInstruments, setStraddlePrices } from "@/store/slices/tickerSlice";
 import { HealthClient, TickerClient } from "@/services/ticker/tickerClient";
 import { BASE_URL } from "@/services/ticker/constants";
-import { PriceSnapshot, Quote, Straddle } from "@/models/ticker";
+import { PriceSnapshot, Quote, Straddle, StraddleQuote } from "@/models/ticker";
 import { useAuth } from "@clerk/nextjs";
 import { toast } from "sonner";
 
@@ -101,11 +101,11 @@ export function useLiveData(interval: number = 1000) {
   const fetchQuote = useCallback(async (cancel: boolean) => {
     try {
       const underlying = 'NIFTY';
-      const { timestamp, quote } = await tickerClient.getQuote(underlying);
+      const quote = await tickerClient.getQuote(underlying);
       if (!quote) {
         throw new Error("No quote received");
       }
-      const snapshot = snapshotFromQuote(timestamp, quote, underlying);
+      const snapshot = snapshotFromQuote(quote);
       if (cancel) return;
       dispatch(addSnapshots([snapshot]));
     } catch (error) {
@@ -134,11 +134,8 @@ export function useLiveData(interval: number = 1000) {
   return { data };
 }
 
-function snapshotFromQuote(timestamp: number, quote: Quote | null, underlying: string): PriceSnapshot {
-  const price = quote?.last_price;
-  if (price === undefined || price === null) {
-    throw new Error("Invalid quote data");
-  }
+function snapshotFromQuote(quote: StraddleQuote): PriceSnapshot {
+  const { id: underlying, timestamp, price } = quote;
   return { underlying, timestamp, price };
 }
 

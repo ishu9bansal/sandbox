@@ -31,11 +31,9 @@ export class TickerClient {
     const queryString = queryParams.toString();
     const uri = `/ticker/quote?${queryString}`;
     try {
-      const now = new Date();
-      const timestamp = now.getTime();
-      const response = await this.client.get<QuoteResponse>(uri);
-      const quote = response ? Object.values(response)[0] : null;
-      return { timestamp, quote };
+      const response = await this.client.get<StraddleQuoteResponse>(uri);
+      const quote = response ? response[underlying] : null;
+      return quote;
     } catch (error) {
       console.error(error); // NOTE: do not expose internal error details to user
       throw Error("Error while fetching quote");  // user facing message

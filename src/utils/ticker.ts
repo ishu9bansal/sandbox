@@ -1,11 +1,12 @@
 import { PriceSnapshot, StraddleQuote, TickerState } from "@/models/ticker";
 
-export function simulateStraddleQuotes(past_seconds: number): StraddleQuote[] {
+export function simulateStraddleQuotes(id: string, past_seconds: number): StraddleQuote[] {
   const quotes: StraddleQuote[] = [];
   const now = Date.now();
   for (let i = past_seconds; i > 0; i--) {
     const timestamp = now - i * 1000; // 1 second intervals
     quotes.push({
+      id,
       quotes: [],
       timestamp,
       price: Math.random() * 100 + 100, // Random price between 100-200
@@ -38,7 +39,7 @@ export function buildSimulatedState(past_seconds: number, straddleCount: number 
   }
   const snapshots = simulatePriceSnapshots(past_seconds);
   const straddlePrices = Object.fromEntries(Array.from({ length: straddleCount }, (_, i) => 
-    ([`STRADDLE_${i + 1}`, simulateStraddleQuotes(past_seconds)])
+    ([`STRADDLE_${i + 1}`, simulateStraddleQuotes(`STRADDLE_${i + 1}`, past_seconds)])
   ));
   const liveTrackingIds = Object.keys(straddlePrices);
   return {

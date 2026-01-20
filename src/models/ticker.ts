@@ -53,6 +53,9 @@ export type Quote = {
   net_change: number;
   ohlc: OHLC;
 };
+/**
+ * @deprecated
+ */
 export type QuoteResponse = Record<InsrumentRef, Quote>;
 
 export type Straddle = {
@@ -66,10 +69,12 @@ export type Straddle = {
 export type StraddleResponse = Straddle[];
 
 export type StraddleQuote = {
+  id: string;
   timestamp: number;
   price: number;
   quotes: Quote[];
 }
+// TODO: refactor (this is not specific to straddle)
 export type StraddleQuoteResponse = Record<InsrumentRef, StraddleQuote>;
 
 
