@@ -7,15 +7,16 @@ import { DatePicker } from '@/components/compositions/date-picker';
 import { SelectInput } from '@/components/compositions/select-input';
 import { useHistory } from '@/hooks/useTickerFetch';
 import { Button } from '@/components/ui/button';
-import { HistoryRecord, PriceDataPoint } from '@/models/ticker';
+import { HistoryRecord } from '@/models/ticker';
 import Chart, { ChartProps } from './Chart';
 
 
 const MARKET_OPEN_TIME = '09:15:00';
 const MARKET_CLOSE_TIME = '15:30:00';
-const TODAY = new Date();
+const TODAY = getTodayDate();
 
 export default function HistoryView() {
+  const debugMode = true;
   const [date, setDate] = useState(TODAY);
   const [startTime, setStartTime] = useState(MARKET_OPEN_TIME);
   const [endTime, setEndTime] = useState(MARKET_CLOSE_TIME);
@@ -61,19 +62,23 @@ export default function HistoryView() {
           secondaryKeys={secondaryKeys}
         />
       </div>
-      <Card title="Selected Details" collapsible>
-        <JsonView data={{
-          date,
-          startTime,
-          endTime,
-          underlying,
-          primaryKeys,
-          secondaryKeys,
-          xAxisDomain,
-          history,
-          chartData,
-        }} />
-      </Card>
+      {
+        debugMode && (
+          <Card title="State Details" collapsible>
+            <JsonView data={{
+              date,
+              startTime,
+              endTime,
+              underlying,
+              primaryKeys,
+              secondaryKeys,
+              xAxisDomain,
+              history,
+              chartData,
+            }} />
+          </Card>
+        )
+      }
     </div>
   );
 }
@@ -105,4 +110,12 @@ function buildChartData(history: HistoryRecord[], underlying: string): ChartProp
   const lastTimestamp = chartData[chartData.length - 1]?.timestamp || 0;
   const xAxisDomain: [number, number] = [firstTimestamp, lastTimestamp];
   return { chartData, primaryKeys, secondaryKeys, xAxisDomain };
+}
+
+function getTodayDate() {
+  const now = new Date();
+  if (now.getHours() < 9 || (now.getHours() === 9 && now.getMinutes() < 15)) {
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+  }
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
 }
