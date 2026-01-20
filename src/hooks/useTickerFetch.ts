@@ -142,6 +142,8 @@ function snapshotFromQuote(timestamp: number, quote: Quote | null, underlying: s
   return { underlying, timestamp, price };
 }
 
+const HEALTHY_DEFAULT_INTERVAL = 30000; // 30 seconds
+const UNHEALTHY_INITIAL_INTERVAL = 500; // 500 ms
 const healthClient = new HealthClient({ baseURL: BASE_URL });
 export function useTickerHealthStatus() {
   const [healthy, setHealthy] = useState(false);
@@ -149,7 +151,7 @@ export function useTickerHealthStatus() {
   useEffect(() => {
     let isMounted = true;
     let timeoutId: NodeJS.Timeout | undefined;
-    let currentDelay = 60000; // Start with 60s for healthy state
+    let currentDelay = HEALTHY_DEFAULT_INTERVAL;
     
     const checkHealth = async () => {
       try {
@@ -157,18 +159,18 @@ export function useTickerHealthStatus() {
         if (isMounted) {
           setHealthy(!!status);
           // Reset to normal interval when healthy
-          currentDelay = 60000;
+          currentDelay = HEALTHY_DEFAULT_INTERVAL;
         }
       } catch (error) {
         if (isMounted) {
           setHealthy(false);
           // Exponential backoff: start at 500ms or double current delay
-          if (currentDelay >= 60000) {
+          if (currentDelay >= HEALTHY_DEFAULT_INTERVAL) {
             // We were in healthy mode, start backoff at 500ms
-            currentDelay = 500;
+            currentDelay = UNHEALTHY_INITIAL_INTERVAL;
           } else {
-            // Continue backoff, double the delay (capped at 60s)
-            currentDelay = Math.min(currentDelay * 2, 60000);
+            // Continue backoff, double the delay (capped at HEALTHY_DEFAULT_INTERVAL)
+            currentDelay = Math.min(currentDelay * 2, HEALTHY_DEFAULT_INTERVAL);
           }
         }
       }
