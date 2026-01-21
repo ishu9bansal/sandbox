@@ -150,7 +150,7 @@ function buildBucketPoint(recordsMap: Record<string, PricePoint[]>): Record<stri
   const dataPoint: Record<string, OHLC> = {};
   Object.entries(recordsMap).forEach(([id, records]) => {
     if (records.length === 0) return;
-    // assume records are sorted by timestamp
+    records.sort((a, b) => a.timestamp - b.timestamp);
     const open = records[0].price;
     const close = records[records.length - 1].price;
     const high = Math.max(...records.map(r => r.price));
