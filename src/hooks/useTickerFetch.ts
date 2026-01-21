@@ -94,7 +94,53 @@ export function useStraddlePriceApi(ids: string[]) {
   return fetchLatestPrice;
 }
 
-export function useHistory(underlying: string, from: Date, to: Date) {
+export function useStraddleHistory(autoReload: boolean, ids: string[], from: Date, to: Date) {
+  const fetchHistory = useStraddleHistoryApi();
+  const [histories, setHistories] = useState<Record<string, HistoryRecord[]>>({});
+  const reloadSingleHistory = useCallback(async (id: string) => {
+    try {
+      const historyData = await fetchHistory(id, from, to);
+      setHistories(prev => ({ ...prev, [id]: historyData }));
+    } catch (error) {
+      console.error(error);
+      toast.error("Error while fetching a straddle history");
+    }
+  }, [from, to, fetchHistory]);
+  const reloadHistories = useCallback(async () => {
+    try {
+      await Promise.all(ids.map(id => reloadSingleHistory(id)));
+    } catch (error) {
+      console.error(error);
+      toast.error("Error while fetching straddle histories");
+    }
+  }, [ids, reloadSingleHistory]);
+  useEffect(() => {
+    if (!autoReload) return;
+    reloadHistories();
+  }, [ids, from, to, autoReload])
+  return { reloadHistories, histories };
+}
+
+export function useStraddleHistoryApi() {
+  const tickerClient = useTickerClient();
+  const fetchHistory = useCallback(async (id: string, from: Date, to: Date) => {
+    try {
+      const historyResponse = await tickerClient.getStraddleHistory(id, from, to);
+      const history = historyResponse ? historyResponse[id] : null;
+      if (!history) {
+        throw new Error("Failed to fetch straddle history");
+      }
+      return history;
+    } catch (error) {
+      console.error(error);
+      toast.error("Error while fetching straddle history");
+      return [];
+    }
+  }, [tickerClient]);
+  return fetchHistory;
+}
+
+export function useHistory(autoReload: boolean, underlying: string, from: Date, to: Date) {
   const fetchHistory = useHistoryApi();
   const [history, setHistory] = useState<HistoryRecord[]>([]);
   const reload = useCallback(async () => {
@@ -107,8 +153,9 @@ export function useHistory(underlying: string, from: Date, to: Date) {
     }
   }, [underlying, from, to, fetchHistory]);
   useEffect(() => {
-    // reload();
-  }, [underlying, from, to])
+    if (!autoReload) return;
+    reload();
+  }, [underlying, from, to, autoReload])
   return { reload, history };
 }
 
