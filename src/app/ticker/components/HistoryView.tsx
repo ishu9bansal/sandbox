@@ -7,7 +7,7 @@ import { DatePicker } from '@/components/compositions/date-picker';
 import { SelectInput } from '@/components/compositions/select-input';
 import { useHistory, useStraddleHistory } from '@/hooks/useTickerFetch';
 import { Button } from '@/components/ui/button';
-import { HistoryRecord, OHLC } from '@/models/ticker';
+import { OHLC, PricePoint } from '@/models/ticker';
 import Chart, { ChartProps } from './Chart';
 import { useAppSelector } from '@/store/hooks';
 import { selectLiveTrackingIds } from '@/store/slices/tickerSlice';
@@ -35,7 +35,7 @@ export default function HistoryView() {
   }, [reload, reloadHistories]);
 
   const { chartData, primaryKeys, secondaryKeys } = useMemo(() => {
-    return buildChartData(history, underlying, histories, straddleIds);
+    return buildChartData(history, underlying, histories, straddleIds, {});
   }, [history, underlying, histories, straddleIds]);
   const xAxisDomain: [number, number] = useMemo(
     () => [from.getTime(), to.getTime()],
@@ -115,10 +115,11 @@ function calLimits(date: Date, startTime: string, endTime: string) {
 }
 
 
-function buildChartData(history: HistoryRecord[], underlying: string, histories: Record<string, HistoryRecord[]>, straddleIds: string[]): ChartProps {
+function buildChartData(history: PricePoint[], underlying: string, histories: Record<string, PricePoint[]>, straddleIds: string[], extraData: Record<string, PricePoint[]>): ChartProps {
   histories[underlying] = history; // include underlying history for ease of access
-  const bucketedData: Record<number, Record<string, HistoryRecord[]>> = {};
-  Object.entries(histories).forEach(([id, records]) => {
+  const bucketedData: Record<number, Record<string, PricePoint[]>> = {};
+  const entries = Object.entries(extraData).concat(Object.entries(histories));
+  entries.forEach(([id, records]) => {
     records.forEach(record => {
       const timeKey = timeBucket(record.timestamp);
       if (!bucketedData[timeKey]) {
@@ -145,7 +146,7 @@ function buildChartData(history: HistoryRecord[], underlying: string, histories:
   return { chartData, primaryKeys, secondaryKeys, xAxisDomain };
 }
 
-function buildBucketPoint(recordsMap: Record<string, HistoryRecord[]>): Record<string, OHLC> {
+function buildBucketPoint(recordsMap: Record<string, PricePoint[]>): Record<string, OHLC> {
   const dataPoint: Record<string, OHLC> = {};
   Object.entries(recordsMap).forEach(([id, records]) => {
     if (records.length === 0) return;

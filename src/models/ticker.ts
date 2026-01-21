@@ -104,5 +104,5 @@ export type HistoryRecord = {
 }
 export type HistoryResponse = Record<InsrumentRef, HistoryRecord[]>;
 
-
+export type PricePoint = { timestamp: number; price: number; };
 export type PriceDataPoint = { timestamp: number; } & Record<string, number>;
