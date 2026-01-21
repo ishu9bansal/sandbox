@@ -75,6 +75,12 @@ export default function HistoryView() {
           options={['NIFTY', 'SENSEX']}
         />
         <Button onClick={onReload}>Reload History</Button>
+        <Button
+          variant={isLive ? 'destructive' : 'default'}
+          onClick={() => setIsLive(prev => !prev)}
+        >
+          {isLive ? 'Stop Live' : 'Start Live'}
+        </Button>
       </div>
       <div className="p-6 bg-[#1a1a1a] border border-white/10 rounded">
         <Chart
