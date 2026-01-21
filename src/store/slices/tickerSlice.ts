@@ -22,7 +22,12 @@ const tickerSlice = createSlice({
         if (!state.liveQuotes[key]) {
           state.liveQuotes[key] = [];
         }
-        state.liveQuotes[key].push(value);
+        const i = state.liveQuotes[key].findIndex(quote => quote.timestamp === value.timestamp);
+        if (i >= 0) {
+          state.liveQuotes[key][i] = value;
+        } else {
+          state.liveQuotes[key].push(value);
+        }
       });
     },
     clearInstruments: (state) => {
