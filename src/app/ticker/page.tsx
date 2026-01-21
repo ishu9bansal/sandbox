@@ -2,7 +2,6 @@
 
 import Obfuscation from "@/components/Obfuscate";
 import InstrumentView from "./components/InstrumentsView";
-import TickerView from "./components/TickerView";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TickerHealth from "./components/TickerHealth";
 import UserView from "./components/UserView";
@@ -28,7 +27,6 @@ export default function CounterPage() {
               <TabsTrigger value="user">User</TabsTrigger>
               <TabsTrigger value="instruments">Instruments</TabsTrigger>
               <TabsTrigger value="straddles">Straddles</TabsTrigger>
-              <TabsTrigger value="live">Live</TabsTrigger>
               <TabsTrigger value="history">History</TabsTrigger>
             </TabsList>
             <div className="flex items-center space-x-2">
@@ -40,9 +38,6 @@ export default function CounterPage() {
           </div>
           <TabsContent value="history">
             <HistoryView />
-          </TabsContent>
-          <TabsContent value="live">
-            <TickerView />
           </TabsContent>
           <TabsContent value="instruments">
             <InstrumentView />
