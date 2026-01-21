@@ -1,7 +1,7 @@
 
 import JsonView from '@/components/JsonView';
 import Card from '@/components/compositions/card';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { DatePicker } from '@/components/compositions/date-picker';
 import { SelectInput } from '@/components/compositions/select-input';
@@ -19,6 +19,7 @@ const TODAY = getTodayDate();
 
 export default function HistoryView() {
   const debugMode = true;
+  const autoReload = false;
   const [date, setDate] = useState(TODAY);
   const [startTime, setStartTime] = useState(MARKET_OPEN_TIME);
   const [endTime, setEndTime] = useState(MARKET_CLOSE_TIME);
@@ -26,8 +27,12 @@ export default function HistoryView() {
   const straddleIds = useAppSelector(selectLiveTrackingIds);
 
   const { from, to } = useMemo(() => calLimits(date, startTime, endTime), [date, startTime, endTime]);
-  const { reload, history } = useHistory(underlying, from, to);
-  const { reloadHistories, histories } = useStraddleHistory(straddleIds, from, to);
+  const { reload, history } = useHistory(autoReload, underlying, from, to);
+  const { reloadHistories, histories } = useStraddleHistory(autoReload, straddleIds, from, to);
+  const onReload = useCallback(() => {
+    reload();
+    reloadHistories();
+  }, [reload, reloadHistories]);
 
   const { chartData, primaryKeys, secondaryKeys } = useMemo(() => buildChartData(history, underlying), [history, underlying]);
   const xAxisDomain: [number, number] = useMemo(() => [from.getTime(), to.getTime()], [from, to]);  // using from and to directly as they are stable references
@@ -56,7 +61,7 @@ export default function HistoryView() {
           onChange={(value) => setUnderlying(value as 'NIFTY' | 'SENSEX')}
           options={['NIFTY', 'SENSEX']}
         />
-        <Button onClick={reload}>Reload History</Button>
+        <Button onClick={onReload}>Reload History</Button>
       </div>
       <div className="p-6 bg-[#1a1a1a] border border-white/10 rounded">
         <Chart
