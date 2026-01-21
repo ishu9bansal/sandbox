@@ -24,11 +24,7 @@ export default function Chart({ chartData, xAxisDomain, secondaryKeys, primaryKe
           tick={{ fill: 'rgba(255, 255, 255, 0.6)', fontSize: 12 }}
           dataKey="timestamp"
           allowDataOverflow={true}
-          tickFormatter={(value, index) => {
-            const date = new Date(value);
-            const isoDate = date.toISOString().split('T')[0];
-            return `${isoDate} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
-          }}
+          tickFormatter={displayHorizontalTick}
           domain={xAxisDomain}
         />
         
@@ -115,10 +111,10 @@ const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<
   if (active && payload && payload.length) {
     return (
       <div
-        className="p-4 bg-black/90 border border-white/20 rounded"
+        className="p-4 bg-black/50 border border-white/20 rounded"
       >
-        <p className="text-black text-sm mb-2">
-          Time: {payload[0]?.payload?.timestamp ? new Date(payload[0].payload.timestamp).toLocaleTimeString() : ''}
+        <p className="text-white text-sm mb-2">
+          Time: {payload[0]?.payload?.timestamp ? displayDateTime(payload[0].payload.timestamp) : ''}
         </p>
         {payload.map((entry, index: number) => (
           <p
@@ -135,3 +131,21 @@ const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<
   }
   return null;
 };
+
+function displayTime(timestamp: number) {
+  const date = new Date(timestamp);
+  return date.toLocaleTimeString();
+}
+function displayDate(timestamp: number) {
+  const date = new Date(timestamp);
+  return date.toLocaleDateString();
+}
+function displayDateTime(timestamp: number) {
+  const date = new Date(timestamp);
+  return date.toLocaleString();
+}
+function displayHorizontalTick(timestamp: number) {
+  // Display as HH:MM AM/PM
+  const date = new Date(timestamp);
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
