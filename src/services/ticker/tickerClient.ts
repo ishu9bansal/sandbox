@@ -80,6 +80,23 @@ export class TickerClient {
       throw Error("Error while fetching history");  // user facing message
     }
   }
+  async getStraddleHistory(straddle: string, from_time: Date, to_time: Date | null = null) {
+    const from = this.formatDate(from_time); 
+    const queryParams = new URLSearchParams({ straddle, from });
+    const to = to_time ? this.formatDate(to_time) : undefined;
+    if (to) {
+      queryParams.append('to', to);
+    }
+    const queryString = queryParams.toString();
+    const uri = `/ticker/straddleHistory?${queryString}`;
+    try {
+      const response = await this.client.get<HistoryResponse>(uri);
+      return response;
+    } catch (error) {
+      console.error(error); // NOTE: do not expose internal error details to user
+      throw Error("Error while fetching straddle history");  // user facing message
+    }
+  }
   private formatDate(date: Date) {
     return date.toLocaleString('sv-SE', {
       year: 'numeric',
