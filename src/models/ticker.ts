@@ -93,7 +93,7 @@ export type HistoryRecord = {
   close: number;
   volume: number;
 }
-export type HistoryResponse = HistoryRecord[];
+export type HistoryResponse = Record<InsrumentRef, HistoryRecord[]>;
 
 
 export type PriceDataPoint = { timestamp: number; } & Record<string, number>;
