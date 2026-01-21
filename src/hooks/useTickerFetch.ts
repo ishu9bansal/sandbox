@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { addSnapshots, selectInstruments, selectLiveTrackingIds, selectTickerData, setInstruments, setStraddlePrices } from "@/store/slices/tickerSlice";
+import { addLiveQuote, selectInstruments, setInstruments } from "@/store/slices/tickerSlice";
 import { HealthClient, TickerClient } from "@/services/ticker/tickerClient";
 import { BASE_URL } from "@/services/ticker/constants";
-import { HistoryRecord, PriceSnapshot, Quote, Straddle, StraddleQuote } from "@/models/ticker";
+import { HistoryRecord, Straddle, LiveQuoteResponse } from "@/models/ticker";
 import { useAuth } from "@clerk/nextjs";
 import { toast } from "sonner";
 
@@ -69,29 +69,6 @@ export function useStraddles(underlying: string) {
     reload();
   }, [underlying])
   return { reload, straddles };
-}
-
-export function useStraddlePriceApi(ids: string[]) {
-  const tickerClient = useTickerClient();
-  const dispatch = useAppDispatch();
-  const fetchLatestPrice = useCallback(async (cancel: boolean) => {
-    if (ids.length === 0) {
-      console.debug("No straddle IDs selected to fetch prices for");
-      return;
-    }
-    try {
-      const prices = await tickerClient.getStraddleQuotes(ids);
-      if (!prices) {
-        throw new Error("Failed to fetch straddle prices");
-      }
-      if (cancel) return;
-      dispatch(setStraddlePrices(prices));
-    } catch (error) {
-      console.error(error);
-      toast.error("Error while fetching straddle prices");
-    }
-  }, [ids, tickerClient]);
-  return fetchLatestPrice;
 }
 
 export function useStraddleHistory(autoReload: boolean, ids: string[], from: Date, to: Date) {
@@ -178,49 +155,73 @@ export function useHistoryApi() {
   return fetchHistory;
 }
 
-export function useLiveData(interval: number = 1000) {
-  const tickerClient = useTickerClient();
-  const data = useAppSelector(selectTickerData);
+export function useLive(underlying: string, straddleIds: string[]) {
   const dispatch = useAppDispatch();
-  const fetchQuote = useCallback(async (cancel: boolean) => {
+  const { fetchQuote, fetchStraddleQuote } = useLiveApis();
+  const persistResponse = useCallback(async (cancel: boolean, fetcher: () => Promise<LiveQuoteResponse>) => {
     try {
-      const underlying = 'NIFTY';
-      const quote = await tickerClient.getQuote(underlying);
-      if (!quote) {
-        throw new Error("No quote received");
-      }
-      const snapshot = snapshotFromQuote(quote);
+      const quoteResponse = await fetcher();
       if (cancel) return;
-      dispatch(addSnapshots([snapshot]));
+      dispatch(addLiveQuote(quoteResponse));
+    } catch (error) {
+      console.error(error); // already handled in fetcher, no need to toast again
+    }
+  }, []);
+  const fetchLiveData = useCallback(async (cancel: boolean) => {
+    await Promise.all([
+      persistResponse(cancel, () => fetchQuote(underlying)),
+      persistResponse(cancel, () => fetchStraddleQuote(straddleIds)),
+    ]);
+  }, [underlying, straddleIds, fetchQuote, fetchStraddleQuote, persistResponse]);
+  return fetchLiveData;
+}
+
+export function useLiveApis() {
+  const tickerClient = useTickerClient();
+  const fetchQuote = useCallback(async (underlying: string) => {
+    try {
+      const quoteResponse = await tickerClient.getQuote(underlying);
+      if (!quoteResponse) {
+        throw new Error("Failed to fetch live quote");
+      }
+      return quoteResponse;
     } catch (error) {
       console.error(error);
-      toast.error("Error while fetching live data");
+      toast.error("Error while fetching live quote");
+      return {};
     }
   }, [tickerClient]);
-  const straddleIds = useAppSelector(selectLiveTrackingIds);
-  const fetchStraddlePrices = useStraddlePriceApi(straddleIds);
+  const fetchStraddleQuote = useCallback(async (ids: string[]) => {
+    try {
+      const quoteResponse = await tickerClient.getStraddleQuotes(ids);
+      if (!quoteResponse) {
+        throw new Error("Failed to fetch live straddle quote");
+      }
+      return quoteResponse;
+    } catch (error) {
+      console.error(error);
+      toast.error("Error while fetching live straddle quote");
+      return {};
+    }
+  }, [tickerClient]);
+  return { fetchQuote, fetchStraddleQuote };
+}
+
+export function useInterval(call: (cancel: boolean) => Promise<void>, interval: number = 1000) {
   useEffect(() => {
     if (!interval) return;
-    let isMounted = true;
+    let cancel = false;
     const intervalMethod = async () => {
-      await Promise.all([
-        fetchQuote(!isMounted),
-        fetchStraddlePrices(!isMounted),
-      ]);
+      await call(cancel);
     };
     intervalMethod(); // Initial
     const intervalId = setInterval(intervalMethod, interval);
     return () => {
-      isMounted = false;
+      cancel = true;
       clearInterval(intervalId);
     };
-  }, [interval, fetchQuote, fetchStraddlePrices]);
-  return { data };
-}
-
-function snapshotFromQuote(quote: StraddleQuote): PriceSnapshot {
-  const { id: underlying, timestamp, price } = quote;
-  return { underlying, timestamp, price };
+  }, [interval, call]);
+  return;
 }
 
 const HEALTHY_DEFAULT_INTERVAL = 30000; // 30 seconds

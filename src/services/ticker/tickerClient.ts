@@ -1,4 +1,4 @@
-import { HistoryResponse, InstrumentResponse, StraddleQuoteResponse, StraddleResponse } from "@/models/ticker";
+import { HistoryResponse, InstrumentResponse, LiveQuoteResponse, StraddleResponse } from "@/models/ticker";
 import ApiClient, { ApiClientConfig } from "../api/api";
 
 export class TickerClient {
@@ -31,9 +31,8 @@ export class TickerClient {
     const queryString = queryParams.toString();
     const uri = `/ticker/quote?${queryString}`;
     try {
-      const response = await this.client.get<StraddleQuoteResponse>(uri);
-      const quote = response ? response[underlying] : null;
-      return quote;
+      const response = await this.client.get<LiveQuoteResponse>(uri);
+      return response;
     } catch (error) {
       console.error(error); // NOTE: do not expose internal error details to user
       throw Error("Error while fetching quote");  // user facing message
@@ -44,7 +43,7 @@ export class TickerClient {
     const queryString = queryParams.toString();
     const uri = `/ticker/straddleQuotes?${queryString}`;
     try {
-      const response = await this.client.get<StraddleQuoteResponse>(uri);
+      const response = await this.client.get<LiveQuoteResponse>(uri);
       return response;
     } catch (error) {
       console.error(error); // NOTE: do not expose internal error details to user

@@ -5,12 +5,12 @@ import { useCallback, useMemo, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { DatePicker } from '@/components/compositions/date-picker';
 import { SelectInput } from '@/components/compositions/select-input';
-import { useHistory, useStraddleHistory } from '@/hooks/useTickerFetch';
+import { useHistory, useInterval, useLive, useStraddleHistory } from '@/hooks/useTickerFetch';
 import { Button } from '@/components/ui/button';
-import { HistoryRecord, OHLC } from '@/models/ticker';
+import { LiveQuote, OHLC, PricePoint } from '@/models/ticker';
 import Chart, { ChartProps } from './Chart';
 import { useAppSelector } from '@/store/hooks';
-import { selectLiveTrackingIds } from '@/store/slices/tickerSlice';
+import { selectLiveQuotes, selectLiveTrackingIds } from '@/store/slices/tickerSlice';
 
 
 const MARKET_OPEN_TIME = '09:15:00';
@@ -20,11 +20,15 @@ const TODAY = getTodayDate();
 export default function HistoryView() {
   const debugMode = false;
   const autoReload = true;
+  const [isLive, setIsLive] = useState(false);
   const [date, setDate] = useState(TODAY);
   const [startTime, setStartTime] = useState(MARKET_OPEN_TIME);
   const [endTime, setEndTime] = useState(MARKET_CLOSE_TIME);
   const [underlying, setUnderlying] = useState<'NIFTY' | 'SENSEX'>('NIFTY');
   const straddleIds = useAppSelector(selectLiveTrackingIds);
+
+  const live = useLive(underlying, straddleIds);
+  useInterval(live, isLive ? 1000 : 0);
 
   const { from, to } = useMemo(() => calLimits(date, startTime, endTime), [date, startTime, endTime]);
   const { reload, history } = useHistory(autoReload, underlying, from, to);
@@ -33,9 +37,13 @@ export default function HistoryView() {
     reload();
     reloadHistories();
   }, [reload, reloadHistories]);
+  const allLiveData = useAppSelector(selectLiveQuotes);
+  const liveQuotes = useMemo(() => {
+    return filterLiveQuotes(allLiveData, from, to, [underlying, ...straddleIds]);
+  }, [allLiveData, from, to, underlying, straddleIds]);
 
   const { chartData, primaryKeys, secondaryKeys } = useMemo(() => {
-    return buildChartData(history, underlying, histories, straddleIds);
+    return buildChartData(history, underlying, histories, straddleIds, liveQuotes);
   }, [history, underlying, histories, straddleIds]);
   const xAxisDomain: [number, number] = useMemo(
     () => [from.getTime(), to.getTime()],
@@ -67,6 +75,12 @@ export default function HistoryView() {
           options={['NIFTY', 'SENSEX']}
         />
         <Button onClick={onReload}>Reload History</Button>
+        <Button
+          variant={isLive ? 'destructive' : 'default'}
+          onClick={() => setIsLive(prev => !prev)}
+        >
+          {isLive ? 'Stop Live' : 'Start Live'}
+        </Button>
       </div>
       <div className="p-6 bg-[#1a1a1a] border border-white/10 rounded">
         <Chart
@@ -99,6 +113,16 @@ export default function HistoryView() {
   );
 }
 
+function filterLiveQuotes(allLiveData: Record<string, LiveQuote[]>, from: Date, to: Date, ids: string[]) {
+  const liveQuotes: Record<string, LiveQuote[]> = {};
+  ids.forEach(id => {
+    const quotes = allLiveData[id] || [];
+    const filteredQuotes = quotes
+      .filter(quote => quote.timestamp >= from.getTime() && quote.timestamp <= to.getTime());
+    liveQuotes[id] = filteredQuotes;
+  });
+  return liveQuotes;
+}
 
 function calLimits(date: Date, startTime: string, endTime: string) {
   const year = date.getFullYear();
@@ -115,10 +139,11 @@ function calLimits(date: Date, startTime: string, endTime: string) {
 }
 
 
-function buildChartData(history: HistoryRecord[], underlying: string, histories: Record<string, HistoryRecord[]>, straddleIds: string[]): ChartProps {
+function buildChartData(history: PricePoint[], underlying: string, histories: Record<string, PricePoint[]>, straddleIds: string[], extraData: Record<string, PricePoint[]>): ChartProps {
   histories[underlying] = history; // include underlying history for ease of access
-  const bucketedData: Record<number, Record<string, HistoryRecord[]>> = {};
-  Object.entries(histories).forEach(([id, records]) => {
+  const bucketedData: Record<number, Record<string, PricePoint[]>> = {};
+  const entries = Object.entries(extraData).concat(Object.entries(histories));
+  entries.forEach(([id, records]) => {
     records.forEach(record => {
       const timeKey = timeBucket(record.timestamp);
       if (!bucketedData[timeKey]) {
@@ -145,11 +170,11 @@ function buildChartData(history: HistoryRecord[], underlying: string, histories:
   return { chartData, primaryKeys, secondaryKeys, xAxisDomain };
 }
 
-function buildBucketPoint(recordsMap: Record<string, HistoryRecord[]>): Record<string, OHLC> {
+function buildBucketPoint(recordsMap: Record<string, PricePoint[]>): Record<string, OHLC> {
   const dataPoint: Record<string, OHLC> = {};
   Object.entries(recordsMap).forEach(([id, records]) => {
     if (records.length === 0) return;
-    // assume records are sorted by timestamp
+    records.sort((a, b) => a.timestamp - b.timestamp);
     const open = records[0].price;
     const close = records[records.length - 1].price;
     const high = Math.max(...records.map(r => r.price));
