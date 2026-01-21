@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { OHLC, PricePoint } from '@/models/ticker';
 import Chart, { ChartProps } from './Chart';
 import { useAppSelector } from '@/store/hooks';
-import { selectLiveTrackingIds } from '@/store/slices/tickerSlice';
+import { selectLiveQuotes, selectLiveTrackingIds } from '@/store/slices/tickerSlice';
 
 
 const MARKET_OPEN_TIME = '09:15:00';
@@ -29,13 +29,15 @@ export default function HistoryView() {
   const { from, to } = useMemo(() => calLimits(date, startTime, endTime), [date, startTime, endTime]);
   const { reload, history } = useHistory(autoReload, underlying, from, to);
   const { reloadHistories, histories } = useStraddleHistory(autoReload, straddleIds, from, to);
+  const { reloadLive, liveQuotes } = useLiveQuotes(from, to, [underlying, ...straddleIds]);
   const onReload = useCallback(() => {
     reload();
     reloadHistories();
+    reloadLive();
   }, [reload, reloadHistories]);
 
   const { chartData, primaryKeys, secondaryKeys } = useMemo(() => {
-    return buildChartData(history, underlying, histories, straddleIds, {});
+    return buildChartData(history, underlying, histories, straddleIds, liveQuotes);
   }, [history, underlying, histories, straddleIds]);
   const xAxisDomain: [number, number] = useMemo(
     () => [from.getTime(), to.getTime()],
@@ -99,6 +101,10 @@ export default function HistoryView() {
   );
 }
 
+function useLiveQuotes(from: Date, to: Date, ids: string[]) {
+  const liveQuotes = useAppSelector(selectLiveQuotes);
+  return { liveQuotes, reloadLive: () => {} };
+}
 
 function calLimits(date: Date, startTime: string, endTime: string) {
   const year = date.getFullYear();

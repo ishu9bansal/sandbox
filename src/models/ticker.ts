@@ -82,6 +82,7 @@ export interface TickerState {
   instruments: Instrument[];
   straddlePrices: Record<string, LiveQuote[]>;
   liveTrackingIds: string[];
+  liveQuotes: Record<string, LiveQuote[]>;
 }
 type NativeHistoryRecord = {
   date: string;

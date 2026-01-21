@@ -6,12 +6,16 @@ const initialState: TickerState = {
   instruments: [],
   straddlePrices: {},
   liveTrackingIds: [],
+  liveQuotes: {},
 };
 
 const tickerSlice = createSlice({
   name: 'ticker',
   initialState,
   reducers: {
+    setLiveQuotes: (state, action: PayloadAction<Record<string, LiveQuote[]>>) => {
+      state.liveQuotes = action.payload;
+    },
     setSnapshots: (state, action: PayloadAction<PriceSnapshot[]>) => {
       state.data = action.payload;
     },
@@ -54,6 +58,7 @@ export default tickerSlice.reducer;
 export const selectTickerData = (state: { ticker: TickerState }) => state.ticker.data;
 export const selectInstruments = (state: { ticker: TickerState }) => state.ticker.instruments;
 export const selectLiveTrackingIds = (state: { ticker: TickerState }) => state.ticker.liveTrackingIds;
+export const selectLiveQuotes = (state: { ticker: TickerState }) => state.ticker.liveQuotes;
 export const selectStraddleData = (ids: string[]) => (state: { ticker: TickerState }) => {
   const result: Record<string, LiveQuote[]> = {};
   ids.forEach(id => {
