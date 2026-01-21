@@ -10,7 +10,7 @@ import {
 } from 'recharts';
 import { useLiveData } from '@/hooks/useTickerFetch';
 import { useCallback, useState } from 'react';
-import { OHLC, PriceDataPoint, PriceSnapshot, StraddleQuote } from '@/models/ticker';
+import { OHLC, PriceDataPoint, PriceSnapshot, LiveQuote } from '@/models/ticker';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ZoomInIcon, ZoomOutIcon } from 'lucide-react';
@@ -309,7 +309,7 @@ function formatTime(timestamp: number): string {
   return `${hours}:${minutes}:${seconds}`;
 }
 
-function buildChartData(data: PriceSnapshot[], pricesMap: Record<string, StraddleQuote[]>): PriceDataPoint[] {
+function buildChartData(data: PriceSnapshot[], pricesMap: Record<string, LiveQuote[]>): PriceDataPoint[] {
   const stockPrices: PriceDataPoint[] = data.map(snapshot => ({
     timestamp: snapshot.timestamp,
     'NIFTY': snapshot.price,

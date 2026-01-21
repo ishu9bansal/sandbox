@@ -1,7 +1,7 @@
-import { PriceSnapshot, StraddleQuote, TickerState } from "@/models/ticker";
+import { PriceSnapshot, LiveQuote, TickerState } from "@/models/ticker";
 
-export function simulateStraddleQuotes(id: string, past_seconds: number): StraddleQuote[] {
-  const quotes: StraddleQuote[] = [];
+export function simulateStraddleQuotes(id: string, past_seconds: number): LiveQuote[] {
+  const quotes: LiveQuote[] = [];
   const now = Date.now();
   for (let i = past_seconds; i > 0; i--) {
     const timestamp = now - i * 1000; // 1 second intervals

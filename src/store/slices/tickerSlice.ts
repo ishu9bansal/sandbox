@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { Instrument, PriceSnapshot, StraddleQuote, StraddleQuoteResponse, TickerState } from '@/models/ticker';
+import type { Instrument, PriceSnapshot, LiveQuote, LiveQuoteResponse, TickerState } from '@/models/ticker';
 
 const initialState: TickerState = {
   data: [],
@@ -33,7 +33,7 @@ const tickerSlice = createSlice({
     clearInstruments: (state) => {
       state.instruments = [];
     },
-    setStraddlePrices: (state, action: PayloadAction<StraddleQuoteResponse>) => {
+    setStraddlePrices: (state, action: PayloadAction<LiveQuoteResponse>) => {
       Object.entries(action.payload).forEach(([key, value]) => {
         if (!state.straddlePrices[key]) {
           state.straddlePrices[key] = [];
@@ -62,7 +62,7 @@ export const selectTickerData = (state: { ticker: TickerState }) => state.ticker
 export const selectInstruments = (state: { ticker: TickerState }) => state.ticker.instruments;
 export const selectLiveTrackingIds = (state: { ticker: TickerState }) => state.ticker.liveTrackingIds;
 export const selectStraddleData = (ids: string[]) => (state: { ticker: TickerState }) => {
-  const result: Record<string, StraddleQuote[]> = {};
+  const result: Record<string, LiveQuote[]> = {};
   ids.forEach(id => {
     result[id] = state.ticker.straddlePrices[id] || [];
   });

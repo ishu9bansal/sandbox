@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { addSnapshots, selectInstruments, selectLiveTrackingIds, selectTickerData, setInstruments, setStraddlePrices } from "@/store/slices/tickerSlice";
 import { HealthClient, TickerClient } from "@/services/ticker/tickerClient";
 import { BASE_URL } from "@/services/ticker/constants";
-import { HistoryRecord, PriceSnapshot, Quote, Straddle, StraddleQuote } from "@/models/ticker";
+import { HistoryRecord, PriceSnapshot, Quote, Straddle, LiveQuote } from "@/models/ticker";
 import { useAuth } from "@clerk/nextjs";
 import { toast } from "sonner";
 
@@ -218,7 +218,7 @@ export function useLiveData(interval: number = 1000) {
   return { data };
 }
 
-function snapshotFromQuote(quote: StraddleQuote): PriceSnapshot {
+function snapshotFromQuote(quote: LiveQuote): PriceSnapshot {
   const { id: underlying, timestamp, price } = quote;
   return { underlying, timestamp, price };
 }

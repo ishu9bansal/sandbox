@@ -68,20 +68,19 @@ export type Straddle = {
 };
 export type StraddleResponse = Straddle[];
 
-export type StraddleQuote = {
+export type LiveQuote = {
   id: string;
   timestamp: number;
   price: number;
   quotes: Quote[];
 }
-// TODO: refactor (this is not specific to straddle)
-export type StraddleQuoteResponse = Record<InsrumentRef, StraddleQuote>;
+export type LiveQuoteResponse = Record<InsrumentRef, LiveQuote>;
 
 
 export interface TickerState {
   data: PriceSnapshot[];
   instruments: Instrument[];
-  straddlePrices: Record<string, StraddleQuote[]>;
+  straddlePrices: Record<string, LiveQuote[]>;
   liveTrackingIds: string[];
 }
 type NativeHistoryRecord = {
