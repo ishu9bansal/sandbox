@@ -116,7 +116,8 @@ export function useHistoryApi() {
   const tickerClient = useTickerClient();
   const fetchHistory = useCallback(async (underlying: string, from: Date, to: Date) => {
     try {
-      const history = await tickerClient.getHistory(underlying, from, to);
+      const historyResponse = await tickerClient.getHistory(underlying, from, to);
+      const history = historyResponse ? historyResponse[underlying] : null;
       if (!history) {
         throw new Error("Failed to fetch histiry");
       }
