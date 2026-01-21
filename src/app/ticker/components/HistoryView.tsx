@@ -7,7 +7,7 @@ import { DatePicker } from '@/components/compositions/date-picker';
 import { SelectInput } from '@/components/compositions/select-input';
 import { useHistory, useStraddleHistory } from '@/hooks/useTickerFetch';
 import { Button } from '@/components/ui/button';
-import { OHLC, PricePoint } from '@/models/ticker';
+import { LiveQuote, OHLC, PricePoint } from '@/models/ticker';
 import Chart, { ChartProps } from './Chart';
 import { useAppSelector } from '@/store/hooks';
 import { selectLiveQuotes, selectLiveTrackingIds } from '@/store/slices/tickerSlice';
@@ -29,12 +29,14 @@ export default function HistoryView() {
   const { from, to } = useMemo(() => calLimits(date, startTime, endTime), [date, startTime, endTime]);
   const { reload, history } = useHistory(autoReload, underlying, from, to);
   const { reloadHistories, histories } = useStraddleHistory(autoReload, straddleIds, from, to);
-  const { reloadLive, liveQuotes } = useLiveQuotes(from, to, [underlying, ...straddleIds]);
   const onReload = useCallback(() => {
     reload();
     reloadHistories();
-    reloadLive();
   }, [reload, reloadHistories]);
+  const allLiveData = useAppSelector(selectLiveQuotes);
+  const liveQuotes = useMemo(() => {
+    return filterLiveQuotes(allLiveData, from, to, [underlying, ...straddleIds]);
+  }, [allLiveData, from, to, underlying, straddleIds]);
 
   const { chartData, primaryKeys, secondaryKeys } = useMemo(() => {
     return buildChartData(history, underlying, histories, straddleIds, liveQuotes);
@@ -101,9 +103,15 @@ export default function HistoryView() {
   );
 }
 
-function useLiveQuotes(from: Date, to: Date, ids: string[]) {
-  const liveQuotes = useAppSelector(selectLiveQuotes);
-  return { liveQuotes, reloadLive: () => {} };
+function filterLiveQuotes(allLiveData: Record<string, LiveQuote[]>, from: Date, to: Date, ids: string[]) {
+  const liveQuotes: Record<string, LiveQuote[]> = {};
+  ids.forEach(id => {
+    const quotes = allLiveData[id] || [];
+    const filteredQuotes = quotes
+      .filter(quote => quote.timestamp >= from.getTime() && quote.timestamp <= to.getTime());
+    liveQuotes[id] = filteredQuotes;
+  });
+  return liveQuotes;
 }
 
 function calLimits(date: Date, startTime: string, endTime: string) {
