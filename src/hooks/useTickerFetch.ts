@@ -94,6 +94,47 @@ export function useStraddlePriceApi(ids: string[]) {
   return fetchLatestPrice;
 }
 
+export function useStraddleHistory(ids: string[], from: Date, to: Date) {
+  const fetchHistory = useStraddleHistoryApi();
+  const [histories, setHistories] = useState<Record<string, HistoryRecord[]>>({});
+  const reloadHistories = useCallback(async () => {
+    try {
+      const allHistories: Record<string, HistoryRecord[]> = {};
+      await Promise.all(ids.map(async (id) => {
+        const historyData = await fetchHistory(id, from, to);
+        allHistories[id] = historyData;
+      }));
+      setHistories(allHistories);
+    } catch (error) {
+      console.error(error);
+      toast.error("Error while fetching straddle histories");
+    }
+  }, [ids, from, to, fetchHistory]);
+  useEffect(() => {
+    // reloadHistories();
+  }, [ids, from, to])
+  return { reloadHistories, histories };
+}
+
+export function useStraddleHistoryApi() {
+  const tickerClient = useTickerClient();
+  const fetchHistory = useCallback(async (id: string, from: Date, to: Date) => {
+    try {
+      const historyResponse = await tickerClient.getStraddleHistory(id, from, to);
+      const history = historyResponse ? historyResponse[id] : null;
+      if (!history) {
+        throw new Error("Failed to fetch straddle history");
+      }
+      return history;
+    } catch (error) {
+      console.error(error);
+      toast.error("Error while fetching straddle history");
+      return [];
+    }
+  }, [tickerClient]);
+  return fetchHistory;
+}
+
 export function useHistory(underlying: string, from: Date, to: Date) {
   const fetchHistory = useHistoryApi();
   const [history, setHistory] = useState<HistoryRecord[]>([]);

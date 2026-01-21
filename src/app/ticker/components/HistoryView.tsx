@@ -5,10 +5,12 @@ import { useMemo, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { DatePicker } from '@/components/compositions/date-picker';
 import { SelectInput } from '@/components/compositions/select-input';
-import { useHistory } from '@/hooks/useTickerFetch';
+import { useHistory, useStraddleHistory } from '@/hooks/useTickerFetch';
 import { Button } from '@/components/ui/button';
 import { HistoryRecord } from '@/models/ticker';
 import Chart, { ChartProps } from './Chart';
+import { useAppSelector } from '@/store/hooks';
+import { selectLiveTrackingIds } from '@/store/slices/tickerSlice';
 
 
 const MARKET_OPEN_TIME = '09:15:00';
@@ -16,14 +18,16 @@ const MARKET_CLOSE_TIME = '15:30:00';
 const TODAY = getTodayDate();
 
 export default function HistoryView() {
-  const debugMode = false;
+  const debugMode = true;
   const [date, setDate] = useState(TODAY);
   const [startTime, setStartTime] = useState(MARKET_OPEN_TIME);
   const [endTime, setEndTime] = useState(MARKET_CLOSE_TIME);
   const [underlying, setUnderlying] = useState<'NIFTY' | 'SENSEX'>('NIFTY');
+  const straddleIds = useAppSelector(selectLiveTrackingIds);
 
   const { from, to } = useMemo(() => calLimits(date, startTime, endTime), [date, startTime, endTime]);
   const { reload, history } = useHistory(underlying, from, to);
+  const { reloadHistories, histories } = useStraddleHistory(straddleIds, from, to);
 
   const { chartData, primaryKeys, secondaryKeys } = useMemo(() => buildChartData(history, underlying), [history, underlying]);
   const xAxisDomain: [number, number] = useMemo(() => [from.getTime(), to.getTime()], [from, to]);  // using from and to directly as they are stable references
@@ -75,6 +79,8 @@ export default function HistoryView() {
               xAxisDomain,
               history,
               chartData,
+              straddleIds,
+              histories,
             }} />
           </Card>
         )
