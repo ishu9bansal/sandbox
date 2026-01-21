@@ -6,6 +6,9 @@ import ReduxProvider from "@/store/ReduxProvider";
 import { SidebarProvider } from "@/contexts/SidebarContext";
 import { Toaster } from "@/components/ui/sonner";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Inter } from "next/font/google";
+
+const inter = Inter({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata: Metadata = {
   title: "Sandbox - Web Projects Playground",
@@ -19,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en">
+      <html lang="en" className={inter.variable}>
         <body className="antialiased">
           <ReduxProvider>
             <SidebarProvider>
