@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { addLiveQuote, addSnapshots, selectInstruments, selectLiveTrackingIds, selectTickerData, setInstruments, setStraddlePrices } from "@/store/slices/tickerSlice";
+import { addLiveQuote, selectInstruments, setInstruments } from "@/store/slices/tickerSlice";
 import { HealthClient, TickerClient } from "@/services/ticker/tickerClient";
 import { BASE_URL } from "@/services/ticker/constants";
-import { HistoryRecord, PriceSnapshot, Quote, Straddle, LiveQuote, LiveQuoteResponse } from "@/models/ticker";
+import { HistoryRecord, Straddle, LiveQuoteResponse } from "@/models/ticker";
 import { useAuth } from "@clerk/nextjs";
 import { toast } from "sonner";
 
@@ -69,29 +69,6 @@ export function useStraddles(underlying: string) {
     reload();
   }, [underlying])
   return { reload, straddles };
-}
-
-export function useStraddlePriceApi(ids: string[]) {
-  const tickerClient = useTickerClient();
-  const dispatch = useAppDispatch();
-  const fetchLatestPrice = useCallback(async (cancel: boolean) => {
-    if (ids.length === 0) {
-      console.debug("No straddle IDs selected to fetch prices for");
-      return;
-    }
-    try {
-      const prices = await tickerClient.getStraddleQuotes(ids);
-      if (!prices) {
-        throw new Error("Failed to fetch straddle prices");
-      }
-      if (cancel) return;
-      dispatch(setStraddlePrices(prices));
-    } catch (error) {
-      console.error(error);
-      toast.error("Error while fetching straddle prices");
-    }
-  }, [ids, tickerClient]);
-  return fetchLatestPrice;
 }
 
 export function useStraddleHistory(autoReload: boolean, ids: string[], from: Date, to: Date) {

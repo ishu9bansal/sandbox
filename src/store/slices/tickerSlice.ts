@@ -1,10 +1,8 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { Instrument, PriceSnapshot, LiveQuote, LiveQuoteResponse, TickerState } from '@/models/ticker';
+import type { Instrument, LiveQuote, LiveQuoteResponse, TickerState } from '@/models/ticker';
 
 const initialState: TickerState = {
-  data: [],
   instruments: [],
-  straddlePrices: {},
   liveTrackingIds: [],
   liveQuotes: {},
 };
@@ -16,14 +14,8 @@ const tickerSlice = createSlice({
     setLiveQuotes: (state, action: PayloadAction<Record<string, LiveQuote[]>>) => {
       state.liveQuotes = action.payload;
     },
-    setSnapshots: (state, action: PayloadAction<PriceSnapshot[]>) => {
-      state.data = action.payload;
-    },
     setInstruments: (state, action: PayloadAction<Instrument[]>) => {
       state.instruments = action.payload;
-    },
-    addSnapshots: (state, action: PayloadAction<PriceSnapshot[]>) => {
-      state.data = state.data.concat(action.payload);
     },
     addLiveQuote: (state, action: PayloadAction<LiveQuoteResponse>) => {
       Object.entries(action.payload).forEach(([key, value]) => {
@@ -33,19 +25,8 @@ const tickerSlice = createSlice({
         state.liveQuotes[key].push(value);
       });
     },
-    clearData: (state) => {
-      state.data = [];
-    },
     clearInstruments: (state) => {
       state.instruments = [];
-    },
-    setStraddlePrices: (state, action: PayloadAction<LiveQuoteResponse>) => {
-      Object.entries(action.payload).forEach(([key, value]) => {
-        if (!state.straddlePrices[key]) {
-          state.straddlePrices[key] = [];
-        }
-        state.straddlePrices[key].push(value);
-      });
     },
     setLiveTrackingIds: (state, action: PayloadAction<string[]>) => {
       state.liveTrackingIds = action.payload;
@@ -55,24 +36,12 @@ const tickerSlice = createSlice({
 
 export const {
   setLiveQuotes,
-  setSnapshots,
-  addSnapshots,
-  clearData,
   setInstruments,
   clearInstruments,
-  setStraddlePrices,
   setLiveTrackingIds,
   addLiveQuote,
 } = tickerSlice.actions;
 export default tickerSlice.reducer;
-export const selectTickerData = (state: { ticker: TickerState }) => state.ticker.data;
 export const selectInstruments = (state: { ticker: TickerState }) => state.ticker.instruments;
 export const selectLiveTrackingIds = (state: { ticker: TickerState }) => state.ticker.liveTrackingIds;
 export const selectLiveQuotes = (state: { ticker: TickerState }) => state.ticker.liveQuotes;
-export const selectStraddleData = (ids: string[]) => (state: { ticker: TickerState }) => {
-  const result: Record<string, LiveQuote[]> = {};
-  ids.forEach(id => {
-    result[id] = state.ticker.straddlePrices[id] || [];
-  });
-  return result;
-};

@@ -78,9 +78,7 @@ export type LiveQuoteResponse = Record<InsrumentRef, LiveQuote>;
 
 
 export interface TickerState {
-  data: PriceSnapshot[];
   instruments: Instrument[];
-  straddlePrices: Record<string, LiveQuote[]>;
   liveTrackingIds: string[];
   liveQuotes: Record<string, LiveQuote[]>;
 }
