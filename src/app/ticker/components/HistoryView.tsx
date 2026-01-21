@@ -7,7 +7,7 @@ import { DatePicker } from '@/components/compositions/date-picker';
 import { SelectInput } from '@/components/compositions/select-input';
 import { useHistory, useStraddleHistory } from '@/hooks/useTickerFetch';
 import { Button } from '@/components/ui/button';
-import { HistoryRecord } from '@/models/ticker';
+import { HistoryRecord, OHLC } from '@/models/ticker';
 import Chart, { ChartProps } from './Chart';
 import { useAppSelector } from '@/store/hooks';
 import { selectLiveTrackingIds } from '@/store/slices/tickerSlice';
@@ -34,8 +34,13 @@ export default function HistoryView() {
     reloadHistories();
   }, [reload, reloadHistories]);
 
-  const { chartData, primaryKeys, secondaryKeys } = useMemo(() => buildChartData(history, underlying), [history, underlying]);
-  const xAxisDomain: [number, number] = useMemo(() => [from.getTime(), to.getTime()], [from, to]);  // using from and to directly as they are stable references
+  const { chartData, primaryKeys, secondaryKeys } = useMemo(() => {
+    return buildChartData(history, underlying, histories, straddleIds);
+  }, [history, underlying, histories, straddleIds]);
+  const xAxisDomain: [number, number] = useMemo(
+    () => [from.getTime(), to.getTime()],
+    [from, to]
+  );  // using from and to directly as they are stable references
 
   return (
     <div>
@@ -110,17 +115,51 @@ function calLimits(date: Date, startTime: string, endTime: string) {
 }
 
 
-function buildChartData(history: HistoryRecord[], underlying: string): ChartProps {
-  const secondaryKeys: string[] = []; // will add straddle prices later
-  const primaryKeys = [underlying];
-  const chartData = history.map(record => ({
-    timestamp: record.timestamp,
-    [underlying]: record.close,
-  })).sort((a, b) => a.timestamp - b.timestamp);
+function buildChartData(history: HistoryRecord[], underlying: string, histories: Record<string, HistoryRecord[]>, straddleIds: string[]): ChartProps {
+  histories[underlying] = history; // include underlying history for ease of access
+  const bucketedData: Record<number, Record<string, HistoryRecord[]>> = {};
+  Object.entries(histories).forEach(([id, records]) => {
+    records.forEach(record => {
+      const timeKey = timeBucket(record.timestamp);
+      if (!bucketedData[timeKey]) {
+        bucketedData[timeKey] = {};
+      }
+      if (!bucketedData[timeKey][id]) {
+        bucketedData[timeKey][id] = [];
+      }
+      bucketedData[timeKey][id].push(record);
+    });
+  });
+  const dataPoints = Object.entries(bucketedData).map(([timeKey, recordsMap]) => {
+    const timestamp = Number(timeKey);
+    const ohlcData = buildBucketPoint(recordsMap);
+    const priceMap = Object.fromEntries(Object.entries(ohlcData).map(([id, ohlc]) => [id, ohlc.close]));
+    return { timestamp, ...priceMap };
+  });
+  const chartData = dataPoints.sort((a, b) => a.timestamp - b.timestamp);
   const firstTimestamp = chartData[0]?.timestamp || 0;
   const lastTimestamp = chartData[chartData.length - 1]?.timestamp || 0;
   const xAxisDomain: [number, number] = [firstTimestamp, lastTimestamp];
+  const secondaryKeys = straddleIds;
+  const primaryKeys = [underlying];
   return { chartData, primaryKeys, secondaryKeys, xAxisDomain };
+}
+
+function buildBucketPoint(recordsMap: Record<string, HistoryRecord[]>): Record<string, OHLC> {
+  const dataPoint: Record<string, OHLC> = {};
+  Object.entries(recordsMap).forEach(([id, records]) => {
+    if (records.length === 0) return;
+    // assume records are sorted by timestamp
+    const open = records[0].price;
+    const close = records[records.length - 1].price;
+    const high = Math.max(...records.map(r => r.price));
+    const low = Math.min(...records.map(r => r.price));
+    dataPoint[id] = { open, high, low, close };
+  });
+  return dataPoint;
+}
+function timeBucket(timestamp: number, bucketSizeMs: number = 1000): number {
+  return Math.floor(timestamp / bucketSizeMs) * bucketSizeMs;
 }
 
 function getTodayDate() {
