@@ -18,8 +18,8 @@ const MARKET_CLOSE_TIME = '15:30:00';
 const TODAY = getTodayDate();
 
 export default function HistoryView() {
-  const debugMode = true;
-  const autoReload = false;
+  const debugMode = false;
+  const autoReload = true;
   const [date, setDate] = useState(TODAY);
   const [startTime, setStartTime] = useState(MARKET_OPEN_TIME);
   const [endTime, setEndTime] = useState(MARKET_CLOSE_TIME);
