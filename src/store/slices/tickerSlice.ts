@@ -25,6 +25,14 @@ const tickerSlice = createSlice({
     addSnapshots: (state, action: PayloadAction<PriceSnapshot[]>) => {
       state.data = state.data.concat(action.payload);
     },
+    addLiveQuote: (state, action: PayloadAction<LiveQuoteResponse>) => {
+      Object.entries(action.payload).forEach(([key, value]) => {
+        if (!state.liveQuotes[key]) {
+          state.liveQuotes[key] = [];
+        }
+        state.liveQuotes[key].push(value);
+      });
+    },
     clearData: (state) => {
       state.data = [];
     },
@@ -54,6 +62,7 @@ export const {
   clearInstruments,
   setStraddlePrices,
   setLiveTrackingIds,
+  addLiveQuote,
 } = tickerSlice.actions;
 export default tickerSlice.reducer;
 export const selectTickerData = (state: { ticker: TickerState }) => state.ticker.data;
