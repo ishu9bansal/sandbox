@@ -46,6 +46,7 @@ const tickerSlice = createSlice({
 });
 
 export const {
+  setLiveQuotes,
   setSnapshots,
   addSnapshots,
   clearData,
