@@ -5,7 +5,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { DatePicker } from '@/components/compositions/date-picker';
 import { SelectInput } from '@/components/compositions/select-input';
-import { useHistory, useStraddleHistory } from '@/hooks/useTickerFetch';
+import { useHistory, useInterval, useLive, useStraddleHistory } from '@/hooks/useTickerFetch';
 import { Button } from '@/components/ui/button';
 import { LiveQuote, OHLC, PricePoint } from '@/models/ticker';
 import Chart, { ChartProps } from './Chart';
@@ -20,11 +20,15 @@ const TODAY = getTodayDate();
 export default function HistoryView() {
   const debugMode = false;
   const autoReload = true;
+  const [isLive, setIsLive] = useState(false);
   const [date, setDate] = useState(TODAY);
   const [startTime, setStartTime] = useState(MARKET_OPEN_TIME);
   const [endTime, setEndTime] = useState(MARKET_CLOSE_TIME);
   const [underlying, setUnderlying] = useState<'NIFTY' | 'SENSEX'>('NIFTY');
   const straddleIds = useAppSelector(selectLiveTrackingIds);
+
+  const live = useLive(underlying, straddleIds);
+  useInterval(live, isLive ? 1000 : 0);
 
   const { from, to } = useMemo(() => calLimits(date, startTime, endTime), [date, startTime, endTime]);
   const { reload, history } = useHistory(autoReload, underlying, from, to);

@@ -32,8 +32,7 @@ export class TickerClient {
     const uri = `/ticker/quote?${queryString}`;
     try {
       const response = await this.client.get<LiveQuoteResponse>(uri);
-      const quote = response ? response[underlying] : null;
-      return quote;
+      return response;
     } catch (error) {
       console.error(error); // NOTE: do not expose internal error details to user
       throw Error("Error while fetching quote");  // user facing message
