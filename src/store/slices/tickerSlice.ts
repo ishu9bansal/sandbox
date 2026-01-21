@@ -12,12 +12,6 @@ const tickerSlice = createSlice({
   name: 'ticker',
   initialState,
   reducers: {
-    setLocalState: (state, action: PayloadAction<Partial<TickerState>>) => {
-      state.data = action.payload.data || state.data;
-      state.instruments = action.payload.instruments || state.instruments;
-      state.straddlePrices = action.payload.straddlePrices || state.straddlePrices;
-      state.liveTrackingIds = action.payload.liveTrackingIds || state.liveTrackingIds;
-    },
     setSnapshots: (state, action: PayloadAction<PriceSnapshot[]>) => {
       state.data = action.payload;
     },
@@ -53,7 +47,6 @@ export const {
   clearData,
   setInstruments,
   clearInstruments,
-  setLocalState,
   setStraddlePrices,
   setLiveTrackingIds,
 } = tickerSlice.actions;

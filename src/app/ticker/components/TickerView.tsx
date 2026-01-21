@@ -14,9 +14,8 @@ import { OHLC, PriceDataPoint, PriceSnapshot, LiveQuote } from '@/models/ticker'
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ZoomInIcon, ZoomOutIcon } from 'lucide-react';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { selectLiveTrackingIds, selectStraddleData, setLocalState } from '@/store/slices/tickerSlice';
-import { buildSimulatedState } from '@/utils/ticker';
+import { useAppSelector } from '@/store/hooks';
+import { selectLiveTrackingIds, selectStraddleData } from '@/store/slices/tickerSlice';
 
 const MARKET_OPEN_TIME = '09:15:00';
 const MARKET_CLOSE_TIME = '15:30:00';
@@ -49,14 +48,6 @@ const TickerView = () => {
       setDefaultZoom();
     }
   }, [defaultZoom, set30minZoom, setDefaultZoom]);
-
-  const dispatch = useAppDispatch();
-  const setAllData = useCallback((seconds: number) => {
-    dispatch(setLocalState(buildSimulatedState(seconds)));
-  }, []);
-  const onSimulate = useCallback(() => {
-    setAllData(15*60); // Last 15 minutes
-  }, [setAllData]);
 
   return (
     <div className="container mx-auto">
@@ -99,13 +90,11 @@ const TickerView = () => {
             variant={isLive ? 'destructive' : 'default'}
             onClick={() => {
               setIsLive(prev => !prev);
-              if (!isLive) setAllData(0); // Clear data when starting live
             }}
           >
             {isLive ? 'Stop Live' : 'Start Live'}
           </Button>
           <Button
-            onClick={onSimulate}
           >
             Set simulated data
           </Button>

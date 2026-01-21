@@ -6,7 +6,7 @@ import { ReactNode, useEffect } from 'react';
 import { setPatients } from './slices/patientSlice';
 import { loadStateFromLocalStorage } from './localStorage';
 import { setPerioRecords } from './slices/perioSlice';
-import { setLocalState } from './slices/tickerSlice';
+import { setLiveTrackingIds } from './slices/tickerSlice';
 
 export default function ReduxProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
@@ -18,8 +18,8 @@ export default function ReduxProvider({ children }: { children: ReactNode }) {
     if (savedState?.perio?.records) {
       store.dispatch(setPerioRecords(savedState.perio.records));
     }
-    if (savedState?.ticker) {
-      store.dispatch(setLocalState(savedState.ticker));
+    if (savedState?.ticker?.liveTrackingIds) {
+      store.dispatch(setLiveTrackingIds(savedState.ticker.liveTrackingIds));
     }
   }, []);
 
