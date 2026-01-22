@@ -44,7 +44,7 @@ export default function HistoryView() {
 
   const { chartData, primaryKeys, secondaryKeys } = useMemo(() => {
     return buildChartData(history, underlying, histories, straddleIds, liveQuotes);
-  }, [history, underlying, histories, straddleIds]);
+  }, [history, underlying, histories, straddleIds, liveQuotes]);
   const xAxisDomain: [number, number] = useMemo(
     () => [from.getTime(), to.getTime()],
     [from, to]
