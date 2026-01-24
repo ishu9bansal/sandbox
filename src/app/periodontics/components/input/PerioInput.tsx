@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { calculateColumnsFromZones, calculateZoneSeparators, dataUpdaterFromValues, deriveValues, deriveZones } from "./utils";
+import { calculateColumnsFromZones, calculateZoneSeparators, dataUpdaterFromValues, deriveDisabledInfo, deriveValues, deriveZones } from "./utils";
 import QuickInputRow, { QuickInputRowRef } from "./QuickInputRow";
 import { stylesGenerator } from "./style";
 import { Quadrant } from "@/models/theeth";
-import { CommonMeasurement } from "@/models/perio";
+import { CommonMeasurement, TeethSelection } from "@/models/perio";
 
 
 const ZONES = deriveZones();
@@ -13,13 +13,15 @@ const labels = ['Buccal', 'Lingual', 'Lingual', 'Buccal'];
 
 interface PerioInputProps {
   data: Quadrant<CommonMeasurement>;
+  teeth?: TeethSelection;
   onUpdate?: (data: Quadrant<CommonMeasurement>) => void;
   onNextFocus?: () => void;
   onPrevFocus?: () => void;
-  disabled?: boolean;
+  readonly?: boolean;
 }
-export default function PerioInput({ data, onUpdate, onNextFocus, onPrevFocus, disabled }: PerioInputProps) {
+export default function PerioInput({ data, teeth, onUpdate, onNextFocus, onPrevFocus, readonly }: PerioInputProps) {
   const [values, setValues] = useState<string[][]>(deriveValues(data));
+  const diabledInfo = deriveDisabledInfo(teeth);
   const handleChange = (row: number, vs: string[]) => {
     setValues((prev) => {
       const updated = [...prev];
@@ -71,8 +73,9 @@ export default function PerioInput({ data, onUpdate, onNextFocus, onPrevFocus, d
           }}
           label={labels[i]}
           values={values[i]}
+          disabled={diabledInfo[i]}
           onRowChange={(vs) => handleChange(i, vs)}
-          disabled={disabled}
+          readonly={readonly}
           onNextFocus={() => next(i)}
           onPrevFocus={() => prev(i)}
           labelStyle={styles.label}

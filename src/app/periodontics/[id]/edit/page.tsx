@@ -70,8 +70,8 @@ function RecordView({ record }: { record: PerioRecord }) {
         />
       }
       { view === 'teeth' && <TeethVisualization data={teeth} onChange={setTeeth} /> }
-      { view === 'ppd' && <PerioInput data={ppd} onUpdate={setPpd} /> }
-      { view === 'lgm' && <PerioInput data={lgm} onUpdate={setLgm} /> }
+      { view === 'ppd' && <PerioInput teeth={teeth} data={ppd} onUpdate={setPpd} /> }
+      { view === 'lgm' && <PerioInput teeth={teeth} data={lgm} onUpdate={setLgm} /> }
       { view === 'patient' &&
         <PatientForm patient_id={patientId} onChange={setPatientId} />
       }
