@@ -11,7 +11,7 @@ export default function DataTableRow<T>({ row, columns, onClick }: DataTableRowP
     onClick?.(row);
   }
   return (
-    <tr style={styles.row} onClick={onRowClick}>
+    <tr style={styles.row} onClick={onRowClick} className={onClick ? "hover:cursor-pointer hover:bg-[#333333]" : ""}>
       {columns.map((col) => (
         <td key={col.key} style={styles.cell}>
           {col.render(row)}
