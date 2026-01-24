@@ -1,9 +1,9 @@
 
-import { CommonMeasurement, MeasurementArea, MeasurementSite } from "@/models/perio";
+import { CommonMeasurement, MeasurementArea, MeasurementSite, TeethSelection } from "@/models/perio";
 import { Quadrant } from "@/models/theeth";
 import { copy } from "@/utils/perio";
 
-const STUDY_LIMIT = 7;
+const STUDY_LIMIT = 8;
 function generateAnnatomicalMapping(limit: number): {q: number, p: number}[][] {
   return [
     Array.from({ length: limit }, (_, i) => ({ q: 0, p: (limit-1-i) })),
@@ -64,6 +64,22 @@ export const dataUpdaterFromValues = (values: string[][], mapping = MAPPING) => 
     }
     return updatedData;
   }
+}
+
+export function deriveDisabledInfo(teethSelection?: TeethSelection): boolean[][] {
+  if (!teethSelection) {
+    return Array.from({ length: MAPPING.length }, () => Array(MAPPING[0].length).fill(false));
+  }
+  const disabledInfo: boolean[][] = [];
+  for (let i = 0; i < MAPPING.length; i++) {
+    const groupInfo: boolean[] = [];
+    for (let j = 0; j < MAPPING[i].length; j++) {
+      const { q, p } = MAPPING[i][j];
+      groupInfo.push(teethSelection[q][p] !== 'O');
+    }
+    disabledInfo.push(groupInfo);
+  }
+  return disabledInfo;
 }
 
 export function deriveZones(mapping = CONCATENATED_MAPPING, siteCount = siteOrder.length): { label: string; size: number }[] {

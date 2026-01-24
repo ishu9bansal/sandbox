@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { calculateColumnsFromZones, calculateZoneSeparators, dataUpdaterFromValues, deriveValues, deriveZones } from "./utils";
+import { calculateColumnsFromZones, calculateZoneSeparators, dataUpdaterFromValues, deriveDisabledInfo, deriveValues, deriveZones } from "./utils";
 import QuickInputRow, { QuickInputRowRef } from "./QuickInputRow";
 import { stylesGenerator } from "./style";
 import { Quadrant } from "@/models/theeth";
-import { CommonMeasurement } from "@/models/perio";
+import { CommonMeasurement, TeethSelection } from "@/models/perio";
 
 
 const ZONES = deriveZones();
@@ -13,13 +13,15 @@ const labels = ['Buccal', 'Lingual', 'Lingual', 'Buccal'];
 
 interface PerioInputProps {
   data: Quadrant<CommonMeasurement>;
+  teeth?: TeethSelection;
   onUpdate?: (data: Quadrant<CommonMeasurement>) => void;
   onNextFocus?: () => void;
   onPrevFocus?: () => void;
-  disabled?: boolean;
+  readonly?: boolean;
 }
-export default function PerioInput({ data, onUpdate, onNextFocus, onPrevFocus, disabled }: PerioInputProps) {
+export default function PerioInput({ data, teeth, onUpdate, onNextFocus, onPrevFocus, readonly }: PerioInputProps) {
   const [values, setValues] = useState<string[][]>(deriveValues(data));
+  const diabledInfo = deriveDisabledInfo(teeth);
   const handleChange = (row: number, vs: string[]) => {
     setValues((prev) => {
       const updated = [...prev];
@@ -34,24 +36,7 @@ export default function PerioInput({ data, onUpdate, onNextFocus, onPrevFocus, d
       onUpdate(updated);
     }
   }, [values]);
-  const inputRefs = useRef<(QuickInputRowRef | null)[]>(Array(labels.length).fill(null));
-  const focus = (c: number, fromBehind: boolean = false): void => {
-    if (c < 0) {
-      onPrevFocus?.();
-      return;
-    }
-    if (c >= labels.length) {
-      onNextFocus?.();
-      return;
-    }
-    const el = inputRefs.current[c];
-    if (el) {
-      const focus = fromBehind ? el.focusLast : el.focusFirst;
-      focus();
-    }
-  };
-  const next = useCallback((c: number): void => focus(c + 1), [focus]);
-  const prev = useCallback((c: number): void => focus(c - 1, true), [focus]);
+  const { inputRefs, next, prev } = useFocus(labels.length, onNextFocus, onPrevFocus);
   const styles = stylesGenerator(COLUMNS, 28);
   const cellStyleGenerator = useCallback((index: number): React.CSSProperties => {
     return {
@@ -71,8 +56,9 @@ export default function PerioInput({ data, onUpdate, onNextFocus, onPrevFocus, d
           }}
           label={labels[i]}
           values={values[i]}
+          disabled={diabledInfo[i]}
           onRowChange={(vs) => handleChange(i, vs)}
-          disabled={disabled}
+          readonly={readonly}
           onNextFocus={() => next(i)}
           onPrevFocus={() => prev(i)}
           labelStyle={styles.label}
@@ -90,4 +76,22 @@ function ZoneMarkers({ zones, style }: { zones: { label: string; size: number }[
       {zones.map((z, i) => (<div key={i} style={{ ...style, gridColumn: `span ${z.size}` }} >{z.label}</div>))}
     </>
   );
+}
+
+function useFocus(limit: number, onNextFocus?: () => void, onPrevFocus?: () => void) {
+  const inputRefs = useRef<(QuickInputRowRef | null)[]>(Array(labels.length).fill(null));
+  const next = useCallback((c: number): void => {
+    c += 1;
+    const focus =  (c >= limit) ? onNextFocus : inputRefs.current[c]?.focusFirst;
+    if (focus) focus();
+  }, [limit, onNextFocus]);
+  const prev = useCallback((c: number): void => {
+    c -= 1;
+    const focus =  (c < 0) ? onPrevFocus : inputRefs.current[c]?.focusLast;
+    if (focus) focus();
+  }, [onPrevFocus]);
+  useEffect(() => {
+    next(-1); // focus first on mount
+  }, []);
+  return { inputRefs, next, prev };
 }

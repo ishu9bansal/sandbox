@@ -2,14 +2,14 @@ import { CommonMeasurement, PerioRecord, SelectionMeasurement, TeethSelection } 
 import { Quadrant } from "@/models/theeth";
 import { ModelInput } from "@/models/type";
 
-const STUDY_LIMIT = 3;
+const STUDY_LIMIT = 7;
 const defaltLabel = (position: number): SelectionMeasurement => {
     if (position>=7) return 'X'; // generally missing wisdom teeth
     if (position < STUDY_LIMIT) return 'O'
     return '-';
 }
 
-export const generateDefaultTeeth = (): TeethSelection => {
+const generateDefaultTeeth = (): TeethSelection => {
     const nums = Array.from({length: 8}, (_, i) => i);  // [0,1,2,3,4,5,6,7]
     const quadrant = nums.map(pos => defaltLabel(pos));
     const teeth = [

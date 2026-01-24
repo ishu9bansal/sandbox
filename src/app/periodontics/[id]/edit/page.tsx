@@ -10,6 +10,7 @@ import PatientForm from "../../components/PatientForm";
 import useFormField from "@/hooks/useFormField";
 import PerioInput from "../../components/input/PerioInput";
 import EditLayout from "../../components/EditLayout";
+import TeethVisualization from "@/components/TeethVisualization";
 
 export default function EditPatientPage() {
   const { id: record_id } = useParams();
@@ -32,10 +33,12 @@ function RecordView({ record }: { record: PerioRecord }) {
     lgm, setLgm, commitLgm,
     patientId, setPatientId, commitPatientId,
     basicInfo, setBasicInfo, commitBasicInfo,
+    teeth, setTeeth, commitTeeth,
   } = useFormFieldGroups(record);
 
   const commitFunctions: Record<ViewType, () => void> = {
     basic: commitBasicInfo,
+    teeth: commitTeeth,
     ppd: commitPpd,
     lgm: commitLgm,
     patient: commitPatientId,
@@ -66,8 +69,9 @@ function RecordView({ record }: { record: PerioRecord }) {
           onNoteChange={(note) => setBasicInfo(prev => ({ ...prev, note }))}
         />
       }
-      { view === 'ppd' && <PerioInput data={ppd} onUpdate={setPpd} /> }
-      { view === 'lgm' && <PerioInput data={lgm} onUpdate={setLgm} /> }
+      { view === 'teeth' && <TeethVisualization data={teeth} onChange={setTeeth} /> }
+      { view === 'ppd' && <PerioInput teeth={teeth} data={ppd} onUpdate={setPpd} /> }
+      { view === 'lgm' && <PerioInput teeth={teeth} data={lgm} onUpdate={setLgm} /> }
       { view === 'patient' &&
         <PatientForm patient_id={patientId} onChange={setPatientId} />
       }
@@ -87,10 +91,11 @@ function EmptyRecordView() {
   );
 }
 
-type ViewType = 'basic' | 'ppd' | 'lgm' | 'patient';
-const VIEW_ORDER: ViewType[] = ['basic', 'ppd', 'lgm', 'patient'];
+type ViewType = 'basic' | 'ppd' | 'lgm' | 'patient' | 'teeth';
+const VIEW_ORDER: ViewType[] = ['basic', 'teeth', 'ppd', 'lgm', 'patient'];
 const viewTitleMap: Record<ViewType, string> = {
   basic: 'Edit Record',
+  teeth: 'Select Missing Teeth',
   ppd: 'Edit Pocket Probing Depth (PPD)',
   lgm: 'Edit Level of Gingival Margin (LGM)',
   patient: 'Assign to Patient',
@@ -101,7 +106,7 @@ const CANCEL = "Cancel";
 const SUBMIT = "Submit";
 
 function useViewsNavigation(onCancel: () => void, onSubmit: () => void) {
-  const [view, setView] = useState<ViewType>('ppd');
+  const [view, setView] = useState<ViewType>('teeth');
   const currentIndex = VIEW_ORDER.indexOf(view);
   const prevView = currentIndex > 0 ? VIEW_ORDER[currentIndex - 1] : null;
   const nextView = currentIndex < VIEW_ORDER.length - 1 ? VIEW_ORDER[currentIndex + 1] : null;
@@ -130,10 +135,14 @@ function useFormFieldGroups(record: PerioRecord) {
   const {
     value: basicInfo, onChange: setBasicInfo, handleUpdate: commitBasicInfo
   } = useFormField({ label: record.label, note: record.note }, useCallback(({ label, note }) => handleUpdate({ label, note }), [handleUpdate]));
+  const {
+    value: teeth, onChange: setTeeth, handleUpdate: commitTeeth
+  } = useFormField(record.teeth, useCallback((teeth) => handleUpdate({ teeth }), [handleUpdate]));
   return {
     ppd, setPpd, commitPpd,
     lgm, setLgm, commitLgm,
     patientId, setPatientId, commitPatientId,
     basicInfo, setBasicInfo, commitBasicInfo,
+    teeth, setTeeth, commitTeeth,
   };
 }

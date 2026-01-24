@@ -7,6 +7,7 @@ interface QuickInputCellProps {
   onNext: () => void;
   onPrev: () => void;
   disabled?: boolean;
+  disabledDisplayValue?: string;
   cellStyle?: React.CSSProperties;
 }
 
@@ -17,6 +18,7 @@ function QuickInputCell({
   onNext,
   onPrev,
   disabled,
+  disabledDisplayValue = "",
   cellStyle,
 }: QuickInputCellProps) {
   const { displayValue, handleKeyEvent } = useInternalState(value, onChange);
@@ -30,10 +32,11 @@ function QuickInputCell({
     }
   }, [onNext, onPrev, handleKeyEvent]);
   const inputRef = useFocusRef(focus);
+  const valueIfDisabled =  displayValue || disabledDisplayValue;
   return (
     <input
       ref={inputRef}
-      value={displayValue}
+      value={valueIfDisabled}
       onChange={() => {}}
       onKeyDown={handleKeyDown}
       style={cellStyle}
