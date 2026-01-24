@@ -3,7 +3,7 @@ import { CommonMeasurement, MeasurementArea, MeasurementSite, TeethSelection } f
 import { Quadrant } from "@/models/theeth";
 import { copy } from "@/utils/perio";
 
-const STUDY_LIMIT = 7;
+const STUDY_LIMIT = 8;
 function generateAnnatomicalMapping(limit: number): {q: number, p: number}[][] {
   return [
     Array.from({ length: limit }, (_, i) => ({ q: 0, p: (limit-1-i) })),
