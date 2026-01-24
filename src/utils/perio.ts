@@ -50,6 +50,15 @@ export function generateNewRecord(): ModelInput<PerioRecord> {
     teeth: generateDefaultTeeth(),
     ppd: createDefaultMeasure(DEFAULT_COMMON_MEASUREMENT),
     lgm: createDefaultMeasure(DEFAULT_COMMON_MEASUREMENT),
+    paramEntries: [],
     patientId: null,
   };
+}
+
+export function newMeasure() {
+  return createDefaultMeasure(DEFAULT_COMMON_MEASUREMENT);
+}
+
+export function generateParamEntryId(): string {
+  return `perio-entry-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
 }
