@@ -55,7 +55,7 @@ export default function PerioRecordDetails({ record, onEdit, onDelete, onBack }:
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-              Label
+              Visit
             </label>
             <p className="text-lg font-semibold text-gray-900 dark:text-white">
               {record.label}
@@ -66,20 +66,22 @@ export default function PerioRecordDetails({ record, onEdit, onDelete, onBack }:
           <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
             Teeth Information
           </label>
-          <TeethVisualization data={record.teeth} />
-          {/* Legend */}
-          <div className="mt-6 text-xs text-white space-y-1">
-            <div className="flex gap-2 items-center">
-                <div className="h-4 w-4 bg-green-300 border rounded"></div>
-                <span>Selected (O)</span>
-            </div>
-            <div className="flex gap-2 items-center">
-                <div className="h-4 w-4 bg-pink-300 border rounded"></div>
-                <span>Skipped (-)</span>
-            </div>
-            <div className="flex gap-2 items-center">
-                <div className="h-4 w-4 bg-gray-300 border rounded line-through text-black">X</div>
-                <span>Missing (X)</span>
+          <div className="flex mt-2 space-y-4 justify-between">
+            <TeethVisualization data={record.teeth} />
+            {/* Legend */}
+            <div className="mt-6 text-xs text-black space-y-1">
+              <div className="flex gap-2 items-center">
+                  <div className="h-4 w-4 bg-green-300 border rounded"></div>
+                  <span>Selected (O)</span>
+              </div>
+              <div className="flex gap-2 items-center">
+                  <div className="h-4 w-4 bg-pink-300 border rounded"></div>
+                  <span>Skipped (-)</span>
+              </div>
+              <div className="flex gap-2 items-center">
+                  <div className="h-4 w-4 bg-gray-300 border rounded line-through text-black">X</div>
+                  <span>Missing (X)</span>
+              </div>
             </div>
           </div>
         </div>
