@@ -1,7 +1,7 @@
 "use client";
 
 import Card from "@/components/compositions/card";
-import { PerioRecord } from '@/models/perio';
+import { CommonMeasurement, PerioRecord, TeethSelection } from '@/models/perio';
 import TeethVisualization from "@/components/TeethVisualization";
 import PerioInput from "./input/PerioInput";
 import PatientCard from "@/app/patients/components/PatientCard";
@@ -9,6 +9,8 @@ import { useSelector } from "react-redux";
 import { selectPatientById } from "@/store/slices/patientSlice";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { Quadrant } from "@/models/theeth";
+import { Edit } from "lucide-react";
 
 interface PerioRecordDetailsProps {
   record: PerioRecord;
@@ -103,7 +105,15 @@ export default function PerioRecordDetails({ record, onEdit, onDelete, onBack }:
         </div>
       </Card>
       <Card title="Paramaeter Entries">
-        {record.paramEntries.map((entry) => (<></>))}
+        {record.paramEntries.map((entry) => (
+          <EntryView
+            key={entry.id}
+            label={entry.label}
+            teeth={record.teeth}
+            entry={entry.entry}
+            onEdit={onEditEntry(entry.id)}
+          />
+        ))}
         <div className="my-6 border-gray-300 dark:border-gray-600">
           <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
             Create new parameter entry
@@ -144,6 +154,29 @@ export default function PerioRecordDetails({ record, onEdit, onDelete, onBack }:
           </div>
         </div>
       </Card>
+    </div>
+  );
+}
+
+type EntryViewProps = {
+  label: string;
+  teeth: TeethSelection;
+  entry: Quadrant<CommonMeasurement>;
+  onEdit: () => void;
+};
+function EntryView({ label, teeth, entry, onEdit }: EntryViewProps) {
+  return (
+    <div className="my-6 pb-4 border-b border-gray-300 dark:border-gray-600">
+      <div className="flex items-center justify-between mb-4">
+        <label className="block text-lg font-medium text-gray-600 dark:text-gray-400 mb-1">
+          {label}
+        </label>
+        <Button variant="outline" size="sm" className="text-xs sm:text-sm mb-4" onClick={onEdit}>
+          <Edit className="mr-2 h-4 w-4" />
+          Edit Entry
+        </Button>
+      </div>
+      <PerioInput teeth={teeth} data={entry} readonly />
     </div>
   );
 }
