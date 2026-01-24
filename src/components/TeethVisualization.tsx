@@ -1,6 +1,7 @@
 "use client";
 
 import { SelectionMeasurement, TeethSelection } from "@/models/perio";
+import { SetStateAction } from "react";
 
 // Component to visualize teeth data in anatomical layout
 // Color coding:
@@ -9,7 +10,7 @@ import { SelectionMeasurement, TeethSelection } from "@/models/perio";
 // - Skipped (-): pink
 // - Default: white
 
-const getToothColor = (status: string) => {
+const getToothColor = (status: string, clickable: boolean) => {
   let bgColor = "bg-white";
   let textColor = "text-black";
 
@@ -22,15 +23,18 @@ const getToothColor = (status: string) => {
     bgColor = "bg-pink-300";
   }
 
-  return { bgColor, textColor };
+  const hoverEffect = clickable ? "hover:brightness-90 cursor-pointer" : "";
+
+  return { bgColor, textColor, hoverEffect };
 };
 
-const ToothCell = ({ tooth, status }: { tooth: string; status: string }) => {
-  const { bgColor, textColor } = getToothColor(status);
+const ToothCell = ({ tooth, status, onToggle }: { tooth: string; status: string; onToggle?: () => void }) => {
+  const { bgColor, textColor, hoverEffect } = getToothColor(status, !!onToggle);
 
   return (
     <div
-      className={`flex items-center justify-center h-10 w-10 border rounded font-semibold text-sm ${bgColor} ${textColor}`}
+      className={`flex items-center justify-center h-10 w-10 border rounded font-semibold text-sm ${bgColor} ${textColor} ${hoverEffect}`}
+      onClick={onToggle}
     >
       {tooth}
     </div>
@@ -52,19 +56,25 @@ const MAPPING = [
   Array.from({ length: 8 }, (_, i) => ({ q: 2, p: i })),
 ];
 
-export default function TeethVisualization({ data }: { data: TeethSelection }) {
+export default function TeethVisualization({ data, onChange }: { data: TeethSelection; onChange?: (data: SetStateAction<TeethSelection>) => void; }) {
   const serializedData = MAPPING.map((ids) => ids.map(
     ({ q, p }) => ({
       label: (11 + q * 10 + p).toString(),
       status: data[q][p] || '-',
+      onToggleStatus: onChange ? () => onChange(prev => {
+        const updated = [...prev] as TeethSelection;
+        updated[q][p] = (updated[q][p] === 'X') ? 'O' : 'X';
+        return updated;
+      }) : undefined,
     })
   ));
-  const renderQuadrant = (teeth: { label: string; status: SelectionMeasurement; }[]) => {
+  const renderQuadrant = (teeth: { label: string; status: SelectionMeasurement; onToggleStatus?: () => void; }[]) => {
     return teeth.map((tooth) => (
       <ToothCell
         key={tooth.label}
         tooth={tooth.label}
         status={tooth.status}
+        onToggle={tooth.onToggleStatus}
       />
     ));
   };

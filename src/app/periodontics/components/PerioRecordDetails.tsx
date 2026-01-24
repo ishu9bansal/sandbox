@@ -8,6 +8,7 @@ import PerioInput from "./input/PerioInput";
 import PatientCard from "@/app/patients/components/PatientCard";
 import { useSelector } from "react-redux";
 import { selectPatientById } from "@/store/slices/patientSlice";
+import { toast } from "sonner";
 
 interface PerioRecordDetailsProps {
   record: PerioRecord;
@@ -63,7 +64,7 @@ export default function PerioRecordDetails({ record, onEdit, onDelete, onBack }:
           <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
             Teeth Information
           </label>
-          <TeethVisualization data={record.teeth} />
+          <TeethVisualization data={record.teeth} onChange={() => toast.info("clicked")} />
           {/* Legend */}
           <div className="mt-6 text-xs text-white space-y-1">
             <div className="flex gap-2 items-center">
