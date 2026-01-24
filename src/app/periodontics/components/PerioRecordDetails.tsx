@@ -1,13 +1,14 @@
 "use client";
 
 import Card from "@/components/compositions/card";
-import Button from "@/components/Button";
 import { PerioRecord } from '@/models/perio';
 import TeethVisualization from "@/components/TeethVisualization";
 import PerioInput from "./input/PerioInput";
 import PatientCard from "@/app/patients/components/PatientCard";
 import { useSelector } from "react-redux";
 import { selectPatientById } from "@/store/slices/patientSlice";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 interface PerioRecordDetailsProps {
   record: PerioRecord;
@@ -28,6 +29,9 @@ export default function PerioRecordDetails({ record, onEdit, onDelete, onBack }:
   };
   const patient = useSelector(selectPatientById(record.patientId));
 
+  const router = useRouter();
+  const onEditEntry = (entryId: string) => () => router.push(`/periodontics/${record.id}/entry/${entryId}`);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -39,12 +43,9 @@ export default function PerioRecordDetails({ record, onEdit, onDelete, onBack }:
           <Button variant="outline" onClick={onEdit} size="sm" className="text-xs sm:text-sm">
             Edit Record
           </Button>
-          <button
-            onClick={onDelete}
-            className="px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 bg-red-600 text-white hover:bg-red-700 focus:ring-red-500"
-          >
+          <Button variant="destructive" onClick={onDelete} size="sm" className="text-xs sm:text-sm">
             Delete Record
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -99,6 +100,17 @@ export default function PerioRecordDetails({ record, onEdit, onDelete, onBack }:
           { patient &&
             <PatientCard patient={patient} />
           }
+        </div>
+      </Card>
+      <Card title="Paramaeter Entries">
+        {record.paramEntries.map((entry) => (<></>))}
+        <div className="my-6 border-gray-300 dark:border-gray-600">
+          <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+            Create new parameter entry
+          </label>
+          <Button onClick={onEditEntry('new')} variant="outline" size="sm" className="text-xs sm:text-sm">
+            + New Entry
+          </Button>
         </div>
       </Card>
 
