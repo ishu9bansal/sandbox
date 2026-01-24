@@ -6,7 +6,14 @@ export default function QuickLabels({ labels, onSelect }: { labels: string[]; on
     <div className="mt-2 flex gap-2">
       <ButtonGroup>
         {labels.map((label) => (
-          <Button key={label} size="xs" onClick={() => onSelect(label)} className="text-xs" variant="secondary">
+          <Button
+            key={label}
+            size="xs"
+            onClick={(e) => {
+              e.preventDefault();
+              onSelect(label);
+            }}
+            className="text-xs" variant="secondary">
             {label}
           </Button>
         ))}
