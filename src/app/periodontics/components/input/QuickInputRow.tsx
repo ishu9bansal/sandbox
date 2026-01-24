@@ -5,7 +5,8 @@ interface QuickInputRowProps {
   label: string;
   values: string[];
   onRowChange: (values: string[]) => void;
-  disabled?: boolean;
+  readonly?: boolean;
+  disabled?: boolean[];
   onNextFocus?: () => void;
   onPrevFocus?: () => void;
   cellStyleGenerator: (index: number) => React.CSSProperties;
@@ -17,10 +18,25 @@ export type QuickInputRowRef = {
   focusLast: () => void;
 };
 
+function findNextEnabled(current: number, direction: number, disabled?: boolean[]): number {
+  let next = current + direction;
+  if (!disabled) {
+    return next;
+  }
+  while (next >= 0 && next < disabled.length) {
+    if (!disabled[next]) {
+      return next;
+    }
+    next += direction;
+  }
+  return next;
+}
+
 const QuickInputRow = forwardRef<QuickInputRowRef, QuickInputRowProps>(function QuickInputRow({
   label,
   values,
   onRowChange,
+  readonly,
   disabled,
   onNextFocus,
   onPrevFocus,
@@ -34,12 +50,12 @@ const QuickInputRow = forwardRef<QuickInputRowRef, QuickInputRowProps>(function 
     if (c < 0)  onPrevFocus?.();
     if (c >= columns) onNextFocus?.();
   }, [columns, onNextFocus, onPrevFocus]);
-  const next = useCallback((c: number): void => focus(c + 1), [focus]);
-  const prev = useCallback((c: number): void => focus(c - 1), [focus]);
+  const next = useCallback((c: number): void => focus(findNextEnabled(c, 1,disabled)), [focus, disabled]);
+  const prev = useCallback((c: number): void => focus(findNextEnabled(c, -1,disabled)), [focus, disabled]);
   useImperativeHandle(ref, () => ({
-    focusFirst: () => focus(0),
-    focusLast: () => focus(columns - 1),
-  }), [columns, focus]);
+    focusFirst: () => next(-1),
+    focusLast: () => prev(columns),
+  }), [columns, next, prev]);
 
   const handleChange = useCallback((c: number, v: string): void => {
     const updated = [...values];
@@ -58,7 +74,8 @@ const QuickInputRow = forwardRef<QuickInputRowRef, QuickInputRowProps>(function 
           onChange={(v) => handleChange(c, v)}
           onNext={() => next(c)}
           onPrev={() => prev(c)}
-          disabled={disabled}
+          disabledDisplayValue={disabled?.[c] ? "X" : ""}
+          disabled={readonly || disabled?.[c]}
           cellStyle={cellStyleGenerator(c)}
         />
       ))}

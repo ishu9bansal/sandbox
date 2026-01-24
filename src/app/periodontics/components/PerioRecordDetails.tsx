@@ -84,13 +84,13 @@ export default function PerioRecordDetails({ record, onEdit, onDelete, onBack }:
           <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
             PPD Values
           </label>
-          <PerioInput data={record.ppd} disabled={true} />
+          <PerioInput teeth={record.teeth} data={record.ppd} readonly />
         </div>
         <div className="my-6 pt-4 border-t border-gray-300 dark:border-gray-600">
           <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
             LGM Values
           </label>
-          <PerioInput data={record.lgm} disabled={true} />
+          <PerioInput teeth={record.teeth} data={record.lgm} readonly />
         </div>
         <div className="my-6 pt-4 border-t border-gray-300 dark:border-gray-600">
           <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
