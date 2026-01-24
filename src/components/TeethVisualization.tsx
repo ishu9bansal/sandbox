@@ -62,8 +62,8 @@ export default function TeethVisualization({ data, onChange }: { data: TeethSele
       label: (11 + q * 10 + p).toString(),
       status: data[q][p] || '-',
       onToggleStatus: onChange ? () => onChange(prev => {
-        const updated = [...prev] as TeethSelection;
-        updated[q][p] = (updated[q][p] === 'X') ? 'O' : 'X';
+        const updated = prev.map(arr => arr.slice()) as TeethSelection;
+        updated[q][p] = (prev[q][p] === 'X') ? 'O' : 'X';
         return updated;
       }) : undefined,
     })
