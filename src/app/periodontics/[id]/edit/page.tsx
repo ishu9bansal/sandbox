@@ -97,7 +97,7 @@ const CANCEL = "Cancel";
 const SUBMIT = "Submit";
 
 function useViewsNavigation(onCancel: () => void, onSubmit: () => void) {
-  const [view, setView] = useState<ViewType>('basic');
+  const [view, setView] = useState<ViewType>('teeth');
   const currentIndex = VIEW_ORDER.indexOf(view);
   const prevView = currentIndex > 0 ? VIEW_ORDER[currentIndex - 1] : null;
   const nextView = currentIndex < VIEW_ORDER.length - 1 ? VIEW_ORDER[currentIndex + 1] : null;
