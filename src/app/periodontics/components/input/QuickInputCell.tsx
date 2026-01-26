@@ -39,7 +39,10 @@ function QuickInputCell({
       value={valueIfDisabled}
       onChange={() => {}}
       onKeyDown={handleKeyDown}
-      style={cellStyle}
+      style={{
+        ...cellStyle,
+        ...valueBasedStyle(displayValue),
+      }}
       disabled={disabled}
       inputMode="tel"
     />
@@ -151,4 +154,22 @@ function useFocusRef(focus: boolean) {
     }
   }, [focus]); // Dependency on focus state
   return inputRef;
+}
+
+function valueBasedStyle(value: string): React.CSSProperties {
+  if (value === "") return {};
+  if (value === "-") return {};
+  const num = parseInt(value);
+  if (isNaN(num)) return {};
+  const absNum = Math.abs(num);
+  if (absNum >= 0 && absNum <= 3) {
+    return { backgroundColor: '#d4edda', borderColor: '#155724', color: '#155724' }; // Greenish
+  }
+  if (absNum >= 4 && absNum <= 5) {
+    return { backgroundColor: '#fff3cd', borderColor: '#856404', color: '#856404' }; // Yellowish
+  }
+  if (absNum >= 6) {
+    return { backgroundColor: '#f8d7da', borderColor: '#721c24', color: '#721c24' }; // Reddish
+  }
+  return {};
 }
