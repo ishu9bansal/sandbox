@@ -6,7 +6,7 @@ import { deletePerioRecord, deletePerioRecords } from "@/store/slices/perioSlice
 import { PerioRecord } from '@/models/perio';
 import Button from "@/components/Button";
 import PerioRecordList from "./components/PerioRecordList";
-import { generatePerioRecordsTable, transformPerioRecordToRep } from "@/models/representation";
+import { PERIO_ENTRY_CSV_HEADERS, PERIO_RECORD_CSV_HEADERS, PerioEntryRep, PerioRecordRep, tableRowFromReps, transformPerioRecordToEntryReps, transformPerioRecordToRecordRep } from "@/models/representation";
 import { copyToClipboard, tableToTsvString } from "@/utils/helpers";
 
 export default function PatientsPage() {
@@ -82,8 +82,18 @@ export default function PatientsPage() {
 }
 
 function copyRecordsToClipboard(records: PerioRecord[]) {
-  const reps = records.map(record => transformPerioRecordToRep(record));
-  const table = generatePerioRecordsTable(reps);
-  const tsv = tableToTsvString(table);
+  const recordReps: PerioRecordRep[] = [];
+  const entryReps: PerioEntryRep[] = [];
+  records.forEach(record => {
+    const recordRep = transformPerioRecordToRecordRep(record);
+    recordReps.push(recordRep);
+    const entriesRep = transformPerioRecordToEntryReps(record);
+    entryReps.push(...entriesRep);
+  });
+  const recordTable = tableRowFromReps(recordReps, PERIO_RECORD_CSV_HEADERS);
+  const entriesTable = tableRowFromReps(entryReps, PERIO_ENTRY_CSV_HEADERS);
+  const recordTsv = tableToTsvString(recordTable);
+  const entriesTsv = tableToTsvString(entriesTable);
+  const tsv = recordTsv + '\n\n' + entriesTsv;
   copyToClipboard(tsv);
 }

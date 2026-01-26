@@ -3,7 +3,7 @@ import { calculateColumnsFromZones, calculateZoneSeparators, dataUpdaterFromValu
 import QuickInputRow, { QuickInputRowRef } from "./QuickInputRow";
 import { stylesGenerator } from "./style";
 import { Quadrant } from "@/models/theeth";
-import { CommonMeasurement, TeethSelection } from "@/models/perio";
+import { CommonMeasurement, ParamType, TeethSelection } from "@/models/perio";
 
 
 const ZONES = deriveZones();
@@ -17,11 +17,21 @@ interface PerioInputProps {
   onUpdate?: (data: Quadrant<CommonMeasurement>) => void;
   onNextFocus?: () => void;
   onPrevFocus?: () => void;
+  paramType?: ParamType;
   readonly?: boolean;
 }
-export default function PerioInput({ data, teeth, onUpdate, onNextFocus, onPrevFocus, readonly }: PerioInputProps) {
+export default function PerioInput({
+  data,
+  teeth,
+  onUpdate,
+  onNextFocus,
+  onPrevFocus,
+  paramType = '6 site',
+  readonly,
+}: PerioInputProps) {
   const [values, setValues] = useState<string[][]>(deriveValues(data));
-  const diabledInfo = deriveDisabledInfo(teeth);
+  const allTeethSelected: TeethSelection = Array.from({ length: 4 }, () => Array.from({ length: 8 }, () => 'O')) as TeethSelection;
+  const diabledInfo = deriveDisabledInfo(teeth || allTeethSelected, paramType);
   const handleChange = (row: number, vs: string[]) => {
     setValues((prev) => {
       const updated = [...prev];

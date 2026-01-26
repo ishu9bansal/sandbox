@@ -20,7 +20,7 @@ export const stylesGenerator = (columnsNum: number, cellSize: number = 18) => {
       borderBottom: "1px solid #3a4050",
       borderRadius: 4,
       background: "#441919ff",
-      color: "#b0b8d4"
+      color: "#ffffff"
     },
     label: {
       fontWeight: 600,
@@ -36,11 +36,9 @@ export const stylesGenerator = (columnsNum: number, cellSize: number = 18) => {
       border: "1px solid #3a4050",
       fontSize: 10,
       outline: "none",
-      background: "#2a2a2a",
-      color: "#e0e0e0"
     },
     zoneSeparatorLeft: {
-      borderLeft: "2px solid #556080"
+      borderLeft: "2px solid"
     },
   }
 };

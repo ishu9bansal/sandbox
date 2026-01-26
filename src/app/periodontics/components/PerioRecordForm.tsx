@@ -1,5 +1,6 @@
 "use client";
 
+import QuickLabels from "@/components/compositions/quick-labels";
 import Input from "@/components/Input";
 
 interface PerioRecordFormProps {
@@ -35,23 +36,6 @@ export default function PerioRecordForm({
         placeholder="Enter any notes"
         type="textarea"
       />
-    </div>
-  );
-}
-
-function QuickLabels({ labels, onSelect }: { labels: string[]; onSelect: (label: string) => void }) {
-  return (
-    <div className="mt-2 flex gap-2">
-      {labels.map((label) => (
-        <button
-          key={label}
-          type="button"
-          className="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-sm rounded hover:bg-gray-300 dark:hover:bg-gray-600"
-          onClick={() => onSelect(label)}
-        >
-          {label}
-        </button>
-      ))}
     </div>
   );
 }

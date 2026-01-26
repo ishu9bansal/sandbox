@@ -8,7 +8,6 @@ import { PerioRecord } from '@/models/perio';
 import { useCallback, useState } from "react";
 import PatientForm from "../../components/PatientForm";
 import useFormField from "@/hooks/useFormField";
-import PerioInput from "../../components/input/PerioInput";
 import EditLayout from "../../components/EditLayout";
 import TeethVisualization from "@/components/TeethVisualization";
 
@@ -29,8 +28,6 @@ function RecordView({ record }: { record: PerioRecord }) {
   const viewTitle = viewTitleMap[view];
   
   const {
-    ppd, setPpd, commitPpd,
-    lgm, setLgm, commitLgm,
     patientId, setPatientId, commitPatientId,
     basicInfo, setBasicInfo, commitBasicInfo,
     teeth, setTeeth, commitTeeth,
@@ -39,8 +36,6 @@ function RecordView({ record }: { record: PerioRecord }) {
   const commitFunctions: Record<ViewType, () => void> = {
     basic: commitBasicInfo,
     teeth: commitTeeth,
-    ppd: commitPpd,
-    lgm: commitLgm,
     patient: commitPatientId,
   };
   const commit = commitFunctions[view];
@@ -52,7 +47,7 @@ function RecordView({ record }: { record: PerioRecord }) {
   // TODO: show progress indicator of which step we are on
   // TODO: is there a better way to manage multi-step forms, instead of conditional rendering?
   return (
-    <div className="max-w-3xl mx-auto">
+    <div className="max-w-4xl mx-auto">
       <EditLayout
         title={viewTitle}
         onSubmit={handleSubmit}
@@ -70,8 +65,6 @@ function RecordView({ record }: { record: PerioRecord }) {
         />
       }
       { view === 'teeth' && <TeethVisualization data={teeth} onChange={setTeeth} /> }
-      { view === 'ppd' && <PerioInput teeth={teeth} data={ppd} onUpdate={setPpd} /> }
-      { view === 'lgm' && <PerioInput teeth={teeth} data={lgm} onUpdate={setLgm} /> }
       { view === 'patient' &&
         <PatientForm patient_id={patientId} onChange={setPatientId} />
       }
@@ -91,13 +84,11 @@ function EmptyRecordView() {
   );
 }
 
-type ViewType = 'basic' | 'ppd' | 'lgm' | 'patient' | 'teeth';
-const VIEW_ORDER: ViewType[] = ['basic', 'teeth', 'ppd', 'lgm', 'patient'];
+type ViewType = 'basic' | 'patient' | 'teeth';
+const VIEW_ORDER: ViewType[] = ['basic', 'teeth', 'patient'];
 const viewTitleMap: Record<ViewType, string> = {
   basic: 'Edit Record',
   teeth: 'Select Missing Teeth',
-  ppd: 'Edit Pocket Probing Depth (PPD)',
-  lgm: 'Edit Level of Gingival Margin (LGM)',
   patient: 'Assign to Patient',
 };
 const BACK = "Back";
@@ -124,12 +115,6 @@ function useFormFieldGroups(record: PerioRecord) {
     dispatch(updatePerioRecord({ ...updatedRecord, id }));
   }, [dispatch, id]);
   const {
-    value: ppd, onChange: setPpd, handleUpdate: commitPpd
-  } = useFormField(record.ppd, useCallback((ppd) => handleUpdate({ ppd }), [handleUpdate]));
-  const {
-    value: lgm, onChange: setLgm, handleUpdate: commitLgm
-  } = useFormField(record.lgm, useCallback((lgm) => handleUpdate({ lgm }), [handleUpdate]));
-  const {
     value: patientId, onChange: setPatientId, handleUpdate: commitPatientId
   } = useFormField(record.patientId, useCallback((patientId) => handleUpdate({ patientId }), [handleUpdate]));
   const {
@@ -139,8 +124,6 @@ function useFormFieldGroups(record: PerioRecord) {
     value: teeth, onChange: setTeeth, handleUpdate: commitTeeth
   } = useFormField(record.teeth, useCallback((teeth) => handleUpdate({ teeth }), [handleUpdate]));
   return {
-    ppd, setPpd, commitPpd,
-    lgm, setLgm, commitLgm,
     patientId, setPatientId, commitPatientId,
     basicInfo, setBasicInfo, commitBasicInfo,
     teeth, setTeeth, commitTeeth,
