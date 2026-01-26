@@ -55,6 +55,14 @@ export default function PerioRecordDetails({ record, onEdit, onDelete, onBack }:
               {record.label}
             </p>
           </div>
+          {record.note && <div>
+            <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+              Note
+            </label>
+            <p className="text-md text-gray-900 dark:text-white">
+              {record.note}
+            </p>
+          </div>}
         </div>
         <div className="my-6 pt-4 border-t border-gray-300 dark:border-gray-600">
           <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
