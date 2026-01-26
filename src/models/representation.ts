@@ -12,11 +12,11 @@ type PerioRepKeys = 'label' | 'note' | 'patientId' | 'createdAt';
 type PatientRepKeys = 'name' | 'age' | 'sex' | 'email' | 'contact' | 'address';
 type PPDRecordRepKeys = `ppd_${MeasurementArea}_${MeasurementSite}_${ToothNum}`;
 type LGMRecordRepKeys = `lgm_${MeasurementArea}_${MeasurementSite}_${ToothNum}`;
+type RecordParamRepKeys = `${string}_${MeasurementArea}_${MeasurementSite}_${ToothNum}`;
 
-type PerioRecordCSVKeys = 'id' | PerioRepKeys | PatientRepKeys | PPDRecordRepKeys | LGMRecordRepKeys;
+type PerioRecordCSVKeys = 'id' | PerioRepKeys | PatientRepKeys | RecordParamRepKeys;
 export type PerioRecordRep = Representation<PerioRecordCSVKeys>;
 export function transformPerioRecordToRep(record: PerioRecord, patient?: Patient): PerioRecordRep {
-  // @ts-expect-error: Dynamic keys will be added below
   const rep: PerioRecordRep = {
     id: record.id,
     label: record.label,
@@ -32,21 +32,19 @@ export function transformPerioRecordToRep(record: PerioRecord, patient?: Patient
   };
   const areas = ['Buccal', 'Lingual'] as MeasurementArea[];
   const sites = ['Mesio', 'Mid', 'Disto'] as MeasurementSite[];
-  for(let i=0; i<4; i++) {
-    for(let j=0; j<8; j++) {
-      for(const area of areas) {
-        for(const site of sites) {
-          const toothNum = `${1 + i}${1 + j}` as ToothNum;
-          // PPD
-          const ppdKey: PPDRecordRepKeys = `ppd_${area}_${site}_${toothNum}`;
-          // LGM
-          const lgmKey: LGMRecordRepKeys = `lgm_${area}_${site}_${toothNum}`;
-          rep[ppdKey] = record.ppd[i][j][area][site].toString();
-          rep[lgmKey] = record.lgm[i][j][area][site].toString();
+  record.paramEntries.forEach(entry => {
+    for(let i=0; i<4; i++) {
+      for(let j=0; j<8; j++) {
+        for(const area of areas) {
+          for(const site of sites) {
+            const toothNum = `${1 + i}${1 + j}` as ToothNum;
+            const paramKey: RecordParamRepKeys = `${entry.label}_${area}_${site}_${toothNum}`;
+            rep[paramKey] = entry.entry[i][j][area][site].toString();
+          }
         }
       }
     }
-  }
+  });
   return rep;
 }
 

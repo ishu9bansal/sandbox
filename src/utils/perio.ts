@@ -48,8 +48,6 @@ export function generateNewRecord(): ModelInput<PerioRecord> {
     label: '',
     note: '',
     teeth: generateDefaultTeeth(),
-    ppd: createDefaultMeasure(DEFAULT_COMMON_MEASUREMENT),
-    lgm: createDefaultMeasure(DEFAULT_COMMON_MEASUREMENT),
     paramEntries: [],
     patientId: null,
   };
