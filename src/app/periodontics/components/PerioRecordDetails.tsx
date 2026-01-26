@@ -1,7 +1,7 @@
 "use client";
 
 import Card from "@/components/compositions/card";
-import { CommonMeasurement, PerioRecord, TeethSelection } from '@/models/perio';
+import { CommonMeasurement, ParamType, PerioRecord, TeethSelection } from '@/models/perio';
 import TeethVisualization from "@/components/TeethVisualization";
 import PerioInput from "./input/PerioInput";
 import PatientCard from "@/app/patients/components/PatientCard";
@@ -103,6 +103,7 @@ export default function PerioRecordDetails({ record, onEdit, onDelete, onBack }:
             label={entry.label}
             teeth={record.teeth}
             entry={entry.entry}
+            type={entry.type}
             onEdit={onEditEntry(entry.id)}
           />
         ))}
@@ -155,8 +156,9 @@ type EntryViewProps = {
   teeth: TeethSelection;
   entry: Quadrant<CommonMeasurement>;
   onEdit: () => void;
+  type: ParamType;
 };
-function EntryView({ label, teeth, entry, onEdit }: EntryViewProps) {
+function EntryView({ label, teeth, entry, type, onEdit }: EntryViewProps) {
   return (
     <div className="my-6 pb-4 border-b border-gray-300 dark:border-gray-600">
       <div className="flex items-center justify-between mb-4">
@@ -168,7 +170,7 @@ function EntryView({ label, teeth, entry, onEdit }: EntryViewProps) {
           Edit Entry
         </Button>
       </div>
-      <PerioInput teeth={teeth} data={entry} readonly />
+      <PerioInput paramType={type} teeth={teeth} data={entry} readonly />
     </div>
   );
 }
