@@ -42,7 +42,7 @@ export function transformPerioRecordToEntryReps(record: PerioRecord): PerioEntry
           for(const site of sites) {
             const toothNum = `${1 + i}${1 + j}` as ToothNum;
             const value = entry.entry[i][j][area][site];
-            if (isNaN(value)) continue;
+            if (isNaN(value) || value === null || value === undefined) continue;
             const entryRep = {
               record: record.id,
               param: entry.label,
