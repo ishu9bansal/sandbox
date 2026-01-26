@@ -1,6 +1,7 @@
 "use client"
 import {
   Card,
+  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
@@ -26,22 +27,15 @@ export default function CardComposition({ className, title, description, childre
     <Card className={className}>
       { title &&
         <CardHeader onClick={toggleCollapse}>
-          <div>
-            <CardTitle className={`text-xl flex justify-between items-center ${ collapsible ? "cursor-pointer" : ""}`}>
-              <span>
-                {title}
-              </span>
-              {collapsible &&
-                <span>
-                  { isCollapsed ? <ChevronUp /> : <ChevronDown />}
-                </span>
-              }
-            </CardTitle>
-            <CardDescription>
-              {description}
-            </CardDescription>
-          </div>
-          
+          <CardTitle className={`text-xl flex justify-between items-center ${ collapsible ? "cursor-pointer" : ""}`}>
+            {title}
+          </CardTitle>
+          <CardDescription>
+            {description}
+          </CardDescription>
+          <CardAction>
+            {collapsible && ( isCollapsed ? <ChevronUp /> : <ChevronDown />)}
+          </CardAction>
           {!isCollapsed && <Separator />}
         </CardHeader>
       }
