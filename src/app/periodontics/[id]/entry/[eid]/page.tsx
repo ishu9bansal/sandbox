@@ -3,6 +3,7 @@
 import EditLayout from "@/app/periodontics/components/EditLayout";
 import PerioInput from "@/app/periodontics/components/input/PerioInput";
 import QuickLabels from "@/components/compositions/quick-labels";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ParamEntry } from "@/models/perio";
@@ -43,6 +44,16 @@ export default function PerioRecordEntryEditPage() {
     });
     router.push(`/periodontics/${record_id}`);
   }, [label, input, onSubmit, router, record_id]);
+  const handleDelete = useCallback(() => {
+    if (recordEntry && window.confirm(`Are you sure you want to delete entry "${recordEntry.label}"?`)) {
+      const updatedParamEntries = record.paramEntries.filter(e => e.id !== recordEntry.id);
+      dispatch(updatePerioRecord({
+        ...record,
+        paramEntries: updatedParamEntries,
+      }));
+      router.push(`/periodontics/${record_id}`);
+    }
+  }, [dispatch, record, recordEntry, router, record_id]);
   const labels = ['PPD', 'LGM', 'Bleeding on Probing', 'Mobility', 'Furcation Involvement', 'Suppuration', 'Gingival Recession'];
   return (
     <div className="max-w-3xl mx-auto">
@@ -51,6 +62,7 @@ export default function PerioRecordEntryEditPage() {
         onSubmit={handleSubmit}
         onCancel={router.back}
         nextLabel={'Submit'}
+        actionChildren={recordEntry && <DeleteButton onDelete={handleDelete} />}
       >
         <Label className="mb-2">Parameter Name</Label>
         <Input
@@ -62,5 +74,13 @@ export default function PerioRecordEntryEditPage() {
         <PerioInput teeth={record.teeth} data={input} onUpdate={setInput} />
       </EditLayout>
     </div>
+  );
+}
+
+function DeleteButton({ onDelete }: { onDelete: () => void }) {
+  return (
+    <Button variant="destructive" onClick={onDelete} type="button">
+      Delete Entry
+    </Button>
   );
 }
