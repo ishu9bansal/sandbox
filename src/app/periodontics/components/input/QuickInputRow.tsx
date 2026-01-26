@@ -76,11 +76,21 @@ const QuickInputRow = forwardRef<QuickInputRowRef, QuickInputRowProps>(function 
           onPrev={() => prev(c)}
           disabledDisplayValue={disabled?.[c] ? "X" : ""}
           disabled={readonly || disabled?.[c]}
-          cellStyle={cellStyleGenerator(c)}
+          cellStyle={{
+            ...cellStyleGenerator(c),
+            ...( disabled?.[c] ? DISABLED_CELL_STYLE : {} ),
+          }}
         />
       ))}
     </>
   );
 });
+
+const DISABLED_CELL_STYLE: React.CSSProperties = {
+  textDecoration: 'line-through',
+  color: '#777777',
+  backgroundColor: '#f0f0f0',
+  borderColor: '#cccccc',
+};
 
 export default QuickInputRow;

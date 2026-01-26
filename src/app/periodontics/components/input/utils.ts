@@ -1,5 +1,5 @@
 
-import { CommonMeasurement, MeasurementArea, MeasurementSite, TeethSelection } from "@/models/perio";
+import { CommonMeasurement, MeasurementArea, MeasurementSite, ParamType, TeethSelection } from "@/models/perio";
 import { Quadrant } from "@/models/theeth";
 import { copy } from "@/utils/perio";
 
@@ -66,16 +66,14 @@ export const dataUpdaterFromValues = (values: string[][], mapping = MAPPING) => 
   }
 }
 
-export function deriveDisabledInfo(teethSelection?: TeethSelection): boolean[][] {
-  if (!teethSelection) {
-    return Array.from({ length: MAPPING.length }, () => Array(MAPPING[0].length).fill(false));
-  }
+export function deriveDisabledInfo(teethSelection: TeethSelection, paramType: ParamType): boolean[][] {
   const disabledInfo: boolean[][] = [];
   for (let i = 0; i < MAPPING.length; i++) {
     const groupInfo: boolean[] = [];
     for (let j = 0; j < MAPPING[i].length; j++) {
-      const { q, p } = MAPPING[i][j];
-      groupInfo.push(teethSelection[q][p] !== 'O');
+      const { q, p, a, s } = MAPPING[i][j];
+      const lingualTerminal = (a === 'Lingual' && (s === 'Disto' || s === 'Mesio'));
+      groupInfo.push(teethSelection[q][p] !== 'O' || (paramType === '4 site' && lingualTerminal));
     }
     disabledInfo.push(groupInfo);
   }

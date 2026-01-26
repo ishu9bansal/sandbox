@@ -10,13 +10,12 @@ type ToothNum =
   '41' | '42' | '43' | '44' | '45' | '46' | '47' | '48';
 type PerioRepKeys = 'label' | 'note' | 'patientId' | 'createdAt';
 type PatientRepKeys = 'name' | 'age' | 'sex' | 'email' | 'contact' | 'address';
-type PPDRecordRepKeys = `ppd_${MeasurementArea}_${MeasurementSite}_${ToothNum}`;
-type LGMRecordRepKeys = `lgm_${MeasurementArea}_${MeasurementSite}_${ToothNum}`;
 
-type PerioRecordCSVKeys = 'id' | PerioRepKeys | PatientRepKeys | PPDRecordRepKeys | LGMRecordRepKeys;
+type PerioRecordCSVKeys = 'id' | PerioRepKeys | PatientRepKeys;
+type PerioEntryCSVKeys = 'record' | 'param' | 'type' | 'tooth' | 'area' | 'site' | 'value';
 export type PerioRecordRep = Representation<PerioRecordCSVKeys>;
-export function transformPerioRecordToRep(record: PerioRecord, patient?: Patient): PerioRecordRep {
-  // @ts-expect-error: Dynamic keys will be added below
+export type PerioEntryRep = Representation<PerioEntryCSVKeys>;
+export function transformPerioRecordToRecordRep(record: PerioRecord, patient?: Patient): PerioRecordRep {
   const rep: PerioRecordRep = {
     id: record.id,
     label: record.label,
@@ -30,33 +29,52 @@ export function transformPerioRecordToRep(record: PerioRecord, patient?: Patient
     contact: patient?.contact ?? '',
     address: patient?.address ?? '',
   };
+  return rep;
+}
+export function transformPerioRecordToEntryReps(record: PerioRecord): PerioEntryRep[] {
   const areas = ['Buccal', 'Lingual'] as MeasurementArea[];
   const sites = ['Mesio', 'Mid', 'Disto'] as MeasurementSite[];
-  for(let i=0; i<4; i++) {
-    for(let j=0; j<8; j++) {
-      for(const area of areas) {
-        for(const site of sites) {
-          const toothNum = `${1 + i}${1 + j}` as ToothNum;
-          // PPD
-          const ppdKey: PPDRecordRepKeys = `ppd_${area}_${site}_${toothNum}`;
-          // LGM
-          const lgmKey: LGMRecordRepKeys = `lgm_${area}_${site}_${toothNum}`;
-          rep[ppdKey] = record.ppd[i][j][area][site].toString();
-          rep[lgmKey] = record.lgm[i][j][area][site].toString();
+  const entries: PerioEntryRep[] = [];
+  record.paramEntries.forEach(entry => {
+    for(let i=0; i<4; i++) {
+      for(let j=0; j<8; j++) {
+        for(const area of areas) {
+          for(const site of sites) {
+            const toothNum = `${1 + i}${1 + j}` as ToothNum;
+            const value = entry.entry[i][j][area][site];
+            if (isNaN(value) || value === null || value === undefined) continue;
+            const entryRep = {
+              record: record.id,
+              param: entry.label,
+              type: entry.type,
+              tooth: toothNum,
+              area: area,
+              site: site,
+              value: value.toString(),
+            };
+            entries.push(entryRep);
+          }
         }
       }
     }
-  }
-  return rep;
+  });
+  return entries;
 }
 
-function tableRowFromPerioRecordRep(rep: PerioRecordRep, orderedHeaders: PerioRecordCSVKeys[]): string[] {
+function tableRowFromRep<T extends string>(rep: Representation<T>, orderedHeaders: T[]): string[] {
   return orderedHeaders.map(header => rep[header]);
 }
 
-export function generatePerioRecordsTable(reps: PerioRecordRep[]): string[][] {
-  if (reps.length === 0) return [];
-  const orderedHeaders = Object.keys(reps[0]) as PerioRecordCSVKeys[];  // TODO: Replace with desired order if needed
-  const dataRows = reps.map(rep => tableRowFromPerioRecordRep(rep, orderedHeaders));
+export function tableRowFromReps<T extends string>(reps: Representation<T>[], orderedHeaders: T[]): string[][] {
+  const dataRows = reps.map(rep => tableRowFromRep(rep, orderedHeaders));
   return [orderedHeaders, ...dataRows];
 }
+
+export const PERIO_RECORD_CSV_HEADERS: PerioRecordCSVKeys[] = [
+  'id', 'label', 'note', 'patientId', 'createdAt',
+  'name', 'age', 'sex', 'email', 'contact', 'address'
+];
+
+export const PERIO_ENTRY_CSV_HEADERS: PerioEntryCSVKeys[] = [
+  'record', 'param', 'type', 'tooth', 'area', 'site', 'value'
+];
