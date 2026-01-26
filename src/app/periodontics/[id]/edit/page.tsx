@@ -47,7 +47,7 @@ function RecordView({ record }: { record: PerioRecord }) {
   // TODO: show progress indicator of which step we are on
   // TODO: is there a better way to manage multi-step forms, instead of conditional rendering?
   return (
-    <div className="max-w-3xl mx-auto">
+    <div className="max-w-4xl mx-auto">
       <EditLayout
         title={viewTitle}
         onSubmit={handleSubmit}
@@ -97,7 +97,7 @@ const CANCEL = "Cancel";
 const SUBMIT = "Submit";
 
 function useViewsNavigation(onCancel: () => void, onSubmit: () => void) {
-  const [view, setView] = useState<ViewType>('teeth');
+  const [view, setView] = useState<ViewType>('basic');
   const currentIndex = VIEW_ORDER.indexOf(view);
   const prevView = currentIndex > 0 ? VIEW_ORDER[currentIndex - 1] : null;
   const nextView = currentIndex < VIEW_ORDER.length - 1 ? VIEW_ORDER[currentIndex + 1] : null;

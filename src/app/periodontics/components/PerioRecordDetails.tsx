@@ -40,19 +40,12 @@ export default function PerioRecordDetails({ record, onEdit, onDelete, onBack }:
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <h2 className="text-2xl font-bold">Record Details</h2>
         <div className="flex flex-wrap gap-2 justify-end">
-          <Button variant="outline" onClick={onBack} size="sm" className="text-xs sm:text-sm">
-            ← Back to List
-          </Button>
-          <Button variant="outline" onClick={onEdit} size="sm" className="text-xs sm:text-sm">
-            Edit Record
-          </Button>
-          <Button variant="destructive" onClick={onDelete} size="sm" className="text-xs sm:text-sm">
-            Delete Record
-          </Button>
+          <SmallButton text="← Back to List" onClick={onBack} />
+          <SmallButton text="Delete Record" variant="destructive" onClick={onDelete} />
         </div>
       </div>
 
-      <Card title="Clinical Data">
+      <ActionCard title="Clinical Data" actionChildren={<SmallButton text="Edit Record" onClick={onEdit} />}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
@@ -94,8 +87,8 @@ export default function PerioRecordDetails({ record, onEdit, onDelete, onBack }:
             <PatientCard patient={patient} />
           }
         </div>
-      </Card>
-      <ActionCard title="Paramaeter Entries" actionChildren={<SmallButton onClick={onEditEntry('new')} />}>
+      </ActionCard>
+      <ActionCard title="Paramaeter Entries" actionChildren={<SmallButton text="+ New Entry" onClick={onEditEntry('new')} />}>
         {record.paramEntries.map((entry) => (
           <EntryView
             key={entry.id}
@@ -110,7 +103,7 @@ export default function PerioRecordDetails({ record, onEdit, onDelete, onBack }:
             <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
               Create new parameter entry
             </label>
-            <SmallButton onClick={onEditEntry('new')} />
+            <SmallButton text="+ New Entry" onClick={onEditEntry('new')} />
           </div>
         </div>
       </ActionCard>
@@ -172,10 +165,10 @@ function EntryView({ label, teeth, entry, onEdit }: EntryViewProps) {
   );
 }
 
-function SmallButton({ onClick }: { onClick: () => void; }) {
+function SmallButton({ text, onClick, variant }: { text: string; onClick: () => void; variant?: 'default' | 'outline' | 'destructive' }) {
   return (
-    <Button onClick={onClick} variant="outline" size="sm" className="text-xs sm:text-sm">
-      + New Entry
+    <Button onClick={onClick} variant={ variant || "outline"} size="sm" className="text-xs sm:text-sm">
+      {text}
     </Button>
   );
 }
