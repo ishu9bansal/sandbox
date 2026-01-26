@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { Quadrant } from "@/models/theeth";
 import { Edit } from "lucide-react";
+import ActionCard from "@/components/compositions/action-card";
 
 interface PerioRecordDetailsProps {
   record: PerioRecord;
@@ -94,7 +95,7 @@ export default function PerioRecordDetails({ record, onEdit, onDelete, onBack }:
           }
         </div>
       </Card>
-      <Card title="Paramaeter Entries">
+      <ActionCard title="Paramaeter Entries" actionChildren={<SmallButton onClick={onEditEntry('new')} />}>
         {record.paramEntries.map((entry) => (
           <EntryView
             key={entry.id}
@@ -105,14 +106,14 @@ export default function PerioRecordDetails({ record, onEdit, onDelete, onBack }:
           />
         ))}
         <div className="my-6 border-gray-300 dark:border-gray-600">
-          <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-            Create new parameter entry
-          </label>
-          <Button onClick={onEditEntry('new')} variant="outline" size="sm" className="text-xs sm:text-sm">
-            + New Entry
-          </Button>
+          <div className="flex justify-between py-4">
+            <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+              Create new parameter entry
+            </label>
+            <SmallButton onClick={onEditEntry('new')} />
+          </div>
         </div>
-      </Card>
+      </ActionCard>
 
       <Card title="Record Information">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -168,5 +169,13 @@ function EntryView({ label, teeth, entry, onEdit }: EntryViewProps) {
       </div>
       <PerioInput teeth={teeth} data={entry} readonly />
     </div>
+  );
+}
+
+function SmallButton({ onClick }: { onClick: () => void; }) {
+  return (
+    <Button onClick={onClick} variant="outline" size="sm" className="text-xs sm:text-sm">
+      + New Entry
+    </Button>
   );
 }

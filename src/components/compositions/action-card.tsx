@@ -21,7 +21,7 @@ export default function ActionCard({ className, title, description, children, ac
   return (
     <Card className={className}>
       <CardHeader>
-        <CardTitle>{title}</CardTitle>
+        <CardTitle className="text-xl">{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
         <CardAction>{actionChildren}</CardAction>
       </CardHeader>
