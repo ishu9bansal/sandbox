@@ -5,6 +5,9 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   error?: string;
 }
 
+/**
+ * @deprecated - use Input from ui library
+ */
 export default function Input({
   label,
   error,

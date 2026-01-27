@@ -1,16 +1,33 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { addLiveQuote, selectInstruments, setInstruments } from "@/store/slices/tickerSlice";
-import { HealthClient, TickerClient } from "@/services/ticker/tickerClient";
+import { HealthClient, TickerClient, ZerodhaClient } from "@/services/ticker/tickerClient";
 import { BASE_URL } from "@/services/ticker/constants";
 import { HistoryRecord, Straddle, LiveQuoteResponse } from "@/models/ticker";
 import { useAuth } from "@clerk/nextjs";
 import { toast } from "sonner";
+import { ApiClientConfig } from "@/services/api/api";
+
+export function usePushTokenApi() {
+  const zerodhaClient = useZerodhaClient();
+  const pushToken = useCallback(async (token: string) => {
+    try {
+      await zerodhaClient.pushToken(token);
+      toast.success("Zerodha token pushed successfully");
+    } catch (error) {
+      console.error(error);
+      toast.error("Error while pushing Zerodha token");
+    }
+  }, [zerodhaClient]);
+  return pushToken;
+}
 
 export function useTickerUser() {
   const tickerClient = useTickerClient();
+  const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<any>({});
   const reload = useCallback(async () => {
+    setLoading(true);
     try {
       const userData = await tickerClient.getUser();
       if (!userData) {
@@ -19,13 +36,18 @@ export function useTickerUser() {
       setUser(userData);
     } catch (error) {
       console.error(error);
-      toast.error("Error while fetching user data");
+      if (error instanceof Error) {
+        toast.error(error.message);
+        setUser({error: error.message});
+      }
+    } finally {
+      setLoading(false);
     }
   }, [tickerClient]);
   useEffect(() => {
     reload();
   }, [])
-  return { reload, user };
+  return { reload, user, loading };
 }
 
 export function useInstruments() {
@@ -276,6 +298,16 @@ export function useTickerHealthStatus() {
 }
 
 function useTickerClient() {
+  const builder = useCallback((config: ApiClientConfig) => new TickerClient(config), []);
+  return useAuthenticatedClient(builder);
+}
+
+function useZerodhaClient() {
+  const builder = useCallback((config: ApiClientConfig) => new ZerodhaClient(config), []);
+  return useAuthenticatedClient(builder);
+}
+
+function useAuthenticatedClient<T>(clientBuilder: (config: ApiClientConfig) => T) {
   const { getToken } = useAuth();
   const authBuilder = useCallback(async () => {
     const token = await getToken();
@@ -286,11 +318,11 @@ function useTickerClient() {
       Authorization: `Bearer ${token}`,
     };
   }, [getToken]);
-  const tickerClient = useMemo(() => new TickerClient({
+  const client = useMemo(() => clientBuilder({
     baseURL: BASE_URL,
     authBuilder,
-  }), [authBuilder]);
-  return tickerClient;
+  }), [authBuilder, clientBuilder]);
+  return client;
 }
 
 export function useLongLivedToken() {

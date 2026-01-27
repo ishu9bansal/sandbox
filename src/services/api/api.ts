@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
+import { DEFAULT_TIMEOUT } from '../ticker/constants';
 
 export interface ApiClientConfig {
   baseURL: string;
@@ -63,7 +64,8 @@ export class ApiClient {
     options?: ApiCallOptions
   ): Promise<T | null> {
     try {
-      const timeout = options?.timeout || 10000; // default timeout 10s
+      const defaultTimeout = DEFAULT_TIMEOUT > 0 ? DEFAULT_TIMEOUT : undefined;
+      const timeout = options?.timeout || defaultTimeout;
       const authHeaders = await this.authBuilder();
       const config: AxiosRequestConfig = {
         method,
