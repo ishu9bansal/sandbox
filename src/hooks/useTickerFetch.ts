@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { addLiveQuote, selectInstruments, setInstruments } from "@/store/slices/tickerSlice";
-import { HealthClient, TickerClient } from "@/services/ticker/tickerClient";
+import { HealthClient, TickerClient, ZerodhaClient } from "@/services/ticker/tickerClient";
 import { BASE_URL } from "@/services/ticker/constants";
 import { HistoryRecord, Straddle, LiveQuoteResponse } from "@/models/ticker";
 import { useAuth } from "@clerk/nextjs";
 import { toast } from "sonner";
+import { ApiClientConfig } from "@/services/api/api";
 
 export function useTickerUser() {
   const tickerClient = useTickerClient();
@@ -276,6 +277,16 @@ export function useTickerHealthStatus() {
 }
 
 function useTickerClient() {
+  const builder = useCallback((config: ApiClientConfig) => new TickerClient(config), []);
+  return useAuthenticatedClient(builder);
+}
+
+function useZerodhaClient() {
+  const builder = useCallback((config: ApiClientConfig) => new ZerodhaClient(config), []);
+  return useAuthenticatedClient(builder);
+}
+
+function useAuthenticatedClient<T>(clientBuilder: (config: ApiClientConfig) => T) {
   const { getToken } = useAuth();
   const authBuilder = useCallback(async () => {
     const token = await getToken();
@@ -286,11 +297,11 @@ function useTickerClient() {
       Authorization: `Bearer ${token}`,
     };
   }, [getToken]);
-  const tickerClient = useMemo(() => new TickerClient({
+  const client = useMemo(() => clientBuilder({
     baseURL: BASE_URL,
     authBuilder,
-  }), [authBuilder]);
-  return tickerClient;
+  }), [authBuilder, clientBuilder]);
+  return client;
 }
 
 export function useLongLivedToken() {
