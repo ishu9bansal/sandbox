@@ -7,15 +7,28 @@ import { Input } from '@/components/ui/input';
 import { useCallback, useState } from 'react';
 
 export default function UserView() {
-  const { reload, user } = useTickerUser();
+  const { reload, user, loading: loadingUser } = useTickerUser();
   const [token, setToken] = useState('');
   const pushToken = usePushTokenApi();
+  const [loading, setLoading] = useState(false);
   const updateToken = useCallback(async () => {
-    await pushToken(token);
+    setLoading(true);
+    try {
+      await pushToken(token);
+    } finally {
+      setLoading(false);
+    }
   }, [token, pushToken]);
   return (
     <div className="space-y-6">
-      <ActionCard title="User Token" actionChildren={<Button onClick={updateToken}>Update Token</Button>} >
+      <ActionCard
+        title="User Token"
+        actionChildren={<ActionButton
+          onClick={updateToken}
+          text='Update Token'
+          loading={loading}
+        />}
+      >
         <Input
           type="text"
           value={token}
@@ -23,10 +36,31 @@ export default function UserView() {
           placeholder="Enter new user token"
         />
       </ActionCard>
-      <ActionCard title="User Details" actionChildren={<Button onClick={reload}>Reload User</Button>}>
+      <ActionCard
+        title="User Details"
+        actionChildren={<ActionButton
+          onClick={reload}
+          text='Reload User'
+          loading={loadingUser}
+        />}
+      >
         <JsonView data={user} />
       </ActionCard>
     </div>
   );
 }
 
+type ActionButtonProps = {
+  onClick: () => void;
+  text: string;
+  loading: boolean;
+  loadingText?: string;
+};
+function ActionButton({ onClick, text, loading, loadingText }: ActionButtonProps) {
+  const loadingTextFinal = loadingText || 'Loading...';
+  return (
+    <Button onClick={onClick} disabled={loading}>
+      {loading ? loadingTextFinal : text}
+    </Button>
+  );
+}

@@ -1,5 +1,6 @@
 import { HistoryResponse, InstrumentResponse, LiveQuoteResponse, StraddleResponse } from "@/models/ticker";
 import ApiClient, { ApiClientConfig } from "../api/api";
+import { AxiosError } from "axios";
 
 export class TickerClient {
   private client: ApiClient;
@@ -12,8 +13,11 @@ export class TickerClient {
       const response = await this.client.get<any>(uri);
       return response;
     } catch (error) {
-      console.error(error); // NOTE: do not expose internal error details to user
-      throw Error("Error while fetching user data");  // user facing message
+      let msg = "Error while fetching user data";
+      if (error instanceof AxiosError) {
+        msg = error.response?.data?.detail || msg;
+      }
+      throw Error(msg);
     }
   }
   async getInstruments() {

@@ -24,8 +24,10 @@ export function usePushTokenApi() {
 
 export function useTickerUser() {
   const tickerClient = useTickerClient();
+  const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<any>({});
   const reload = useCallback(async () => {
+    setLoading(true);
     try {
       const userData = await tickerClient.getUser();
       if (!userData) {
@@ -34,13 +36,18 @@ export function useTickerUser() {
       setUser(userData);
     } catch (error) {
       console.error(error);
-      toast.error("Error while fetching user data");
+      if (error instanceof Error) {
+        toast.error(error.message);
+        setUser({error: error.message});
+      }
+    } finally {
+      setLoading(false);
     }
   }, [tickerClient]);
   useEffect(() => {
     reload();
   }, [])
-  return { reload, user };
+  return { reload, user, loading };
 }
 
 export function useInstruments() {
