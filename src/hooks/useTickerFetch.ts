@@ -8,6 +8,20 @@ import { useAuth } from "@clerk/nextjs";
 import { toast } from "sonner";
 import { ApiClientConfig } from "@/services/api/api";
 
+export function usePushTokenApi() {
+  const zerodhaClient = useZerodhaClient();
+  const pushToken = useCallback(async (token: string) => {
+    try {
+      await zerodhaClient.pushToken(token);
+      toast.success("Zerodha token pushed successfully");
+    } catch (error) {
+      console.error(error);
+      toast.error("Error while pushing Zerodha token");
+    }
+  }, [zerodhaClient]);
+  return pushToken;
+}
+
 export function useTickerUser() {
   const tickerClient = useTickerClient();
   const [user, setUser] = useState<any>({});
