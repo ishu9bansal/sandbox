@@ -98,7 +98,7 @@ function ParameterEntriesSection({ record }: { record: PerioRecord; }) {
   const router = useRouter();
   const onEditEntry = (entryId: string) => () => router.push(`/periodontics/${record.id}/entry/${entryId}`);
   return (
-    <ActionCard title="Paramaeter Entries" actionChildren={<SmallButton text="+ New Entry" onClick={onEditEntry('new')} />}>
+    <ActionCard title="Parameter Entries" actionChildren={<SmallButton text="+ New Entry" onClick={onEditEntry('new')} />}>
       {record.paramEntries.map((entry) => (
         <EntryView
           key={entry.id}
@@ -110,11 +110,14 @@ function ParameterEntriesSection({ record }: { record: PerioRecord; }) {
         />
       ))}
       <div className="my-6 border-gray-300 dark:border-gray-600">
-        <div className="flex justify-between py-4">
+        <div className="flex flex-col items-center py-4">
           <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
             Create new parameter entry
           </label>
-          <SmallButton text="+ New Entry" onClick={onEditEntry('new')} />
+          <Button onClick={onEditEntry('new')}>
+            <Edit className="mr-2 h-4 w-4" />
+            New Entry
+          </Button>
         </div>
       </div>
     </ActionCard>
