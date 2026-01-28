@@ -10,15 +10,6 @@ import { ApiClientConfig } from "@/services/api/api";
 
 export function useZerodhaApis() {
   const zerodhaClient = useZerodhaClient();
-  const pushToken = useCallback(async (token: string) => {
-    try {
-      await zerodhaClient.pushToken(token);
-      toast.success("Zerodha token pushed successfully");
-    } catch (error) {
-      console.error(error);
-      toast.error("Error while pushing Zerodha token");
-    }
-  }, [zerodhaClient]);
   const getLoginUrl = useCallback(async () => {
     try {
       const response = await zerodhaClient.getLoginUrl();
@@ -41,7 +32,7 @@ export function useZerodhaApis() {
       toast.error("Error while logging out from Zerodha");
     }
   }, [zerodhaClient]);
-  return { pushToken, getLoginUrl, logout };
+  return { getLoginUrl, logout };
 }
 
 export function useZerodhaCallbackApi() {
