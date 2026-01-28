@@ -62,8 +62,8 @@ function useZerodhaAuth(getLoginUrl: () => Promise<string | null>, logout: () =>
       toast.error("Login URL not available");
       return;
     }
-    window.open(loginUrl, '_blank');    // open in new tab
-    // window.location.href = loginUrl; // alternatively, redirect current tab
+    // window.open(loginUrl, '_blank');   // open in new tab
+    window.location.href = loginUrl;      // redirect current tab
   }, [loginUrl]);
 
   const onLogout = useCallback(async () => {
