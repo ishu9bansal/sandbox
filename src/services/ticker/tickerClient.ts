@@ -149,4 +149,36 @@ export class ZerodhaClient {
       throw Error("Error while pushing token");  // user facing message
     }
   }
+  async getLoginUrl() {
+    const uri = `/zerodha/url`;
+    try {
+      const response = await this.client.get<{ login_url: string }>(uri);
+      return response;
+    } catch (error) {
+      console.error(error); // NOTE: do not expose internal error details to user
+      throw Error("Error while fetching login URL");  // user facing message
+    }
+  }
+  async logout() {
+    const uri = `/zerodha/logout`;
+    try {
+      const response = await this.client.delete<{ message: string }>(uri);
+      return response;
+    } catch (error) {
+      console.error(error); // NOTE: do not expose internal error details to user
+      throw Error("Error while logging out");  // user facing message
+    }
+  }
+  async login(request_token: string) {
+    const queryParams = new URLSearchParams({ request_token });
+    const queryString = queryParams.toString();
+    const uri = `/zerodha/login?${queryString}`;
+    try {
+      const response = await this.client.post<{ message: string }>(uri);
+      return response;
+    } catch (error) {
+      console.error(error); // NOTE: do not expose internal error details to user
+      throw Error("Error while logging in");  // user facing message
+    }
+  }
 }
