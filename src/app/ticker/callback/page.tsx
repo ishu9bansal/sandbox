@@ -2,9 +2,9 @@
 
 import { useZerodhaCallbackApi } from "@/hooks/useTickerFetch";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, Suspense } from "react";
 
-export default function CallbackPage() {
+function CallbackContent() {
   const [error, setError] = useState<string | null>(null);
   const queryParams = useSearchParams();
   const token = queryParams.get("request_token");
@@ -34,5 +34,13 @@ export default function CallbackPage() {
         <div>Logging in...</div>
       )}
     </div>
+  );
+}
+
+export default function CallbackPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CallbackContent />
+    </Suspense>
   );
 }
