@@ -8,18 +8,48 @@ import { useAuth } from "@clerk/nextjs";
 import { toast } from "sonner";
 import { ApiClientConfig } from "@/services/api/api";
 
-export function usePushTokenApi() {
+export function useZerodhaApis() {
   const zerodhaClient = useZerodhaClient();
-  const pushToken = useCallback(async (token: string) => {
+  const getLoginUrl = useCallback(async () => {
     try {
-      await zerodhaClient.pushToken(token);
-      toast.success("Zerodha token pushed successfully");
+      const response = await zerodhaClient.getLoginUrl();
+      if (!response || !response.login_url) {
+        throw new Error("No login URL received");
+      }
+      return response.login_url;
     } catch (error) {
       console.error(error);
-      toast.error("Error while pushing Zerodha token");
+      toast.error("Error while fetching Zerodha login URL");
+      return null;
     }
   }, [zerodhaClient]);
-  return pushToken;
+  const logout = useCallback(async () => {
+    try {
+      await zerodhaClient.logout();
+      toast.success("Logged out from Zerodha successfully");
+    } catch (error) {
+      console.error(error);
+      toast.error("Error while logging out from Zerodha");
+    }
+  }, [zerodhaClient]);
+  return { getLoginUrl, logout };
+}
+
+export function useZerodhaCallbackApi() {
+  const zerodhaClient = useZerodhaClient();
+  const login = useCallback(async (request_token: string) => {
+    try {
+      const resp = await zerodhaClient.login(request_token);
+      if (!resp) {
+        throw new Error("No response from login");
+      }
+      return;
+    } catch (error) {
+      console.error(error);
+      throw new Error("Error while logging in to Zerodha");
+    }
+  }, [zerodhaClient]);
+  return login;
 }
 
 export function useTickerUser() {
