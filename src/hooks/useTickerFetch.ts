@@ -39,11 +39,14 @@ export function useZerodhaCallbackApi() {
   const zerodhaClient = useZerodhaClient();
   const login = useCallback(async (request_token: string) => {
     try {
-      await zerodhaClient.login(request_token);
-      toast.success("Logged in to Zerodha successfully");
+      const resp = await zerodhaClient.login(request_token);
+      if (!resp) {
+        throw new Error("No response from login");
+      }
+      return;
     } catch (error) {
       console.error(error);
-      toast.error("Error while logging in to Zerodha");
+      throw new Error("Error while logging in to Zerodha");
     }
   }, [zerodhaClient]);
   return login;

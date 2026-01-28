@@ -137,18 +137,6 @@ export class ZerodhaClient {
   constructor(config: ApiClientConfig) {
     this.client = new ApiClient(config);
   }
-  async pushToken(token: string) {
-    const queryParams = new URLSearchParams({ token });
-    const queryString = queryParams.toString();
-    const uri = `/zerodha?${queryString}`;
-    try {
-      const response = await this.client.post<{ message: string; token: string; }>(uri);
-      return response;
-    } catch (error) {
-      console.error(error); // NOTE: do not expose internal error details to user
-      throw Error("Error while pushing token");  // user facing message
-    }
-  }
   async getLoginUrl() {
     const uri = `/zerodha/url`;
     try {

@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 
 export default function UserView() {
   const { reload, user, loading: loadingUser } = useTickerUser();
-  const { getLoginUrl, logout} = useZerodhaApis();
+  const { getLoginUrl, logout } = useZerodhaApis();
   const { onLogin, onLogout, logoutLoading } = useZerodhaAuth(getLoginUrl, logout);
   return (
     <div className="space-y-6">
