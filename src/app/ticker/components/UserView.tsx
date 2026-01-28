@@ -96,10 +96,6 @@ function useZerodhaAuth(getLoginUrl: () => Promise<string | null>, logout: () =>
     setLogoutLoading(true);
     try {
       await logout();
-      toast.success("Logged out successfully");
-    } catch (error) {
-      console.error(error);
-      toast.error("Error while logging out");
     } finally {
       setLogoutLoading(false);
     }
