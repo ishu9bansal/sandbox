@@ -8,6 +8,7 @@ import Button from "@/components/Button";
 import PerioRecordList from "./components/PerioRecordList";
 import { PERIO_ENTRY_CSV_HEADERS, PERIO_RECORD_CSV_HEADERS, PerioEntryRep, PerioRecordRep, tableRowFromReps, transformPerioRecordToEntryReps, transformPerioRecordToRecordRep } from "@/models/representation";
 import { copyToClipboard, tableToTsvString } from "@/utils/helpers";
+import { Patient, PatientInput } from "@/models/patient";
 
 export default function PatientsPage() {
   const router = useRouter();
@@ -28,7 +29,7 @@ export default function PatientsPage() {
   };
 
   const handleCopyRecords = (recordsToCopy: PerioRecord[]) => {
-    copyRecordsToClipboard(recordsToCopy);
+    copyRecordsToClipboard(recordsToCopy, {});
     alert(`${recordsToCopy.length} record${recordsToCopy.length > 1 ? 's' : ''} copied to clipboard in TSV format.`);
   };
 
@@ -81,11 +82,18 @@ export default function PatientsPage() {
   );
 }
 
-function copyRecordsToClipboard(records: PerioRecord[]) {
+const UNKNOWN_PATIENT: PatientInput = {
+  name: 'Unknown',
+  age: 0,
+  sex: 'Other',
+}
+
+function copyRecordsToClipboard(records: PerioRecord[], patientMap: Record<string, Patient>) {
   const recordReps: PerioRecordRep[] = [];
   const entryReps: PerioEntryRep[] = [];
   records.forEach(record => {
-    const recordRep = transformPerioRecordToRecordRep(record);
+    const patient = record.patientId ? patientMap[record.patientId] : undefined;
+    const recordRep = transformPerioRecordToRecordRep(record, patient || UNKNOWN_PATIENT);
     recordReps.push(recordRep);
     const entriesRep = transformPerioRecordToEntryReps(record);
     entryReps.push(...entriesRep);

@@ -1,4 +1,4 @@
-import { Patient } from "./patient";
+import { PatientInput } from "./patient";
 import { MeasurementArea, MeasurementSite, PerioRecord } from "./perio";
 
 type Representation<T extends string> = Record<T, string>;
@@ -15,7 +15,7 @@ type PerioRecordCSVKeys = 'id' | PerioRepKeys | PatientRepKeys;
 type PerioEntryCSVKeys = 'record' | 'param' | 'type' | 'tooth' | 'area' | 'site' | 'value';
 export type PerioRecordRep = Representation<PerioRecordCSVKeys>;
 export type PerioEntryRep = Representation<PerioEntryCSVKeys>;
-export function transformPerioRecordToRecordRep(record: PerioRecord, patient?: Patient): PerioRecordRep {
+export function transformPerioRecordToRecordRep(record: PerioRecord, patient?: PatientInput): PerioRecordRep {
   const rep: PerioRecordRep = {
     id: record.id,
     label: record.label,
