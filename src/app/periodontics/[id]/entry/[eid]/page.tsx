@@ -2,15 +2,16 @@
 
 import EditLayout from "@/app/periodontics/components/EditLayout";
 import PerioInput from "@/app/periodontics/components/input/PerioInput";
+import CustomSitesSelector from "@/app/periodontics/components/input/CustomSitesSelector";
 import QuickLabels from "@/components/compositions/quick-labels";
 import { SelectInput } from "@/components/compositions/select-input";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ParamEntry, ParamType } from "@/models/perio";
+import { CustomSitesConfig, ParamEntry, ParamType } from "@/models/perio";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectPerioRecordById, updatePerioRecord } from "@/store/slices/perioSlice";
-import { generateParamEntryId, newMeasure } from "@/utils/perio";
+import { generateParamEntryId, getDefaultCustomSitesConfig, newMeasure } from "@/utils/perio";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
@@ -35,18 +36,22 @@ export default function PerioRecordEntryEditPage() {
   }, [dispatch, record]);
   const recordEntry = record.paramEntries.find(e => e.id === entry_id);
   const [label, setLabel] = useState(recordEntry ? recordEntry.label : '');
-  const [type, setType] = useState('6 site');
+  const [type, setType] = useState<ParamType>(recordEntry ? recordEntry.type : '6 site');
+  const [customSitesConfig, setCustomSitesConfig] = useState<CustomSitesConfig>(
+    recordEntry?.customSitesConfig || getDefaultCustomSitesConfig()
+  );
   const [input, setInput] = useState(recordEntry ? recordEntry.entry : newMeasure());
   const viewTitle = recordEntry ? "Edit Entry" : "Add Entry";
   const handleSubmit = useCallback(() => {
     onSubmit({
       id: recordEntry ? recordEntry.id : generateParamEntryId(),
-      type: type as ParamType,
+      type: type,
       label,
       entry: input,
+      customSitesConfig: type === 'custom' ? customSitesConfig : undefined,
     });
     router.push(`/periodontics/${record_id}`);
-  }, [label, input, onSubmit, router, record_id]);
+  }, [label, input, type, customSitesConfig, onSubmit, router, record_id, recordEntry]);
   const handleDelete = useCallback(() => {
     if (recordEntry && window.confirm(`Are you sure you want to delete entry "${recordEntry.label}"?`)) {
       const updatedParamEntries = record.paramEntries.filter(e => e.id !== recordEntry.id);
@@ -78,13 +83,24 @@ export default function PerioRecordEntryEditPage() {
           </div>
           <div>
             <Label className="mb-2">Parameter Type</Label>
-            <SelectInput value={type} onChange={setType} options={['6 site', '4 site']} />
+            <SelectInput value={type} onChange={(value) => setType(value as ParamType)} options={['6 site', '4 site', 'custom']} />
           </div>
           <div className="col-span-2">
             <QuickLabels labels={labels} onSelect={setLabel} />
           </div>
+          {type === 'custom' && (
+            <div className="col-span-2">
+              <CustomSitesSelector config={customSitesConfig} onChange={setCustomSitesConfig} />
+            </div>
+          )}
           <div className="col-span-2">
-            <PerioInput paramType={type as ParamType} teeth={record.teeth} data={input} onUpdate={setInput} />
+            <PerioInput 
+              paramType={type} 
+              teeth={record.teeth} 
+              data={input} 
+              onUpdate={setInput} 
+              customSitesConfig={type === 'custom' ? customSitesConfig : undefined}
+            />
           </div>
         </div>
       </EditLayout>

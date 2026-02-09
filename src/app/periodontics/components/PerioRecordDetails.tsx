@@ -1,7 +1,7 @@
 "use client";
 
 import Card from "@/components/compositions/card";
-import { CommonMeasurement, ParamType, PerioRecord, TeethSelection } from '@/models/perio';
+import { CommonMeasurement, CustomSitesConfig, ParamType, PerioRecord, TeethSelection } from '@/models/perio';
 import TeethVisualization from "@/components/TeethVisualization";
 import PerioInput from "./input/PerioInput";
 import PatientCard from "@/app/patients/components/PatientCard";
@@ -106,6 +106,7 @@ function ParameterEntriesSection({ record }: { record: PerioRecord; }) {
           teeth={record.teeth}
           entry={entry.entry}
           type={entry.type}
+          customSitesConfig={entry.customSitesConfig}
           onEdit={onEditEntry(entry.id)}
         />
       ))}
@@ -174,8 +175,9 @@ type EntryViewProps = {
   entry: Quadrant<CommonMeasurement>;
   onEdit: () => void;
   type: ParamType;
+  customSitesConfig?: CustomSitesConfig;
 };
-function EntryView({ label, teeth, entry, type, onEdit }: EntryViewProps) {
+function EntryView({ label, teeth, entry, type, customSitesConfig, onEdit }: EntryViewProps) {
   return (
     <div className="my-6 pb-4 border-b border-gray-300 dark:border-gray-600">
       <div className="flex items-center justify-between mb-4">
@@ -187,7 +189,7 @@ function EntryView({ label, teeth, entry, type, onEdit }: EntryViewProps) {
           Edit Entry
         </Button>
       </div>
-      <PerioInput paramType={type} teeth={teeth} data={entry} readonly />
+      <PerioInput paramType={type} teeth={teeth} data={entry} customSitesConfig={customSitesConfig} readonly />
     </div>
   );
 }
