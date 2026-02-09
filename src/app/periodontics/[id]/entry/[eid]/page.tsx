@@ -15,6 +15,20 @@ import { generateParamEntryId, getDefaultCustomSitesConfig, newMeasure } from "@
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
+function getInitialCustomSitesConfig(entry?: ParamEntry): CustomSitesConfig {
+  if (entry?.customSitesConfig) {
+    return entry.customSitesConfig;
+  }
+  if (entry?.type === '4 site') {
+    // Initialize to match 4-site behavior: disable Lingual Mesio and Disto
+    return {
+      Buccal: { Mesio: true, Mid: true, Disto: true },
+      Lingual: { Mesio: false, Mid: true, Disto: false },
+    };
+  }
+  return getDefaultCustomSitesConfig();
+}
+
 export default function PerioRecordEntryEditPage() {
   const { id: record_id, eid: entry_id } = useParams();
   const router = useRouter();
@@ -38,7 +52,7 @@ export default function PerioRecordEntryEditPage() {
   const [label, setLabel] = useState(recordEntry ? recordEntry.label : '');
   const [type, setType] = useState<ParamType>(recordEntry ? recordEntry.type : '6 site');
   const [customSitesConfig, setCustomSitesConfig] = useState<CustomSitesConfig>(
-    recordEntry?.customSitesConfig || getDefaultCustomSitesConfig()
+    getInitialCustomSitesConfig(recordEntry)
   );
   const [input, setInput] = useState(recordEntry ? recordEntry.entry : newMeasure());
   const viewTitle = recordEntry ? "Edit Entry" : "Add Entry";
