@@ -33,7 +33,7 @@ export default function PerioInput({
 }: PerioInputProps) {
   const [values, setValues] = useState<string[][]>(deriveValues(data));
   const allTeethSelected: TeethSelection = Array.from({ length: 4 }, () => Array.from({ length: 8 }, () => 'O')) as TeethSelection;
-  const diabledInfo = deriveDisabledInfo(teeth || allTeethSelected, paramType, customSitesConfig);
+  const disabledInfo = deriveDisabledInfo(teeth || allTeethSelected, paramType, customSitesConfig);
   const handleChange = (row: number, vs: string[]) => {
     setValues((prev) => {
       const updated = [...prev];
@@ -68,7 +68,7 @@ export default function PerioInput({
           }}
           label={labels[i]}
           values={values[i]}
-          disabled={diabledInfo[i]}
+          disabled={disabledInfo[i]}
           onRowChange={(vs) => handleChange(i, vs)}
           readonly={readonly}
           onNextFocus={() => next(i)}
