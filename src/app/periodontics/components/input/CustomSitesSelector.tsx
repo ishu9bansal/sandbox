@@ -1,3 +1,5 @@
+import { SelectInput } from "@/components/compositions/select-input";
+import { Label } from "@/components/ui/label";
 import { CustomSitesConfig, MeasurementSite } from "@/models/perio";
 
 interface CustomSitesSelectorProps {
@@ -87,5 +89,41 @@ export default function CustomSitesSelector({ config, onChange }: CustomSitesSel
         </div>
       </div>
     </div>
+  );
+}
+
+const PRESETS: Record<string, CustomSitesConfig> = {
+  '6 site': {
+    Buccal: { Mesio: true, Mid: true, Disto: true },
+    Lingual: { Mesio: true, Mid: true, Disto: true },
+  },
+  '4 site': {
+    Buccal: { Mesio: true, Mid: true, Disto: true },
+    Lingual: { Mesio: false, Mid: true, Disto: false },
+  },
+}
+
+export function PresetSitesSelector({ config, onChange }: CustomSitesSelectorProps) {
+  const handlePresetChange = (preset: string) => {
+    const newConfig = PRESETS[preset];
+    if (newConfig) {
+      onChange(newConfig);
+    }
+  };
+  const derivedPreset = Object.entries(PRESETS).find(([_, presetConfig]) => {
+    return JSON.stringify(presetConfig) === JSON.stringify(config);
+  })?.[0];
+
+  const type = derivedPreset || 'Custom';
+
+  return (
+    <>
+      <Label className="mb-2">Preset Site Selection</Label>
+      <SelectInput
+        value={type} 
+        onChange={(value) => handlePresetChange(value)} 
+        options={Object.keys(PRESETS).concat('Custom').map(p => ({ label: p, value: p, disabled: p === 'Custom' }))} 
+      />
+    </>
   );
 }

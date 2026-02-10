@@ -2,18 +2,17 @@
 
 import EditLayout from "@/app/periodontics/components/EditLayout";
 import PerioInput from "@/app/periodontics/components/input/PerioInput";
-import CustomSitesSelector from "@/app/periodontics/components/input/CustomSitesSelector";
+import CustomSitesSelector, { PresetSitesSelector } from "@/app/periodontics/components/input/CustomSitesSelector";
 import QuickLabels from "@/components/compositions/quick-labels";
-import { SelectInput } from "@/components/compositions/select-input";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CustomSitesConfig, ParamEntry, ParamType } from "@/models/perio";
+import { CustomSitesConfig, ParamEntry } from "@/models/perio";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectPerioRecordById, updatePerioRecord } from "@/store/slices/perioSlice";
 import { generateParamEntryId, get6SiteConfig, get4SiteConfig, detectPresetType, newMeasure } from "@/utils/perio";
 import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 export default function PerioRecordEntryEditPage() {
   const { id: record_id, eid: entry_id } = useParams();
@@ -43,41 +42,18 @@ export default function PerioRecordEntryEditPage() {
     recordEntry?.sitesConfig || get6SiteConfig()
   );
   
-  // Type is derived from sitesConfig
-  const [type, setType] = useState<ParamType>(
-    recordEntry ? recordEntry.type : '6 site'
-  );
-  
   const [input, setInput] = useState(recordEntry ? recordEntry.entry : newMeasure());
   const viewTitle = recordEntry ? "Edit Entry" : "Add Entry";
-  
-  // Update type when sitesConfig changes (grid changes)
-  useEffect(() => {
-    const detectedType = detectPresetType(sitesConfig);
-    setType(detectedType);
-  }, [sitesConfig]);
-  
-  // Update sitesConfig when type changes (dropdown changes)
-  const handleTypeChange = (newType: ParamType) => {
-    if (newType === '6 site') {
-      setSitesConfig(get6SiteConfig());
-    } else if (newType === '4 site') {
-      setSitesConfig(get4SiteConfig());
-    }
-    // If 'custom', keep current sitesConfig
-    setType(newType);
-  };
   
   const handleSubmit = useCallback(() => {
     onSubmit({
       id: recordEntry ? recordEntry.id : generateParamEntryId(),
-      type: type,
       label,
       entry: input,
       sitesConfig: sitesConfig,
     });
     router.push(`/periodontics/${record_id}`);
-  }, [label, input, type, sitesConfig, onSubmit, router, record_id, recordEntry]);
+  }, [label, input, sitesConfig, onSubmit, router, record_id, recordEntry]);
   
   const handleDelete = useCallback(() => {
     if (recordEntry && window.confirm(`Are you sure you want to delete entry "${recordEntry.label}"?`)) {
@@ -119,12 +95,7 @@ export default function PerioRecordEntryEditPage() {
               <CustomSitesSelector config={sitesConfig} onChange={setSitesConfig} />
             </div>
             <div>
-              <Label className="mb-2">Preset Site Selection</Label>
-              <SelectInput 
-                value={type} 
-                onChange={(value) => handleTypeChange(value as ParamType)} 
-                options={['6 site', '4 site', 'custom']} 
-              />
+              <PresetSitesSelector config={sitesConfig} onChange={setSitesConfig} />
             </div>
           </div>
           
