@@ -4,13 +4,14 @@ export type SelectionMeasurement = 'X' | 'O' | '-'; // 'X' = missing, 'O' = Sele
 export type TeethSelection = Quadrant<SelectionMeasurement>;
 export type MeasurementSite = 'Mesio' | 'Mid' | 'Disto';
 export type MeasurementArea = 'Buccal' | 'Lingual'; // Buccal or Lingual/Palatal
-export type CommonMeasurement = Record<MeasurementArea, Record<MeasurementSite, number>>;
-export type ParamType = '6 site' | '4 site';
+export type ToothMeasurement<T> = Record<MeasurementArea, Record<MeasurementSite, T>>;
+export type CommonMeasurement = ToothMeasurement<number>;
+export type SitesConfig = ToothMeasurement<boolean>;
 export type ParamEntry = {
   id: string;
-  type: ParamType;
   label: string;
   entry: Quadrant<CommonMeasurement>;
+  sites: SitesConfig;
 };
 
 export interface PerioRecord {
