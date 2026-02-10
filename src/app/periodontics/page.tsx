@@ -2,18 +2,20 @@
 
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { deletePerioRecord, deletePerioRecords } from "@/store/slices/perioSlice";
+import { deletePerioRecord, deletePerioRecords, selectPerioRecords } from "@/store/slices/perioSlice";
 import { PerioRecord } from '@/models/perio';
 import Button from "@/components/Button";
 import PerioRecordList from "./components/PerioRecordList";
 import { PERIO_ENTRY_CSV_HEADERS, PERIO_RECORD_CSV_HEADERS, PerioEntryRep, PerioRecordRep, tableRowFromReps, transformPerioRecordToEntryReps, transformPerioRecordToRecordRep } from "@/models/representation";
 import { copyToClipboard, tableToTsvString } from "@/utils/helpers";
 import { Patient, PatientInput } from "@/models/patient";
+import { selectAllPatients } from "@/store/slices/patientSlice";
 
 export default function PatientsPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const records = useAppSelector(state => state.perio.records);
+  const records = useAppSelector(selectPerioRecords);
+  const patients = useAppSelector(selectAllPatients);
 
   const handleDeleteRecord = (record: PerioRecord) => {
     if (window.confirm(`Are you sure you want to delete ${record.label}?`)) {
@@ -28,8 +30,8 @@ export default function PatientsPage() {
     }
   };
 
-  const handleCopyRecords = (recordsToCopy: PerioRecord[]) => {
-    copyRecordsToClipboard(recordsToCopy, {});
+  const handleCopyRecords = (recordsToCopy: PerioRecord[], patients: Patient[]) => {
+    copyRecordsToClipboard(recordsToCopy, patients);
     alert(`${recordsToCopy.length} record${recordsToCopy.length > 1 ? 's' : ''} copied to clipboard in TSV format.`);
   };
 
@@ -65,7 +67,7 @@ export default function PatientsPage() {
         onEdit={handleEditRecord}
         onDelete={handleDeleteRecord}
         onBulkDelete={handleBulkDelete}
-        onCopy={handleCopyRecords}
+        onCopy={(r) => handleCopyRecords(r, patients)}
       />
 
       {records.length === 0 && (
@@ -88,11 +90,11 @@ const UNKNOWN_PATIENT: PatientInput = {
   sex: 'Other',
 }
 
-function copyRecordsToClipboard(records: PerioRecord[], patientMap: Record<string, Patient>) {
+function copyRecordsToClipboard(records: PerioRecord[], patients: Patient[]) {
   const recordReps: PerioRecordRep[] = [];
   const entryReps: PerioEntryRep[] = [];
   records.forEach(record => {
-    const patient = record.patientId ? patientMap[record.patientId] : undefined;
+    const patient = patients.find(p => p.id === record.patientId); // Find patient for the record, if exists
     const recordRep = transformPerioRecordToRecordRep(record, patient || UNKNOWN_PATIENT);
     recordReps.push(recordRep);
     const entriesRep = transformPerioRecordToEntryReps(record);
