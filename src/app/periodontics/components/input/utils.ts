@@ -4,6 +4,7 @@ import { Quadrant } from "@/models/theeth";
 import { copy } from "@/utils/perio";
 
 const STUDY_LIMIT = 8;
+// TODO: remove CONCATENATED_MAPPING usage in derived zones calculations
 function generateAnnatomicalMapping(limit: number): {q: number, p: number}[][] {
   return [
     Array.from({ length: limit }, (_, i) => ({ q: 0, p: (limit-1-i) })),
@@ -20,13 +21,22 @@ function generateConcateMapping(mapping: {q: number, p: number}[][]) {
   ];
 }
 const CONCATENATED_MAPPING = generateConcateMapping(ANNATOMICAL_MAPPING);
+
 const siteOrder: MeasurementSite[] = ['Mesio', 'Mid', 'Disto'];
-const siteMapping = CONCATENATED_MAPPING.map(group => group.map(el => siteOrder.map(s => ({...el, s}))));
-function generateFlatMapping(siteMap: { s: MeasurementSite; q: number; p: number; }[][][], area: MeasurementArea) {
-  return siteMap.map(group => group.flat().map(({s, q, p}) => ({s, q, p, a: area})));
+function generateQuadrant(a: MeasurementArea, q: number, limit: number) {
+  return Array.from({ length: limit }, (_, p) => (siteOrder.map((s) => ({ q, p, s, a })))).flat();
 }
-const BUCCAL_MAPPING = generateFlatMapping(siteMapping, 'Buccal');
-const LINGUAL_MAPPING = generateFlatMapping(siteMapping, 'Lingual');
+function generateAreaMapping(area: MeasurementArea, limit: number) {
+  const quadrants = [0,1,2,3].map(q => generateQuadrant(area, q, limit));
+  quadrants[0].reverse();
+  quadrants[3].reverse();
+  return [
+    [...quadrants[0], ...quadrants[1]],
+    [...quadrants[3], ...quadrants[2]],
+  ];
+}
+const BUCCAL_MAPPING = generateAreaMapping('Buccal', STUDY_LIMIT);
+const LINGUAL_MAPPING = generateAreaMapping('Lingual', STUDY_LIMIT);
 const MAPPING = [
   BUCCAL_MAPPING[0],
   LINGUAL_MAPPING[0],
