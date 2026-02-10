@@ -33,12 +33,14 @@ export const stylesGenerator = (columnsNum: number, cellSize: number = 18) => {
       height: cellSize,
       textAlign: "center" as const,
       borderRadius: 6,
-      border: "1px solid #3a4050",
+      borderWidth: 1,
+      borderStyle: "solid",
+      borderColor: "#3a4050",
       fontSize: 10,
       outline: "none",
     },
     zoneSeparatorLeft: {
-      borderLeft: "2px solid"
+      borderLeftWidth: 2,
     },
   }
 };

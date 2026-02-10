@@ -12,7 +12,7 @@ type PerioRepKeys = 'label' | 'note' | 'patientId' | 'createdAt';
 type PatientRepKeys = 'name' | 'age' | 'sex' | 'email' | 'contact' | 'address';
 
 type PerioRecordCSVKeys = 'id' | PerioRepKeys | PatientRepKeys;
-type PerioEntryCSVKeys = 'record' | 'param' | 'type' | 'tooth' | 'area' | 'site' | 'value';
+type PerioEntryCSVKeys = 'record' | 'param' | 'tooth' | 'area' | 'site' | 'value';
 export type PerioRecordRep = Representation<PerioRecordCSVKeys>;
 export type PerioEntryRep = Representation<PerioEntryCSVKeys>;
 export function transformPerioRecordToRecordRep(record: PerioRecord, patient?: PatientInput): PerioRecordRep {
@@ -46,7 +46,6 @@ export function transformPerioRecordToEntryReps(record: PerioRecord): PerioEntry
             const entryRep = {
               record: record.id,
               param: entry.label,
-              type: entry.type,
               tooth: toothNum,
               area: area,
               site: site,
@@ -76,5 +75,5 @@ export const PERIO_RECORD_CSV_HEADERS: PerioRecordCSVKeys[] = [
 ];
 
 export const PERIO_ENTRY_CSV_HEADERS: PerioEntryCSVKeys[] = [
-  'record', 'param', 'type', 'tooth', 'area', 'site', 'value'
+  'record', 'param', 'tooth', 'area', 'site', 'value'
 ];

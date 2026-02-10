@@ -1,4 +1,4 @@
-import { CommonMeasurement, PerioRecord, SelectionMeasurement, TeethSelection } from "@/models/perio";
+import { CommonMeasurement, PerioRecord, SelectionMeasurement, SitesConfig, TeethSelection } from "@/models/perio";
 import { Quadrant } from "@/models/theeth";
 import { ModelInput } from "@/models/type";
 
@@ -59,4 +59,11 @@ export function newMeasure() {
 
 export function generateParamEntryId(): string {
   return `perio-entry-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
+}
+
+export function createDefaultSitesConfig(): SitesConfig {
+  return {
+    Buccal: { Mesio: true, Mid: true, Disto: true },
+    Lingual: { Mesio: true, Mid: true, Disto: true },
+  };
 }
