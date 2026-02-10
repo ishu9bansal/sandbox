@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { CustomSitesConfig, ParamEntry } from "@/models/perio";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectPerioRecordById, updatePerioRecord } from "@/store/slices/perioSlice";
-import { generateParamEntryId, get6SiteConfig, get4SiteConfig, detectPresetType, newMeasure } from "@/utils/perio";
+import { generateParamEntryId, newMeasure } from "@/utils/perio";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
@@ -39,7 +39,10 @@ export default function PerioRecordEntryEditPage() {
   
   // Initialize sitesConfig from existing entry or default to 6-site
   const [sitesConfig, setSitesConfig] = useState<CustomSitesConfig>(
-    recordEntry?.sitesConfig || get6SiteConfig()
+    recordEntry?.sitesConfig || {
+      Buccal: { Mesio: true, Mid: true, Disto: true },
+      Lingual: { Mesio: true, Mid: true, Disto: true },
+    }
   );
   
   const [input, setInput] = useState(recordEntry ? recordEntry.entry : newMeasure());

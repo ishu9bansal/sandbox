@@ -12,7 +12,6 @@ import { useRouter } from "next/navigation";
 import { Quadrant } from "@/models/theeth";
 import { Edit } from "lucide-react";
 import ActionCard from "@/components/compositions/action-card";
-import { get6SiteConfig, get4SiteConfig } from "@/utils/perio";
 
 interface PerioRecordDetailsProps {
   record: PerioRecord;

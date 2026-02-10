@@ -1,4 +1,4 @@
-import { CommonMeasurement, CustomSitesConfig, PerioRecord, SelectionMeasurement, TeethSelection } from "@/models/perio";
+import { CommonMeasurement, PerioRecord, SelectionMeasurement, TeethSelection } from "@/models/perio";
 import { Quadrant } from "@/models/theeth";
 import { ModelInput } from "@/models/type";
 
@@ -59,56 +59,4 @@ export function newMeasure() {
 
 export function generateParamEntryId(): string {
   return `perio-entry-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
-}
-
-export function getDefaultCustomSitesConfig(): CustomSitesConfig {
-  return {
-    Buccal: { Mesio: true, Mid: true, Disto: true },
-    Lingual: { Mesio: true, Mid: true, Disto: true },
-  };
-}
-
-export function get6SiteConfig(): CustomSitesConfig {
-  return {
-    Buccal: { Mesio: true, Mid: true, Disto: true },
-    Lingual: { Mesio: true, Mid: true, Disto: true },
-  };
-}
-
-export function get4SiteConfig(): CustomSitesConfig {
-  return {
-    Buccal: { Mesio: true, Mid: true, Disto: true },
-    Lingual: { Mesio: false, Mid: true, Disto: false },
-  };
-}
-
-export function detectPresetType(config: CustomSitesConfig): '6 site' | '4 site' | 'custom' {
-  const sixSite = get6SiteConfig();
-  const fourSite = get4SiteConfig();
-  
-  // Check if matches 6-site
-  if (
-    config.Buccal.Mesio === sixSite.Buccal.Mesio &&
-    config.Buccal.Mid === sixSite.Buccal.Mid &&
-    config.Buccal.Disto === sixSite.Buccal.Disto &&
-    config.Lingual.Mesio === sixSite.Lingual.Mesio &&
-    config.Lingual.Mid === sixSite.Lingual.Mid &&
-    config.Lingual.Disto === sixSite.Lingual.Disto
-  ) {
-    return '6 site';
-  }
-  
-  // Check if matches 4-site
-  if (
-    config.Buccal.Mesio === fourSite.Buccal.Mesio &&
-    config.Buccal.Mid === fourSite.Buccal.Mid &&
-    config.Buccal.Disto === fourSite.Buccal.Disto &&
-    config.Lingual.Mesio === fourSite.Lingual.Mesio &&
-    config.Lingual.Mid === fourSite.Lingual.Mid &&
-    config.Lingual.Disto === fourSite.Lingual.Disto
-  ) {
-    return '4 site';
-  }
-  
-  return 'custom';
 }
