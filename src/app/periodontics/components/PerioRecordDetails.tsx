@@ -105,7 +105,7 @@ function ParameterEntriesSection({ record }: { record: PerioRecord; }) {
           label={entry.label}
           teeth={record.teeth}
           entry={entry.entry}
-          customSitesConfig={entry.sites}
+          sites={entry.sites}
           onEdit={onEditEntry(entry.id)}
         />
       ))}
@@ -173,9 +173,9 @@ type EntryViewProps = {
   teeth: TeethSelection;
   entry: Quadrant<CommonMeasurement>;
   onEdit: () => void;
-  customSitesConfig: SitesConfig;
+  sites: SitesConfig;
 };
-function EntryView({ label, teeth, entry, customSitesConfig, onEdit }: EntryViewProps) {
+function EntryView({ label, teeth, entry, sites, onEdit }: EntryViewProps) {
   
   return (
     <div className="my-6 pb-4 border-b border-gray-300 dark:border-gray-600">
@@ -188,7 +188,7 @@ function EntryView({ label, teeth, entry, customSitesConfig, onEdit }: EntryView
           Edit Entry
         </Button>
       </div>
-      <PerioInput teeth={teeth} data={entry} customSitesConfig={customSitesConfig} readonly />
+      <PerioInput teeth={teeth} data={entry} sites={sites} readonly />
     </div>
   );
 }

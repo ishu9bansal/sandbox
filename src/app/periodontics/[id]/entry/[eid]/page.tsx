@@ -105,7 +105,7 @@ export default function PerioRecordEntryEditPage() {
               teeth={record.teeth} 
               data={input} 
               onUpdate={setInput} 
-              customSitesConfig={sitesConfig}
+              sites={sitesConfig}
             />
           </div>
         </div>
