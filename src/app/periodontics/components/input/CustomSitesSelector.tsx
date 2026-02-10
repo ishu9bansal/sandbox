@@ -36,8 +36,12 @@ export default function CustomSitesSelector({ config, onChange }: CustomSitesSel
           ⚠️ At least one site must be selected
         </div>
       )}
-      <div className="inline-block border-2 border-gray-300 rounded-lg p-2 bg-white">
+      <div className="inline-grid grid-cols-2 border-2 border-gray-300 rounded-lg p-2 bg-white">
         {/* Top row - Buccal */}
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 bg-blue-500 border-2 border-blue-600 rounded"></div>
+          <span>Buccal</span>
+        </div>
         <div className="grid grid-cols-3 gap-1 mb-1">
           {sites.map((site) => (
             <button
@@ -45,7 +49,7 @@ export default function CustomSitesSelector({ config, onChange }: CustomSitesSel
               type="button"
               onClick={() => handleToggle('Buccal', site)}
               className={`
-                w-14 h-14 border-2 rounded-md font-medium text-xs transition-colors
+                w-7 h-7 border-2 rounded-md font-medium text-xs transition-colors
                 ${config.Buccal[site] 
                   ? 'bg-blue-500 text-white border-blue-600 hover:bg-blue-600' 
                   : 'bg-gray-100 text-gray-400 border-gray-300 hover:bg-gray-200'
@@ -53,11 +57,15 @@ export default function CustomSitesSelector({ config, onChange }: CustomSitesSel
               `}
               title={`Buccal ${site}`}
             >
-              {site.charAt(0)}
+              {site.charAt(0)+site.charAt(1)}
             </button>
           ))}
         </div>
         {/* Bottom row - Lingual */}
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 bg-green-500 border-2 border-green-600 rounded"></div>
+          <span>Lingual</span>
+        </div>
         <div className="grid grid-cols-3 gap-1">
           {sites.map((site) => (
             <button
@@ -65,7 +73,7 @@ export default function CustomSitesSelector({ config, onChange }: CustomSitesSel
               type="button"
               onClick={() => handleToggle('Lingual', site)}
               className={`
-                w-14 h-14 border-2 rounded-md font-medium text-xs transition-colors
+                w-7 h-7 border-2 rounded-md font-medium text-xs transition-colors
                 ${config.Lingual[site] 
                   ? 'bg-green-500 text-white border-green-600 hover:bg-green-600' 
                   : 'bg-gray-100 text-gray-400 border-gray-300 hover:bg-gray-200'
@@ -73,19 +81,9 @@ export default function CustomSitesSelector({ config, onChange }: CustomSitesSel
               `}
               title={`Lingual ${site}`}
             >
-              {site.charAt(0)}
+              {site.charAt(0)+site.charAt(1)}
             </button>
           ))}
-        </div>
-      </div>
-      <div className="text-xs text-gray-600 space-y-1">
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 bg-blue-500 border-2 border-blue-600 rounded"></div>
-          <span>Buccal (Top row)</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 bg-green-500 border-2 border-green-600 rounded"></div>
-          <span>Lingual (Bottom row)</span>
         </div>
       </div>
     </div>

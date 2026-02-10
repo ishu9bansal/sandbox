@@ -111,8 +111,15 @@ export default function PerioRecordEntryEditPage() {
                 placeholder="Enter parameter name"
               />
             </div>
+            <div className="col-span-2">
+              <Label className="mb-2">Preset Names</Label>
+              <QuickLabels labels={labels} onSelect={setLabel} />
+            </div>
             <div>
-              <Label className="mb-2">Preset Type</Label>
+              <CustomSitesSelector config={sitesConfig} onChange={setSitesConfig} />
+            </div>
+            <div>
+              <Label className="mb-2">Preset Site Selection</Label>
               <SelectInput 
                 value={type} 
                 onChange={(value) => handleTypeChange(value as ParamType)} 
@@ -121,18 +128,9 @@ export default function PerioRecordEntryEditPage() {
             </div>
           </div>
           
-          <div>
-            <QuickLabels labels={labels} onSelect={setLabel} />
-          </div>
-          
-          {/* Always visible site selector */}
-          <div>
-            <CustomSitesSelector config={sitesConfig} onChange={setSitesConfig} />
-          </div>
           
           <div>
-            <PerioInput 
-              paramType={type} 
+            <PerioInput
               teeth={record.teeth} 
               data={input} 
               onUpdate={setInput} 

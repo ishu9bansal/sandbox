@@ -3,7 +3,7 @@ import { calculateColumnsFromZones, calculateZoneSeparators, dataUpdaterFromValu
 import QuickInputRow, { QuickInputRowRef } from "./QuickInputRow";
 import { stylesGenerator } from "./style";
 import { Quadrant } from "@/models/theeth";
-import { CommonMeasurement, CustomSitesConfig, ParamType, TeethSelection } from "@/models/perio";
+import { CommonMeasurement, CustomSitesConfig, TeethSelection } from "@/models/perio";
 
 
 const ZONES = deriveZones();
@@ -17,8 +17,7 @@ interface PerioInputProps {
   onUpdate?: (data: Quadrant<CommonMeasurement>) => void;
   onNextFocus?: () => void;
   onPrevFocus?: () => void;
-  paramType?: ParamType;
-  customSitesConfig: CustomSitesConfig;  // Now required
+  customSitesConfig: CustomSitesConfig;
   readonly?: boolean;
 }
 export default function PerioInput({
@@ -27,7 +26,6 @@ export default function PerioInput({
   onUpdate,
   onNextFocus,
   onPrevFocus,
-  paramType = '6 site',
   customSitesConfig,
   readonly,
 }: PerioInputProps) {
