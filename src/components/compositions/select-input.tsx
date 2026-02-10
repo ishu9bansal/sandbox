@@ -10,13 +10,13 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-
+type Option = { label: string; value: string; disabled?: boolean; };
 type SelectInputProps = {
   placeholder?: string;
   label?: string;
   value: string;
   onChange: (value: string) => void;
-  options: { label: string; value: string }[] | string[];
+  options: Option[] | string[];
 }
 export function SelectInput({
   placeholder = "Select...",
@@ -25,9 +25,9 @@ export function SelectInput({
   onChange,
   options,
 }: SelectInputProps) {
-  const formattedOptions = typeof options[0] === "string"
+  const formattedOptions: Option[] = typeof options[0] === "string"
     ? (options as string[]).map((opt) => ({ label: opt, value: opt }))
-    : (options as { label: string; value: string }[]);
+    : (options as Option[]);
   return (
     <Select onValueChange={onChange} value={value}>
       <SelectTrigger className="w-[180px]">
@@ -37,7 +37,7 @@ export function SelectInput({
         <SelectGroup>
           <SelectLabel>{label}</SelectLabel>
           {formattedOptions.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
+            <SelectItem key={option.value} value={option.value} disabled={option.disabled}>
               {option.label}
             </SelectItem>
           ))}
