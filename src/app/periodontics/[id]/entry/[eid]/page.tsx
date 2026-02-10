@@ -11,23 +11,9 @@ import { Label } from "@/components/ui/label";
 import { CustomSitesConfig, ParamEntry, ParamType } from "@/models/perio";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectPerioRecordById, updatePerioRecord } from "@/store/slices/perioSlice";
-import { generateParamEntryId, getDefaultCustomSitesConfig, newMeasure } from "@/utils/perio";
+import { generateParamEntryId, get6SiteConfig, get4SiteConfig, detectPresetType, newMeasure } from "@/utils/perio";
 import { useParams, useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
-
-function getInitialCustomSitesConfig(entry?: ParamEntry): CustomSitesConfig {
-  if (entry?.customSitesConfig) {
-    return entry.customSitesConfig;
-  }
-  if (entry?.type === '4 site') {
-    // Initialize to match 4-site behavior: disable Lingual Mesio and Disto
-    return {
-      Buccal: { Mesio: true, Mid: true, Disto: true },
-      Lingual: { Mesio: false, Mid: true, Disto: false },
-    };
-  }
-  return getDefaultCustomSitesConfig();
-}
+import { useCallback, useEffect, useState } from "react";
 
 export default function PerioRecordEntryEditPage() {
   const { id: record_id, eid: entry_id } = useParams();
@@ -48,24 +34,51 @@ export default function PerioRecordEntryEditPage() {
       paramEntries: updatedParamEntries,
     }));
   }, [dispatch, record]);
+  
   const recordEntry = record.paramEntries.find(e => e.id === entry_id);
   const [label, setLabel] = useState(recordEntry ? recordEntry.label : '');
-  const [type, setType] = useState<ParamType>(recordEntry ? recordEntry.type : '6 site');
-  const [customSitesConfig, setCustomSitesConfig] = useState<CustomSitesConfig>(
-    getInitialCustomSitesConfig(recordEntry)
+  
+  // Initialize sitesConfig from existing entry or default to 6-site
+  const [sitesConfig, setSitesConfig] = useState<CustomSitesConfig>(
+    recordEntry?.sitesConfig || get6SiteConfig()
   );
+  
+  // Type is derived from sitesConfig
+  const [type, setType] = useState<ParamType>(
+    recordEntry ? recordEntry.type : '6 site'
+  );
+  
   const [input, setInput] = useState(recordEntry ? recordEntry.entry : newMeasure());
   const viewTitle = recordEntry ? "Edit Entry" : "Add Entry";
+  
+  // Update type when sitesConfig changes (grid changes)
+  useEffect(() => {
+    const detectedType = detectPresetType(sitesConfig);
+    setType(detectedType);
+  }, [sitesConfig]);
+  
+  // Update sitesConfig when type changes (dropdown changes)
+  const handleTypeChange = (newType: ParamType) => {
+    if (newType === '6 site') {
+      setSitesConfig(get6SiteConfig());
+    } else if (newType === '4 site') {
+      setSitesConfig(get4SiteConfig());
+    }
+    // If 'custom', keep current sitesConfig
+    setType(newType);
+  };
+  
   const handleSubmit = useCallback(() => {
     onSubmit({
       id: recordEntry ? recordEntry.id : generateParamEntryId(),
       type: type,
       label,
       entry: input,
-      customSitesConfig: type === 'custom' ? customSitesConfig : undefined,
+      sitesConfig: sitesConfig,
     });
     router.push(`/periodontics/${record_id}`);
-  }, [label, input, type, customSitesConfig, onSubmit, router, record_id, recordEntry]);
+  }, [label, input, type, sitesConfig, onSubmit, router, record_id, recordEntry]);
+  
   const handleDelete = useCallback(() => {
     if (recordEntry && window.confirm(`Are you sure you want to delete entry "${recordEntry.label}"?`)) {
       const updatedParamEntries = record.paramEntries.filter(e => e.id !== recordEntry.id);
@@ -76,7 +89,9 @@ export default function PerioRecordEntryEditPage() {
       router.push(`/periodontics/${record_id}`);
     }
   }, [dispatch, record, recordEntry, router, record_id]);
+  
   const labels = ['PPD', 'LGM', 'Bleeding on Probing', 'Mobility', 'Furcation Involvement', 'Suppuration', 'Gingival Recession'];
+  
   return (
     <div className="max-w-3xl mx-auto">
       <EditLayout
@@ -86,34 +101,42 @@ export default function PerioRecordEntryEditPage() {
         nextLabel={'Submit'}
         actionChildren={recordEntry && <DeleteButton onDelete={handleDelete} />}
       >
-        <div className="space-y-6 grid grid-cols-2 gap-4">
-          <div>
-            <Label className="mb-2">Parameter Name</Label>
-            <Input
-              value={label}
-              onChange={(e) => setLabel(e.target.value)}
-              placeholder="Enter parameter name"
-            />
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label className="mb-2">Parameter Name</Label>
+              <Input
+                value={label}
+                onChange={(e) => setLabel(e.target.value)}
+                placeholder="Enter parameter name"
+              />
+            </div>
+            <div>
+              <Label className="mb-2">Preset Type</Label>
+              <SelectInput 
+                value={type} 
+                onChange={(value) => handleTypeChange(value as ParamType)} 
+                options={['6 site', '4 site', 'custom']} 
+              />
+            </div>
           </div>
+          
           <div>
-            <Label className="mb-2">Parameter Type</Label>
-            <SelectInput value={type} onChange={(value) => setType(value as ParamType)} options={['6 site', '4 site', 'custom']} />
-          </div>
-          <div className="col-span-2">
             <QuickLabels labels={labels} onSelect={setLabel} />
           </div>
-          {type === 'custom' && (
-            <div className="col-span-2">
-              <CustomSitesSelector config={customSitesConfig} onChange={setCustomSitesConfig} />
-            </div>
-          )}
-          <div className="col-span-2">
+          
+          {/* Always visible site selector */}
+          <div>
+            <CustomSitesSelector config={sitesConfig} onChange={setSitesConfig} />
+          </div>
+          
+          <div>
             <PerioInput 
               paramType={type} 
               teeth={record.teeth} 
               data={input} 
               onUpdate={setInput} 
-              customSitesConfig={type === 'custom' ? customSitesConfig : undefined}
+              customSitesConfig={sitesConfig}
             />
           </div>
         </div>

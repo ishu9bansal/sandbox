@@ -12,7 +12,7 @@ export type ParamEntry = {
   type: ParamType;
   label: string;
   entry: Quadrant<CommonMeasurement>;
-  customSitesConfig?: CustomSitesConfig;
+  sitesConfig: CustomSitesConfig;  // Always required, primary data
 };
 
 export interface PerioRecord {

@@ -18,7 +18,7 @@ interface PerioInputProps {
   onNextFocus?: () => void;
   onPrevFocus?: () => void;
   paramType?: ParamType;
-  customSitesConfig?: CustomSitesConfig;
+  customSitesConfig: CustomSitesConfig;  // Now required
   readonly?: boolean;
 }
 export default function PerioInput({
@@ -33,7 +33,7 @@ export default function PerioInput({
 }: PerioInputProps) {
   const [values, setValues] = useState<string[][]>(deriveValues(data));
   const allTeethSelected: TeethSelection = Array.from({ length: 4 }, () => Array.from({ length: 8 }, () => 'O')) as TeethSelection;
-  const disabledInfo = deriveDisabledInfo(teeth || allTeethSelected, paramType, customSitesConfig);
+  const disabledInfo = deriveDisabledInfo(teeth || allTeethSelected, customSitesConfig);
   const handleChange = (row: number, vs: string[]) => {
     setValues((prev) => {
       const updated = [...prev];

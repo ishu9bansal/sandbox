@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { Quadrant } from "@/models/theeth";
 import { Edit } from "lucide-react";
 import ActionCard from "@/components/compositions/action-card";
+import { get6SiteConfig, get4SiteConfig } from "@/utils/perio";
 
 interface PerioRecordDetailsProps {
   record: PerioRecord;
@@ -106,7 +107,7 @@ function ParameterEntriesSection({ record }: { record: PerioRecord; }) {
           teeth={record.teeth}
           entry={entry.entry}
           type={entry.type}
-          customSitesConfig={entry.customSitesConfig}
+          customSitesConfig={entry.sitesConfig}
           onEdit={onEditEntry(entry.id)}
         />
       ))}
@@ -178,6 +179,11 @@ type EntryViewProps = {
   customSitesConfig?: CustomSitesConfig;
 };
 function EntryView({ label, teeth, entry, type, customSitesConfig, onEdit }: EntryViewProps) {
+  // Backward compatibility: derive sitesConfig from type if not provided
+  const sitesConfig = customSitesConfig || (
+    type === '4 site' ? get4SiteConfig() : get6SiteConfig()
+  );
+  
   return (
     <div className="my-6 pb-4 border-b border-gray-300 dark:border-gray-600">
       <div className="flex items-center justify-between mb-4">
@@ -189,7 +195,7 @@ function EntryView({ label, teeth, entry, type, customSitesConfig, onEdit }: Ent
           Edit Entry
         </Button>
       </div>
-      <PerioInput paramType={type} teeth={teeth} data={entry} customSitesConfig={customSitesConfig} readonly />
+      <PerioInput paramType={type} teeth={teeth} data={entry} customSitesConfig={sitesConfig} readonly />
     </div>
   );
 }

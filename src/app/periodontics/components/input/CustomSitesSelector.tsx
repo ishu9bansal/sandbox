@@ -1,6 +1,4 @@
-import { CustomSitesConfig, MeasurementArea, MeasurementSite } from "@/models/perio";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
+import { CustomSitesConfig, MeasurementSite } from "@/models/perio";
 
 interface CustomSitesSelectorProps {
   config: CustomSitesConfig;
@@ -8,14 +6,13 @@ interface CustomSitesSelectorProps {
 }
 
 export default function CustomSitesSelector({ config, onChange }: CustomSitesSelectorProps) {
-  const areas: MeasurementArea[] = ['Buccal', 'Lingual'];
   const sites: MeasurementSite[] = ['Mesio', 'Mid', 'Disto'];
 
   const hasAnySiteEnabled = (cfg: CustomSitesConfig): boolean => {
-    return areas.some(area => sites.some(site => cfg[area][site]));
+    return sites.some(site => cfg.Buccal[site] || cfg.Lingual[site]);
   };
 
-  const handleToggle = (area: MeasurementArea, site: MeasurementSite) => {
+  const handleToggle = (area: 'Buccal' | 'Lingual', site: MeasurementSite) => {
     const newConfig = {
       ...config,
       [area]: {
@@ -32,36 +29,64 @@ export default function CustomSitesSelector({ config, onChange }: CustomSitesSel
   const allDisabled = !hasAnySiteEnabled(config);
 
   return (
-    <div className="border rounded-lg p-4 space-y-4">
-      <h3 className="text-sm font-semibold">Select Sites to Capture</h3>
+    <div className="space-y-2">
+      <h3 className="text-sm font-semibold">Site Selection</h3>
       {allDisabled && (
         <div className="bg-yellow-50 border border-yellow-200 rounded p-2 text-sm text-yellow-800">
           ⚠️ At least one site must be selected
         </div>
       )}
-      <div className="grid grid-cols-2 gap-6">
-        {areas.map((area) => (
-          <div key={area} className="space-y-2">
-            <h4 className="text-sm font-medium text-gray-700">{area}</h4>
-            <div className="space-y-2">
-              {sites.map((site) => (
-                <div key={site} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`${area}-${site}`}
-                    checked={config[area][site]}
-                    onCheckedChange={() => handleToggle(area, site)}
-                  />
-                  <Label
-                    htmlFor={`${area}-${site}`}
-                    className="text-sm font-normal cursor-pointer"
-                  >
-                    {site}
-                  </Label>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
+      <div className="inline-block border-2 border-gray-300 rounded-lg p-2 bg-white">
+        {/* Top row - Buccal */}
+        <div className="grid grid-cols-3 gap-1 mb-1">
+          {sites.map((site) => (
+            <button
+              key={`buccal-${site}`}
+              type="button"
+              onClick={() => handleToggle('Buccal', site)}
+              className={`
+                w-14 h-14 border-2 rounded-md font-medium text-xs transition-colors
+                ${config.Buccal[site] 
+                  ? 'bg-blue-500 text-white border-blue-600 hover:bg-blue-600' 
+                  : 'bg-gray-100 text-gray-400 border-gray-300 hover:bg-gray-200'
+                }
+              `}
+              title={`Buccal ${site}`}
+            >
+              {site.charAt(0)}
+            </button>
+          ))}
+        </div>
+        {/* Bottom row - Lingual */}
+        <div className="grid grid-cols-3 gap-1">
+          {sites.map((site) => (
+            <button
+              key={`lingual-${site}`}
+              type="button"
+              onClick={() => handleToggle('Lingual', site)}
+              className={`
+                w-14 h-14 border-2 rounded-md font-medium text-xs transition-colors
+                ${config.Lingual[site] 
+                  ? 'bg-green-500 text-white border-green-600 hover:bg-green-600' 
+                  : 'bg-gray-100 text-gray-400 border-gray-300 hover:bg-gray-200'
+                }
+              `}
+              title={`Lingual ${site}`}
+            >
+              {site.charAt(0)}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="text-xs text-gray-600 space-y-1">
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 bg-blue-500 border-2 border-blue-600 rounded"></div>
+          <span>Buccal (Top row)</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 bg-green-500 border-2 border-green-600 rounded"></div>
+          <span>Lingual (Bottom row)</span>
+        </div>
       </div>
     </div>
   );
