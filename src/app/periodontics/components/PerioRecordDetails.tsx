@@ -1,7 +1,7 @@
 "use client";
 
 import Card from "@/components/compositions/card";
-import { CommonMeasurement, CustomSitesConfig, PerioRecord, TeethSelection } from '@/models/perio';
+import { CommonMeasurement, SitesConfig, PerioRecord, TeethSelection } from '@/models/perio';
 import TeethVisualization from "@/components/TeethVisualization";
 import PerioInput from "./input/PerioInput";
 import PatientCard from "@/app/patients/components/PatientCard";
@@ -105,7 +105,7 @@ function ParameterEntriesSection({ record }: { record: PerioRecord; }) {
           label={entry.label}
           teeth={record.teeth}
           entry={entry.entry}
-          customSitesConfig={entry.sitesConfig}
+          customSitesConfig={entry.sites}
           onEdit={onEditEntry(entry.id)}
         />
       ))}
@@ -173,7 +173,7 @@ type EntryViewProps = {
   teeth: TeethSelection;
   entry: Quadrant<CommonMeasurement>;
   onEdit: () => void;
-  customSitesConfig: CustomSitesConfig;
+  customSitesConfig: SitesConfig;
 };
 function EntryView({ label, teeth, entry, customSitesConfig, onEdit }: EntryViewProps) {
   

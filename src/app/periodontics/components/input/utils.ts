@@ -1,5 +1,5 @@
 
-import { CommonMeasurement, CustomSitesConfig, MeasurementArea, MeasurementSite, TeethSelection } from "@/models/perio";
+import { CommonMeasurement, SitesConfig, MeasurementArea, MeasurementSite, TeethSelection } from "@/models/perio";
 import { Quadrant } from "@/models/theeth";
 import { copy } from "@/utils/perio";
 
@@ -68,7 +68,7 @@ export const dataUpdaterFromValues = (values: string[][], mapping = MAPPING) => 
 
 export function deriveDisabledInfo(
   teethSelection: TeethSelection, 
-  sitesConfig: CustomSitesConfig
+  sitesConfig: SitesConfig
 ): boolean[][] {
   const disabledInfo: boolean[][] = [];
   for (let i = 0; i < MAPPING.length; i++) {

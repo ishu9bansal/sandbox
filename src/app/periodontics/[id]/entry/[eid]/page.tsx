@@ -7,10 +7,10 @@ import QuickLabels from "@/components/compositions/quick-labels";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CustomSitesConfig, ParamEntry } from "@/models/perio";
+import { SitesConfig, ParamEntry } from "@/models/perio";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectPerioRecordById, updatePerioRecord } from "@/store/slices/perioSlice";
-import { generateParamEntryId, newMeasure } from "@/utils/perio";
+import { createDefaultSitesConfig, generateParamEntryId, newMeasure } from "@/utils/perio";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
@@ -37,12 +37,9 @@ export default function PerioRecordEntryEditPage() {
   const recordEntry = record.paramEntries.find(e => e.id === entry_id);
   const [label, setLabel] = useState(recordEntry ? recordEntry.label : '');
   
-  // Initialize sitesConfig from existing entry or default to 6-site
-  const [sitesConfig, setSitesConfig] = useState<CustomSitesConfig>(
-    recordEntry?.sitesConfig || {
-      Buccal: { Mesio: true, Mid: true, Disto: true },
-      Lingual: { Mesio: true, Mid: true, Disto: true },
-    }
+  // Initialize sitesConfig from existing entry or default
+  const [sitesConfig, setSitesConfig] = useState<SitesConfig>(
+    recordEntry?.sites || createDefaultSitesConfig()
   );
   
   const [input, setInput] = useState(recordEntry ? recordEntry.entry : newMeasure());
@@ -53,7 +50,7 @@ export default function PerioRecordEntryEditPage() {
       id: recordEntry ? recordEntry.id : generateParamEntryId(),
       label,
       entry: input,
-      sitesConfig: sitesConfig,
+      sites: sitesConfig,
     });
     router.push(`/periodontics/${record_id}`);
   }, [label, input, sitesConfig, onSubmit, router, record_id, recordEntry]);

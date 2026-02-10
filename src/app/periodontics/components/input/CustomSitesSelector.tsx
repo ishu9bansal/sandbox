@@ -1,16 +1,16 @@
 import { SelectInput } from "@/components/compositions/select-input";
 import { Label } from "@/components/ui/label";
-import { CustomSitesConfig, MeasurementSite } from "@/models/perio";
+import { SitesConfig, MeasurementSite } from "@/models/perio";
 
 interface CustomSitesSelectorProps {
-  config: CustomSitesConfig;
-  onChange: (config: CustomSitesConfig) => void;
+  config: SitesConfig;
+  onChange: (config: SitesConfig) => void;
 }
 
 export default function CustomSitesSelector({ config, onChange }: CustomSitesSelectorProps) {
   const sites: MeasurementSite[] = ['Mesio', 'Mid', 'Disto'];
 
-  const hasAnySiteEnabled = (cfg: CustomSitesConfig): boolean => {
+  const hasAnySiteEnabled = (cfg: SitesConfig): boolean => {
     return sites.some(site => cfg.Buccal[site] || cfg.Lingual[site]);
   };
 
@@ -92,7 +92,7 @@ export default function CustomSitesSelector({ config, onChange }: CustomSitesSel
   );
 }
 
-const PRESETS: Record<string, CustomSitesConfig> = {
+const PRESETS: Record<string, SitesConfig> = {
   '6 site': {
     Buccal: { Mesio: true, Mid: true, Disto: true },
     Lingual: { Mesio: true, Mid: true, Disto: true },
